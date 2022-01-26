@@ -184,8 +184,10 @@ void forward_pass(unsigned char img[][32]) {
 }
 
 void update_weights() {
-		for (int j=0; j<12; j++)	// Only 12 operations
-				dense_b2[j] -= eta*db2[j];
+		for (int j=0; j<12; j++) {
+                        // Only 10 operations, round to 12
+                        dense_b2[j] -= eta*db2[j];
+                }	
 		for(int i = 0; i < 120; i += 4) {
 			// Load 256-bits (composed of 4 packed double-precision (64-bit) floating-point elements) 
 			// from memory into dst. mem_addr must be aligned on a 32-byte boundary or a general-protection 
