@@ -214,12 +214,13 @@ void update_weights() {
 				_mm256_store_pd(&dense_w2[i][j], v_dense_w2);
 			}
 		}
-		for(int i = 0; i < 120; i += 4)
+		for(int i = 0; i < 120; i += 4) {
 			for (int k = 0; k < 980; k++) {
 				__m256d v_dense_w = _mm256_load_pd (&dense_w[k][i]);
 				__m256d v_dw1 = _mm256_load_pd (&dw1[k][i]);
 				v_dense_w = _mm256_fnmadd_pd (v_dw1, v_eta, v_dense_w);
 				_mm256_store_pd(&dense_w[k][i], v_dense_w);
+                        }
 		}
 			
 		
