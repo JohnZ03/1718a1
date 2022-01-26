@@ -4,9 +4,12 @@
 #include <sstream>
 #include <fstream>
 
+#include <immintrin.h>
+
 using namespace std;
 const int filter_size=7;
 const double eta=0.01;
+__m256d v_eta = _mm256_set1_pd (0.01f);
 const int batch_size=200;
 
 unsigned char data_train[60000][784];
@@ -26,13 +29,18 @@ double dense_w[980][120];
 double dense_b[120];
 double dense_sum[120];
 double dense_sigmoid[120];
-double dense_w2[120][10];
-double dense_b2[10];
+// double dense_w2[120][10];
+double dense_w2[120][12];
+// double dense_b2[10];
+double dense_b2[12];
 double dense_sum2[10];
 double dense_softmax[10];
 
-double dw2[120][10];
-double db2[10];
+// double dw2[120][10];
+double dw2[120][12]={};
+// double db2[10];
+double db2[12]={};
+
 double dw1[980][120];
 double db1[120];
 
@@ -176,16 +184,53 @@ void forward_pass(unsigned char img[][32]) {
 }
 
 void update_weights() {
-        for (int i=0; i<120; i++) {
-                dense_b[i] -= eta*db1[i];
-                for (int j=0; j<10; j++) {
-                        dense_b2[j] -= eta*db2[j];
-                        dense_w2[i][j] -= eta*dw2[i][j];
-                }
-                for (int k=0; k<980; k++) {
-                        dense_w[k][i] -= eta*dw1[k][i];
-                }
-        }
+		for (int j=0; j<12; j++)	// Only 12 operations
+				dense_b2[j] -= eta*db2[j];
+		for(int i = 0; i < 120; i += 4) {
+			// Load 256-bits (composed of 4 packed double-precision (64-bit) floating-point elements) 
+			// from memory into dst. mem_addr must be aligned on a 32-byte boundary or a general-protection 
+			// exception may be generated.
+			
+			// If crashed, use __mm256_loadu_pd the unaligned counterparts!
+			__m256d v_db1 = _mm256_load_pd (&db1[i]);
+			__m256d v_dense_b = _mm256_load_pd (&dense_b[i]);
+			
+			// Multiply packed double-precision (64-bit) floating-point elements in a and b,
+			// add the negated intermediate result to packed elements in c, and store the results in dst.
+			v_dense_b = _mm256_fnmadd_pd (v_db1, v_eta, v_dense_b);
+			// Store 256-bits (composed of 4 packed double-precision (64-bit) floating-point elements) 
+			// from a into memory. mem_addr must be aligned on a 32-byte boundary or a general-protection 
+			// exception may be generated.
+			_mm256_store_pd(&dense_b[i], v_dense_b);
+		}
+		for(int i = 0; i < 120; i++) {
+			// Expand j to 12
+			for (int j = 0; j < 12; j += 4) {
+				__m256d v_dense_w2 = _mm256_load_pd (&dense_w2[i][j]);
+				__m256d v_dw2 = _mm256_load_pd (&dw2[i][j]);
+				v_dense_w2 = _mm256_fnmadd_pd (v_dw2, v_eta, v_dense_w2);
+				_mm256_store_pd(&dense_w2[i][j], v_dense_w2);
+			}
+		}
+		for(int i = 0; i < 120; i += 4)
+			for (int k = 0; k < 980; k++) {
+				__m256d v_dense_w = _mm256_load_pd (&dense_w[k][i]);
+				__m256d v_dw1 = _mm256_load_pd (&dw1[k][i]);
+				v_dense_w = _mm256_fnmadd_pd (v_dw1, v_eta, v_dense_w);
+				_mm256_store_pd(&dense_w[k][i], v_dense_w);
+		}
+			
+		
+        // for (int i=0; i<120; i++) {
+                // dense_b[i] -= eta*db1[i];
+                // for (int j=0; j<10; j++) {
+                        // dense_b2[j] -= eta*db2[j];
+                        // dense_w2[i][j] -= eta*dw2[i][j];
+                // }
+                // for (int k=0; k<980; k++) {
+                        // dense_w[k][i] -= eta*dw1[k][i];
+                // }
+        // }
 
         for (int i=0; i<5; i++) {
                 for (int k=0; k<7; k++) {
