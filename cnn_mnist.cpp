@@ -105,6 +105,7 @@ void initialise_weights() {
 void forward_pass(unsigned char img[][32]) {
 
         // Convolution Operation + Sigmoid Activation
+        // TODO: 5 Lingfeng
         for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<28; i++) {
                         for (int j=0; j<28; j++) {
@@ -123,6 +124,7 @@ void forward_pass(unsigned char img[][32]) {
         }
 
         // MAX Pooling (max_pooling, max_layer)
+        // TODO: 5 Haotian
         double cur_max =0;
         int max_i=0, max_j=0;
         for (int filter_dim=0; filter_dim<5; filter_dim++) {
@@ -146,6 +148,7 @@ void forward_pass(unsigned char img[][32]) {
                 }
         }
 
+        // TODO: 3 Lingfeng
         int k=0;
         for (int filter_dim=0;filter_dim<5;filter_dim++) {
                 for (int i=0;i<14;i++) {
@@ -157,6 +160,7 @@ void forward_pass(unsigned char img[][32]) {
         }
 
         // Dense Layer
+        // TODO: 3 Haotian
         for (int i=0; i<120; i++) {
                 dense_sum[i] = 0;
                 dense_sigmoid[i] = 0;
@@ -168,6 +172,7 @@ void forward_pass(unsigned char img[][32]) {
         }
 
         // Dense Layer 2
+        // TODO: 2
         for (int i=0; i<10; i++) {
                 dense_sum2[i]=0;
                 for (int j=0; j<120; j++) {
@@ -177,6 +182,7 @@ void forward_pass(unsigned char img[][32]) {
         }
 
         // Softmax Output
+        // TODO: 1
         double den = softmax_den(dense_sum2, 10);
         for (int i=0; i<10; i++) {
                 dense_softmax[i] = exp(dense_sum2[i])/den;
@@ -235,6 +241,7 @@ void update_weights() {
                 // }
         // }
 
+        // TODO: 4
         for (int i=0; i<5; i++) {
                 for (int k=0; k<7; k++) {
                         for (int j=0; j<7; j++) {
@@ -254,12 +261,14 @@ void update_weights() {
 /* Backward Pass */
 void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         double delta4[10];
+        // TODO: 1
         for (int i=0; i<10; i++) {
                 delta4[i] = y_hat[i] - y[i]; // Derivative of Softmax + Cross entropy
                 db2[i] = delta4[i]; // Bias Changes
         }
 
         // Calculate Weight Changes for Dense Layer 2
+        // TODO: 2
         for (int i=0; i<120; i++) {
                 for (int j=0; j<10; j++) {
                         dw2[i][j] = dense_sigmoid[i]*delta4[j];
@@ -267,6 +276,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         }
 
         // Delta 3
+        // TODO: 3 Haotian
         double delta3[120];
         for (int i=0; i<120; i++) {
                 delta3[i] = 0;
@@ -275,9 +285,11 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
                 }
                 delta3[i] *= d_sigmoid(dense_sum[i]);
         }
+        // TODO: 1
         for (int i=0; i<120; i++) db1[i] = delta3[i]; // Bias Weight change
 
         // Calculate Weight Changes for Dense Layer 1
+        // TODO: 2
         for (int i=0; i<980; i++) {
                 for (int j=0; j<120; j++) {
                         dw1[i][j] = dense_input[i]*delta3[j];
@@ -285,6 +297,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         }
 
         // Delta2
+        // TODO: 3 Lingfeng
         double delta2[980];
         for (int i=0; i<980; i++) {
                 delta2[i] = 0;
@@ -295,6 +308,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         }
 
         // Calc back-propagated max layer dw_max
+        // TODO: 5 Zhuojun
         int k=0;
         for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<28; i+= 2) {
@@ -310,6 +324,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
                 }
         }
         // Calc Conv Bias Changes
+        // TODO: 2
         for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<28; i++) {
                         for (int j=0; j<28; j++) {
@@ -319,6 +334,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         }
 
         // Set Conv Layer Weight changes to 0
+        // TODO: 2
         for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<5; i++) {
                         for (int j=0; j<5; j++) {
@@ -328,6 +344,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         }
 
         // Calculate Weight Changes for Conv Layer
+        // TODO: 5 Guoxian
         for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<26; i++) {
                         for (int j=0; j<26; j++) {
