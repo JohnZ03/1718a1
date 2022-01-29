@@ -287,7 +287,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         }
         // TODO: 1 Zhuojun
         for (int i=0; i<120; i+=4) {
-		__m256d db1[i] = _mm256d_load_pd (delta3[i]); // Bias Weight change
+		__m256d db1[i] = _mm256d_load_pd (&delta3[i]); // Bias Weight change
 	}
 
         // Calculate Weight Changes for Dense Layer 1
