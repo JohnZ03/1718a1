@@ -12,6 +12,8 @@ const double eta=0.01;
 __m256d v_eta = _mm256_set1_pd (0.01f);
 const int batch_size=200;
 
+__m256d v_list[10];
+
 unsigned char data_train[60000][784];
 unsigned char data_test[10000][784];
 unsigned char label_train[60000];
