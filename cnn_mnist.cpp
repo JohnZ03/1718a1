@@ -298,6 +298,8 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
 
         // Delta2 Guoxian
         // TODO: 3 Guoxian
+
+	    /*	
         double delta2[980];
         for (int i=0; i<980; i++) {
                 delta2[i] = 0;
@@ -306,6 +308,37 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
                 }
                 delta2[i] *= d_sigmoid(dense_input[i]);
         }
+        
+        */
+        //simd---------------------------------------------
+		double delta2[980];
+        for (int i=0; i<980; i++) {
+                //delta2[i] = 0;
+			    __m256d v_delta2_i = _mm256_set1_pd(0.00f);
+                for (int j=0; j<120; j+=4) {
+			            __m256d v_dense_w = _mm256_load_pd (&dense_w[i][j]);
+			            __m256d v_delta3  = _mm256_load_pd (&delta3[j]);
+					    v_delta2_i = _mm256_fnmadd_pd(v_dense_w,v_delta3,v_delta2_i);
+                }
+				__m256d s= _mm256_hadd_pd(v_delta2_i,v_delta2_i);
+				delta2[i] = ((double*)&s)[0] + ((double*)&s)[2];
+                //delta2[i] *= d_sigmoid(dense_input[i]);
+        }
+
+        double d_sigmoid_dense_input[980];
+
+		for (int i=0; i<980; i++){
+            d_sigmoid_dense_input[i] = d_sigmoid(dense_input[i]);
+		}
+
+		for (int i=0; i<980; i+=4){
+            __m256d v_delta2 = _mm256_load_pd (&delta2[i]);
+			__m256d v_d_sigmoid_dense_input = _mm256_load_pd(&d_sigmoid_dense_input[i]);
+			v_delta2 = _mm256_fnmadd_pd(v_d_sigmoid_dense_input, v_delta2,_mm256_set1_pd(0.00f));
+			_mm256_store_pd(&delta2[i], v_delta2);
+	    }
+        //simd---------------------------------------------
+        
 
         // Calc back-propagated max layer dw_max
         // TODO: 5 Zhuojun
