@@ -262,22 +262,57 @@ void update_weights() {
 void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         double delta4[10];
         // TODO: 1 Zhuojun
+	for (int i=0; i<12 ; i+=4) {
+		__m256d v_delta4 = _mm256_load_pd (&delta4[i]);
+		__m256d v_y_hat = _mm256_load_pd (&y_hat[i]);
+		double y_d = *y;
+		__m256d v_db2 = _mm256_load_pd(&db2[i]);
+		__m256d v_y = _mm256_loadu_pd (&y_d);
+		v_delta4 = _mm256_sub_pd (v_y_hat,v_y);
+		_mm256_store_pd(&delta4[i],v_delta4);
+		_mm256_store_pd(&db2[i],v_db2);
+	}
+
+	/**************orignal version
         for (int i=0; i<10; i++) {
                 delta4[i] = y_hat[i] - y[i]; // Derivative of Softmax + Cross entropy
                 db2[i] = delta4[i]; // Bias Changes
         }
+	***************/
 
         // Calculate Weight Changes for Dense Layer 2
         // TODO: 2 Zhuojun
+	for (int i=0; i<120; i++) {
+		for(int j=0; j<12; j+=4) {
+			__m256d v_dense_sigmoid = _mm256_load_pd (&dense_sigmoid[i]);
+			__m256d v_delta4 = _mm256_load_pd (&delta4[j]);
+			__m256d v_dw2 = _mm256_mul_pd (v_dense_sigmoid, v_delta4);
+			_mm256_store_pd(&dw2[i][j],v_dw2);
+		}
+	}
+	/************origin
         for (int i=0; i<120; i++) {
                 for (int j=0; j<10; j++) {
                         dw2[i][j] = dense_sigmoid[i]*delta4[j];
                 }
         }
+	********/
 
         // Delta 3
         // TODO: 3 Zhuojun
-        double delta3[120];
+	double delta3[120];
+	for (int i=0; i<120; i++) {
+		__m256d v_delta3 = _mm256_set1_pd(0.00f);
+		for (int j=0; j<10; j+4) {
+			__m256d v_dense_w2 = _mm256_load_pd (&dense_w2[i][j]);
+			__m256d v_delta4 = _mm256_load_pd (&delta4[j]);
+			v_delta3 = _mm256_fmadd_pd(v_dense_w2,v_delta4,v_delta3);
+		}
+		__m256d s = _mm256_hadd_pd(v_delta3,v_delta3);
+		delta3[i] = ((double*)&s)[0] + ((double*)&s)[2];
+	}
+
+	/*****original
         for (int i=0; i<120; i++) {
                 delta3[i] = 0;
                 for (int j=0; j<10; j++) {
@@ -285,20 +320,35 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
                 }
                 delta3[i] *= d_sigmoid(dense_sum[i]);
         }
+	*****/
+
         // TODO: 1 Zhuojun
         for (int i=0; i<120; i+=4) {
 		__m256d v_delta3 = _mm256_load_pd (&delta3[i]); // Bias Weight change
                 _mm256_store_pd(&db1[i], v_delta3);
 	}
+
         // for (int i=0; i<120; i++) db1[i] = delta3[i];
 
         // Calculate Weight Changes for Dense Layer 1
         // TODO: 2 Zhuojun
-        for (int i=0; i<980; i++) {
+	for (int i=0; i<980; i++) {
+                for (int j=0; j<120; j+=4) {
+			__m256d v_dense_input = _mm256_load_pd (&dense_input[i]);
+			__m256d v_delta3 = _mm256_load_pd (&delta3[i]);
+			__m256d v_dw1 = _mm256_load_pd (&dw1[i][j]);
+			v_dw1 = _mm256_mul_pd(v_dense_input,v_delta3);
+			_mm256_store_pd(&dw2[i][j],v_dw1);
+		 }
+        }
+
+	/****** original
+	for (int i=0; i<980; i++) {
                 for (int j=0; j<120; j++) {
                         dw1[i][j] = dense_input[i]*delta3[j];
                 }
         }
+	*********/
 
         // Delta2 Guoxian
         // TODO: 3 Guoxian
