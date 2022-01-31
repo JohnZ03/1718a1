@@ -49,6 +49,10 @@ double dw_conv[5][7][7];
 double db_conv[5][28][28];
 
 
+// Vectorized Variables
+__m256d v_dense_b[30];
+__m256d v_dense_w[245][30];
+__m256d v_dense_input[245];
 /* ************************************************************ */
 /* Helper functions */
 double sigmoid(double x) {
@@ -170,16 +174,23 @@ void forward_pass(unsigned char img[][32]) {
         //         dense_sum[i] += dense_b[i];
         //         dense_sigmoid[i] = sigmoid(dense_sum[i]);
         // }
+
+        // Preload Data
+        for (int i=0; i<120; i+=4) {
+                v_dense_b[i/4] = _mm256_load_pd(&dense_b[i]);
+                for (int j=0; j<980; j+=4) {
+                        v_dense_w[j/4][i/4] = _mm256_load_pd(&dense_w[j][i]);
+                        v_dense_input[i/4] = _mm256_load_pd(&dense_input[j]);
+                }
+        }
+
         for (int i=0; i<120; i+=4) {
                 __m256d v_dense_sum = _mm256_setzero_pd ();
                 __m256d v_dense_sigmoid = _mm256_setzero_pd ();
                 for (int j=0; j<980; j+=4) {
-                        __m256d v_dense_w = _mm256_load_pd(&dense_w[j][i]);
-                        __m256d v_dense_input = _mm256_load_pd(&dense_input[j]);
-                        v_dense_sum =  _mm256_fmadd_pd(v_dense_w, v_dense_input, v_dense_sum);
+                        v_dense_sum =  _mm256_fmadd_pd(v_dense_w[j/4][i/4], v_dense_input[i/4], v_dense_sum);
                 }
-                __m256d v_dense_b = _mm256_load_pd(&dense_b[i]);
-                v_dense_sum = _mm256_add_pd(v_dense_sum, v_dense_b);
+                v_dense_sum = _mm256_add_pd(v_dense_sum, v_dense_b[i/4]);
                 _mm256_store_pd(&dense_sum[i], v_dense_sum);
                 for (int k=0; k<4; k++) {
                         dense_sigmoid[i+k] = sigmoid(dense_sum[i+k]);
