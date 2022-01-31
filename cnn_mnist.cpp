@@ -12,8 +12,6 @@ const double eta=0.01;
 __m256d v_eta = _mm256_set1_pd (0.01f);
 const int batch_size=200;
 
-__m256d v_list[10];
-
 unsigned char data_train[60000][784];
 unsigned char data_test[10000][784];
 unsigned char label_train[60000];
@@ -163,14 +161,29 @@ void forward_pass(unsigned char img[][32]) {
 
         // Dense Layer
         // TODO: 3 Haotian
-        for (int i=0; i<120; i++) {
-                dense_sum[i] = 0;
-                dense_sigmoid[i] = 0;
-                for (int j=0; j<980; j++) {
-                        dense_sum[i] += dense_w[j][i] * dense_input[j];
+        // for (int i=0; i<120; i++) {
+        //         dense_sum[i] = 0;
+        //         dense_sigmoid[i] = 0;
+        //         for (int j=0; j<980; j++) {
+        //                 dense_sum[i] += dense_w[j][i] * dense_input[j];
+        //         }
+        //         dense_sum[i] += dense_b[i];
+        //         dense_sigmoid[i] = sigmoid(dense_sum[i]);
+        // }
+        for (int i=0; i<120; i+=4) {
+                __m256d v_dense_sum = _mm256_setzero_pd ();
+                __m256d v_dense_sigmoid = _mm256_setzero_pd ();
+                for (int j=0; j<980; j+=4) {
+                        __m256d v_dense_w = _mm256_load_pd(&dense_w[j][i]);
+                        __m256d v_dense_input = _mm256_load_pd(&dense_input[j]);
+                        v_dense_sum =  _mm256_fmadd_pd(v_dense_w, v_dense_input, v_dense_sum);
                 }
-                dense_sum[i] += dense_b[i];
-                dense_sigmoid[i] = sigmoid(dense_sum[i]);
+                __m256d v_dense_b = _mm256_load_pd(&dense_b[i]);
+                v_dense_sum = _mm256_add_pd(v_dense_sum, v_dense_b);
+                _mm256_store_pd(&dense_sum[i], v_dense_sum);
+                for (int k=0; k<4; k++) {
+                        dense_sigmoid[i+k] = sigmoid(dense_sum[i+k]);
+                }
         }
 
         // Dense Layer 2
@@ -479,7 +492,7 @@ int main() {
         }
 
         int val_len = 600;
-        int cor=0;
+        int cor=0; 
         int confusion_mat[10][10];
         for (int i=0; i<10; i++){
                 for (int j=0; j<10; j++) confusion_mat[i][j] = 0;
