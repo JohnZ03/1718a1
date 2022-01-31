@@ -31,5 +31,8 @@
 *.out
 *.app
 
-# VS Code folder
+# IDE folder
 .vscode/
+cmake-build-debug/
+.idea/
+CMakeLists.txt
