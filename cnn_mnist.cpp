@@ -206,18 +206,26 @@ void forward_pass(unsigned char img[][32]) {
                 _mm256_store_pd(&dense_sum2[i], v_dense_sum2);
         }
 
-        __m256d v_dense_sum2 = _mm256_setzero_pd();
-        for (int j=0; j<120; j++) {
-                __m256d v_dense_w2 = _mm256_load_pd(&dense_w2[j][8]);
-                __m256d v_dense_sigmoid = _mm256_load_pd(&dense_sigmoid[j]);
-                v_dense_sum2 =  _mm256_fmadd_pd(v_dense_w2, v_dense_sigmoid, v_dense_sum2);
+        for (int i=8; i<10; i++) {
+                dense_sum2[i]=0;
+                for (int j=0; j<120; j++) {
+                        dense_sum2[i] += dense_w2[j][i] * dense_sigmoid[j];
+                }
+                dense_sum2[i] += dense_b2[i];
         }
-        __m256d v_dense_b2 = _mm256_load_pd(&dense_b2[8]);
-        v_dense_sum2 = _mm256_add_pd(v_dense_sum2, v_dense_b2);
-        double dense_sum2_temp[4];
-        _mm256_store_pd(&dense_sum2_temp[0], v_dense_sum2);
-        dense_sum2[8] = dense_sum2_temp[0];
-        dense_sum2[9] = dense_sum2_temp[1];
+
+        // __m256d v_dense_sum2 = _mm256_setzero_pd();
+        // for (int j=0; j<120; j++) {
+        //         __m256d v_dense_w2 = _mm256_load_pd(&dense_w2[j][8]);
+        //         __m256d v_dense_sigmoid = _mm256_load_pd(&dense_sigmoid[j]);
+        //         v_dense_sum2 =  _mm256_fmadd_pd(v_dense_w2, v_dense_sigmoid, v_dense_sum2);
+        // }
+        // __m256d v_dense_b2 = _mm256_load_pd(&dense_b2[8]);
+        // v_dense_sum2 = _mm256_add_pd(v_dense_sum2, v_dense_b2);
+        // double dense_sum2_temp[4];
+        // _mm256_store_pd(&dense_sum2_temp[0], v_dense_sum2);
+        // dense_sum2[8] = dense_sum2_temp[0];
+        // dense_sum2[9] = dense_sum2_temp[1];
 
         // Softmax Output
         // TODO: 1 Haotian
