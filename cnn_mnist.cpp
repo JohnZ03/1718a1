@@ -304,13 +304,18 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
 	double delta3[120];
 	for (int i=0; i<120; i++) {
 		__m256d v_delta3 = _mm256_set1_pd(0.00f);
-		for (int j=0; j<10; j+4) {
+		for (int j=0; j<10; j+=4) {
 			__m256d v_dense_w2 = _mm256_load_pd (&dense_w2[i][j]);
 			__m256d v_delta4 = _mm256_load_pd (&delta4[j]);
 			v_delta3 = _mm256_fmadd_pd(v_dense_w2,v_delta4,v_delta3);
 		}
-		__m256d s = _mm256_hadd_pd(v_delta3,v_delta3);
-		delta3[i] = ((double*)&s)[0] + ((double*)&s)[2];
+                double mult[4];
+                _mm256_store_pd(mult, v_delta3);
+                for (int k = 1; k < 4; k++)
+                        mult[0] *= mult[k];
+                delta3[i] = mult[0];
+		// __m256d s = _mm256_hadd_pd(v_delta3,v_delta3);
+		// delta3[i] = ((double*)&s)[0] + ((double*)&s)[2];
 	}
 
 	/*****original
