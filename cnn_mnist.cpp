@@ -400,7 +400,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         // TODO: 5 Guoxian
 
 
-	    /*	
+	    
         for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<26; i++) {
                         for (int j=0; j<26; j++) {
@@ -413,7 +413,8 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
                         }
                 }
         }
-	   */	
+	   	
+		/*
        //simd ------------------------------------------------------- 
 		for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<26; i++) {
@@ -436,12 +437,12 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
                                     v_dw_conv = _mm256_fmadd_pd(v_img_temp, v_cur_val,v_dw_conv);
 									_mm256_store_pd(&dw_temp1[0],v_dw_conv);
 								    _mm256_store_pd(&dw_conv[filter_dim][k][0],v_dw_conv);
-									/*
-                                    dw_conv[filter_dim][k][0] += img_temp[0] * cur_val[0];  //l=0
-                                    dw_conv[filter_dim][k][1] += img_temp[1] * cur_val[1];  //l=1
-                                    dw_conv[filter_dim][k][2] += img_temp[2] * cur_val[2];  //l=2
-                                    dw_conv[filter_dim][k][3] += img_temp[3] * cur_val[3];  //l=3
-									}*/
+									
+                                    //dw_conv[filter_dim][k][0] += img_temp[0] * cur_val[0];  //l=0
+                                    //dw_conv[filter_dim][k][1] += img_temp[1] * cur_val[1];  //l=1
+                                    //dw_conv[filter_dim][k][2] += img_temp[2] * cur_val[2];  //l=2
+                                    //dw_conv[filter_dim][k][3] += img_temp[3] * cur_val[3];  //l=3
+									
                                     dw_conv[filter_dim][k][4] += img[i+k+1][j+2] * cur_val[0];  //l=4
 									
                                 }
@@ -450,7 +451,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
                 }
         }
        //simd -------------------------------------------------------
-       
+       */
 }
 /* ************************************************************ */
 
