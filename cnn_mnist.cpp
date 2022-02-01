@@ -441,17 +441,28 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32])
         }
 
         // Calculate Weight Changes for Dense Layer 2
-        // TODO: 2 Zhuojun
+        /*
+		// TODO: 2 Zhuojun
         for (int i = 0; i < 120; i++)
         {
                 for (int j = 0; j < 10; j++)
                 {
                         dw2[i][j] = dense_sigmoid[i] * delta4[j];
                 }
-        }
+        }*/
+
+	for (int i=0; i<120; i++) {
+		for(int j=0; j<12; j+=4) {
+			__m256d v_dense_sigmoid = _mm256_broadcast_sd (&dense_sigmoid[i]);
+			__m256d v_delta4 = _mm256_load_pd (&delta4[j]);
+			__m256d v_dw2 = _mm256_mul_pd (v_dense_sigmoid, v_delta4);
+			_mm256_store_pd(&dw2[i][j],v_dw2);
+		}
+	}
 
         // Delta 3
         // TODO: 3 Zhuojun
+	/*	
         double delta3[120];
         for (int i = 0; i < 120; i++)
         {
@@ -461,7 +472,35 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32])
                         delta3[i] += dense_w2[i][j] * delta4[j];
                 }
                 delta3[i] *= d_sigmoid(dense_sum[i]);
-        }
+        }*/
+	double delta3[120];
+	double d_sigmoid_dense_sum[120];
+
+	for (int i=0; i<120; i++) {
+		__m256d v_delta3 = _mm256_set1_pd(0.00f);
+		for (int j=0; j<8; j+=4) {
+			__m256d v_dense_w2 = _mm256_load_pd (&dense_w2[i][j]);
+			__m256d v_delta4 = _mm256_load_pd (&delta4[j]);
+			v_delta3 = _mm256_fmadd_pd(v_dense_w2,v_delta4,v_delta3);
+		}
+		__m256d	v_dense_w2 = _mm256_load_pd (&dense_w2[i][8]);
+		__m256d	v_delta4 = _mm256_load_pd (&delta4[8]);
+		__m256d	v_delta3_temp = _mm256_mul_pd(v_dense_w2,v_delta4);
+
+	    v_delta3_temp = _mm256_hadd_pd(v_delta3,v_delta3_temp);
+		delta3[i] = ((double*)&v_delta3_temp)[0] + ((double*)&v_delta3_temp)[1] + ((double*)&v_delta3_temp)[2];
+		//delta3[i] *= d_sigmoid(dense_sum[i]);
+        d_sigmoid_dense_sum[i] = d_sigmoid(dense_sum[i]);
+	}
+
+    for (int i = 0; i < 120; i += 4)
+    {
+            __m256d v_delta3 = _mm256_load_pd(&delta3[i]);
+            __m256d v_d_sigmoid_dense_sum = _mm256_load_pd(&d_sigmoid_dense_sum[i]);
+            v_delta3 = _mm256_mul_pd(v_d_sigmoid_dense_sum, v_delta3);
+            _mm256_store_pd(&delta3[i], v_delta3);
+    }
+
         // TODO: 1 Zhuojun
         for (int i = 0; i < 120; i += 4)
         {
