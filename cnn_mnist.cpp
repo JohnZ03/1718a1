@@ -522,7 +522,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32])
         {
                 __m256d v_delta2 = _mm256_load_pd(&delta2[i]);
                 __m256d v_d_sigmoid_dense_input = _mm256_load_pd(&d_sigmoid_dense_input[i]);
-                v_delta2 = _mm256_fmadd_pd(v_d_sigmoid_dense_input, v_delta2, _mm256_set1_pd(0.00f));
+                v_delta2 = _mm256_mul_pd(v_d_sigmoid_dense_input, v_delta2);
                 _mm256_store_pd(&delta2[i], v_delta2);
         }
         //simd---------------------------------------------
@@ -552,7 +552,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32])
         }
         // Calc Conv Bias Changes
         // TODO: 2 Guoxian
-        /*
+        
        for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<28; i++) {
                         for (int j=0; j<28; j++) {
@@ -560,17 +560,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32])
                         }
                 }
         }
-	   */
-        for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-        {
-                for (int i = 0; i < 28; i++)
-                {
-                        for (int j = 0; j < 28; j++)
-                        {
-                                memcpy(db_conv[filter_dim][i], dw_max[filter_dim][i], 28);
-                        }
-                }
-        }
+
 
         // Set Conv Layer Weight changes to 0
         // TODO: 2 Guoxian
@@ -593,7 +583,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32])
 
         // Calculate Weight Changes for Conv Layer
         // TODO: 5 Guoxian
-
+        
         for (int filter_dim = 0; filter_dim < 5; filter_dim++)
         {
                 for (int i = 0; i < 26; i++)
@@ -649,7 +639,8 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32])
                 }
         }
        //simd -------------------------------------------------------
-       */
+	   */
+       
 }
 /* ************************************************************ */
 
