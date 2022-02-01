@@ -51,7 +51,7 @@ double db1[120];
 
 double dw_max[5][28][28];
 // double dw_conv[5][7][7];
-double dw_conv[5][8][8];
+double dw_conv[5][8][8]={};
 double db_conv[5][28][28];
 
 
