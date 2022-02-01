@@ -6,6 +6,8 @@
 
 #include <immintrin.h>
 
+#include <cstring>
+
 using namespace std;
 const int filter_size=7;
 const double eta=0.01;
@@ -340,6 +342,8 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
 
         // Delta2 Guoxian
         // TODO: 3 Guoxian
+
+	    /*	
         double delta2[980];
         for (int i=0; i<980; i++) {
                 delta2[i] = 0;
@@ -348,6 +352,37 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
                 }
                 delta2[i] *= d_sigmoid(dense_input[i]);
         }
+        
+        */
+        //simd---------------------------------------------
+		double delta2[980];
+        for (int i=0; i<980; i++) {
+                //delta2[i] = 0;
+			    __m256d v_delta2_i = _mm256_set1_pd(0.00f);
+                for (int j=0; j<120; j+=4) {
+			            __m256d v_dense_w = _mm256_load_pd (&dense_w[i][j]);
+			            __m256d v_delta3  = _mm256_load_pd (&delta3[j]);
+					    v_delta2_i = _mm256_fmadd_pd(v_dense_w,v_delta3,v_delta2_i);
+                }
+				__m256d s= _mm256_hadd_pd(v_delta2_i,v_delta2_i);
+				delta2[i] = ((double*)&s)[0] + ((double*)&s)[2];
+                //delta2[i] *= d_sigmoid(dense_input[i]);
+        }
+
+        double d_sigmoid_dense_input[980];
+
+		for (int i=0; i<980; i++){
+            d_sigmoid_dense_input[i] = d_sigmoid(dense_input[i]);
+		}
+
+		for (int i=0; i<980; i+=4){
+            __m256d v_delta2 = _mm256_load_pd (&delta2[i]);
+			__m256d v_d_sigmoid_dense_input = _mm256_load_pd(&d_sigmoid_dense_input[i]);
+			v_delta2 = _mm256_fmadd_pd(v_d_sigmoid_dense_input, v_delta2,_mm256_set1_pd(0.00f));
+			_mm256_store_pd(&delta2[i], v_delta2);
+	    }
+        //simd---------------------------------------------
+        
 
         // Calc back-propagated max layer dw_max
         // TODO: 5 Zhuojun
@@ -367,26 +402,47 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         }
         // Calc Conv Bias Changes
         // TODO: 2 Guoxian
-        for (int filter_dim=0; filter_dim<5; filter_dim++) {
+		/*
+       for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<28; i++) {
                         for (int j=0; j<28; j++) {
                                 db_conv[filter_dim][i][j] = dw_max[filter_dim][i][j];
                         }
                 }
         }
+	   */
+        for (int filter_dim=0; filter_dim<5; filter_dim++) {
+                for (int i=0; i<28; i++) {
+                        for (int j=0; j<28; j++) {
+								memcpy(db_conv[filter_dim][i],dw_max[filter_dim][i],28);
+                        }
+                }
+        }
+ 
 
         // Set Conv Layer Weight changes to 0
         // TODO: 2 Guoxian
-        for (int filter_dim=0; filter_dim<5; filter_dim++) {
+        /*for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<5; i++) {
                         for (int j=0; j<5; j++) {
                                 dw_conv[filter_dim][i][j] = 0;
                         }
                 }
+        }*/
+
+
+		for (int filter_dim=0; filter_dim<5; filter_dim++) {
+                for (int i=0; i<5; i++) {
+		     		memset(dw_conv[filter_dim][i],0,5);
+				}
         }
+
 
         // Calculate Weight Changes for Conv Layer
         // TODO: 5 Guoxian
+
+
+	    /*	
         for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<26; i++) {
                         for (int j=0; j<26; j++) {
@@ -399,8 +455,44 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
                         }
                 }
         }
+	   */	
+       //simd ------------------------------------------------------- 
+		for (int filter_dim=0; filter_dim<5; filter_dim++) {
+                for (int i=0; i<26; i++) {
+                        for (int j=0; j<26; j++) {
+                                double cur_val[4];
+								for(int m=0;m<4;m++){
+									cur_val[m] = dw_max[filter_dim][i][j];
+								}
+                                for (int k=0; k<5; k++) {
+									
+									double img_temp[4];
+									for(int l=0;l<4;l++){
+										img_temp[l] = img[i+k+1][j+l-2];
+									}
 
+									double dw_temp1[4];
+		                            __m256d v_dw_conv  = _mm256_load_pd(&dw_conv[filter_dim][k][0]); 
+									__m256d v_img_temp = _mm256_load_pd(&img_temp[0]);
+									__m256d v_cur_val  = _mm256_load_pd(&cur_val[0]);
+                                    v_dw_conv = _mm256_fmadd_pd(v_img_temp, v_cur_val,v_dw_conv);
+									_mm256_store_pd(&dw_temp1[0],v_dw_conv);
+								    _mm256_store_pd(&dw_conv[filter_dim][k][0],v_dw_conv);
+									/*
+                                    dw_conv[filter_dim][k][0] += img_temp[0] * cur_val[0];  //l=0
+                                    dw_conv[filter_dim][k][1] += img_temp[1] * cur_val[1];  //l=1
+                                    dw_conv[filter_dim][k][2] += img_temp[2] * cur_val[2];  //l=2
+                                    dw_conv[filter_dim][k][3] += img_temp[3] * cur_val[3];  //l=3
+									}*/
+                                    dw_conv[filter_dim][k][4] += img[i+k+1][j+2] * cur_val[0];  //l=4
+									
+                                }
 
+                        }
+                }
+        }
+       //simd -------------------------------------------------------
+       
 }
 /* ************************************************************ */
 
