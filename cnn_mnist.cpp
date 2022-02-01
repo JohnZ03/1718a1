@@ -511,14 +511,23 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32])
 
         // Calculate Weight Changes for Dense Layer 1
         // TODO: 2 Zhuojun
-        for (int i = 0; i < 980; i++)
+    /*    for (int i = 0; i < 980; i++)
         {
                 for (int j = 0; j < 120; j++)
                 {
                         dw1[i][j] = dense_input[i] * delta3[j];
                 }
-        }
+        }*/
 
+	for (int i=0; i<980; i++) {
+                for (int j=0; j<120; j+=4) {
+			__m256d v_dense_input = _mm256_broadcast_sd (&dense_input[i]);
+			__m256d v_delta3 = _mm256_load_pd (&delta3[j]);
+			// __m256d v_dw1 = _mm256_load_pd (&dw1[i][j]);
+			__m256d v_dw1 = _mm256_mul_pd(v_dense_input,v_delta3);
+			_mm256_store_pd(&dw1[i][j],v_dw1);
+		 }
+        }
         // Delta2 Guoxian
         // TODO: 3 Guoxian
 
