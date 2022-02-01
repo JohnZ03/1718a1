@@ -464,20 +464,20 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
 
         // Set Conv Layer Weight changes to 0
         // TODO: 2 Guoxian
-        /*for (int filter_dim=0; filter_dim<5; filter_dim++) {
+        for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<5; i++) {
                         for (int j=0; j<5; j++) {
                                 dw_conv[filter_dim][i][j] = 0;
                         }
                 }
-        }*/
-
-
-		for (int filter_dim=0; filter_dim<5; filter_dim++) {
-                for (int i=0; i<5; i++) {
-		     		memset(dw_conv[filter_dim][i],0,5);
-				}
         }
+
+
+	// 	for (int filter_dim=0; filter_dim<5; filter_dim++) {
+        //         for (int i=0; i<5; i++) {
+	// 	     		memset(dw_conv[filter_dim][i],0,5);
+	// 			}
+        // }
 
 
         // Calculate Weight Changes for Conv Layer
