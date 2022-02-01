@@ -161,14 +161,28 @@ void forward_pass(unsigned char img[][32]) {
 
         // Dense Layer
         // TODO: 3 Haotian
-        for (int i=0; i<120; i++) {
-                dense_sum[i] = 0;
-                dense_sigmoid[i] = 0;
+        // for (int i=0; i<120; i++) {
+        //         dense_sum[i] = 0;
+        //         dense_sigmoid[i] = 0;
+        //         for (int j=0; j<980; j++) {
+        //                 dense_sum[i] += dense_w[j][i] * dense_input[j];
+        //         }
+        //         dense_sum[i] += dense_b[i];
+        //         dense_sigmoid[i] = sigmoid(dense_sum[i]);
+        // }
+        for (int i=0; i<120; i+=4) {
+                __m256d v_dense_sum = _mm256_setzero_pd();
                 for (int j=0; j<980; j++) {
-                        dense_sum[i] += dense_w[j][i] * dense_input[j];
+                        __m256d v_dense_w = _mm256_load_pd(&dense_w[j][i]);
+                        __m256d v_dense_input = _mm256_load_pd(&dense_input[j]);
+                        v_dense_sum =  _mm256_fmadd_pd(v_dense_w, v_dense_input, v_dense_sum);
                 }
-                dense_sum[i] += dense_b[i];
-                dense_sigmoid[i] = sigmoid(dense_sum[i]);
+                __m256d v_dense_b = _mm256_load_pd(&dense_b[i]);
+                v_dense_sum = _mm256_add_pd(v_dense_sum, v_dense_b);
+                _mm256_store_pd(&dense_sum[i], v_dense_sum);
+                for (int k=0; k<4; k++) {
+                        dense_sigmoid[i+k] = sigmoid(dense_sum[i+k]);
+                }
         }
 
         // Dense Layer 2
@@ -180,6 +194,30 @@ void forward_pass(unsigned char img[][32]) {
                 }
                 dense_sum2[i] += dense_b2[i];
         }
+        // for (int i=0; i<8; i+=4) {
+        //         __m256d v_dense_sum2 = _mm256_setzero_pd();
+        //         for (int j=0; j<120; j++) {
+        //                 __m256d v_dense_w2 = _mm256_load_pd(&dense_w2[j][i]);
+        //                 __m256d v_dense_sigmoid = _mm256_load_pd(&dense_sigmoid[j]);
+        //                 v_dense_sum2 =  _mm256_fmadd_pd(v_dense_w2, v_dense_sigmoid, v_dense_sum2);
+        //         }
+        //         __m256d v_dense_b2 = _mm256_load_pd(&dense_b2[i]);
+        //         v_dense_sum2 = _mm256_add_pd(v_dense_sum2, v_dense_b2);
+        //         _mm256_store_pd(&dense_sum2[i], v_dense_sum2);
+        // }
+
+        // __m256d v_dense_sum2 = _mm256_setzero_pd();
+        // for (int j=0; j<120; j++) {
+        //         __m256d v_dense_w2 = _mm256_load_pd(&dense_w2[j][8]);
+        //         __m256d v_dense_sigmoid = _mm256_load_pd(&dense_sigmoid[j]);
+        //         v_dense_sum2 =  _mm256_fmadd_pd(v_dense_w2, v_dense_sigmoid, v_dense_sum2);
+        // }
+        // __m256d v_dense_b2 = _mm256_load_pd(&dense_b2[8]);
+        // v_dense_sum2 = _mm256_add_pd(v_dense_sum2, v_dense_b2);
+        // double dense_sum2_temp[4];
+        // _mm256_store_pd(&dense_sum2_temp[0], v_dense_sum2);
+        // dense_sum2[8] = dense_sum2_temp[0];
+        // dense_sum2[9] = dense_sum2_temp[1];
 
         // Softmax Output
         // TODO: 1 Haotian
@@ -286,7 +324,11 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
                 delta3[i] *= d_sigmoid(dense_sum[i]);
         }
         // TODO: 1 Zhuojun
-        for (int i=0; i<120; i++) db1[i] = delta3[i]; // Bias Weight change
+        for (int i=0; i<120; i+=4) {
+		__m256d v_delta3 = _mm256_load_pd (&delta3[i]); // Bias Weight change
+                _mm256_store_pd(&db1[i], v_delta3);
+	}
+        // for (int i=0; i<120; i++) db1[i] = delta3[i];
 
         // Calculate Weight Changes for Dense Layer 1
         // TODO: 2 Zhuojun
@@ -473,7 +515,7 @@ int main() {
         }
 
         int val_len = 600;
-        int cor=0;
+        int cor=0; 
         int confusion_mat[10][10];
         for (int i=0; i<10; i++){
                 for (int j=0; j<10; j++) confusion_mat[i][j] = 0;
