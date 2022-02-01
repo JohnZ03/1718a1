@@ -275,17 +275,17 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
 	}
 
 	/**************orignal version
-        for (int i=0; i<10; i++) {
-                delta4[i] = y_hat[i] - y[i]; // Derivative of Softmax + Cross entropy
-                db2[i] = delta4[i]; // Bias Changes
-        }
+        // for (int i=0; i<10; i++) {
+        //         delta4[i] = y_hat[i] - y[i]; // Derivative of Softmax + Cross entropy
+        //         db2[i] = delta4[i]; // Bias Changes
+        // }
 	***************/
 
         // Calculate Weight Changes for Dense Layer 2
         // TODO: 2 Zhuojun
 	for (int i=0; i<120; i++) {
 		for(int j=0; j<12; j+=4) {
-			__m256d v_dense_sigmoid = _mm256_load_pd (&dense_sigmoid[i]);
+			__m256d v_dense_sigmoid = _mm256_broadcast_sd (&dense_sigmoid[i]);
 			__m256d v_delta4 = _mm256_load_pd (&delta4[j]);
 			__m256d v_dw2 = _mm256_mul_pd (v_dense_sigmoid, v_delta4);
 			_mm256_store_pd(&dw2[i][j],v_dw2);
