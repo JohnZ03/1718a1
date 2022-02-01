@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 
+#include <cstring>
 #include <immintrin.h>
 
 using namespace std;
@@ -11,13 +12,15 @@ const int filter_size=7;
 const double eta=0.01;
 __m256d v_eta = _mm256_set1_pd (0.01f);
 const int batch_size=200;
+// __m256d v_zeros = _mm256_setzero_pd();
 
 unsigned char data_train[60000][784];
 unsigned char data_test[10000][784];
 unsigned char label_train[60000];
 unsigned char label_test[10000];
 
-double conv_w[5][7][7];
+// double conv_w[5][7][7];
+double conv_w[5][8][8]={};
 double conv_b[5][28][28];
 double conv_layer[5][28][28];
 double sig_layer[5][28][28];
@@ -45,7 +48,8 @@ double dw1[980][120];
 double db1[120];
 
 double dw_max[5][28][28];
-double dw_conv[5][7][7];
+// double dw_conv[5][7][7];
+double dw_conv[5][8][8];
 double db_conv[5][28][28];
 
 
@@ -103,22 +107,78 @@ void initialise_weights() {
 /* ************************************************************ */
 /* Forward Pass */
 void forward_pass(unsigned char img[][32]) {
+// img[5~32] [2~29] of img [35][32] are valid! Refer to give_img()
 
         // Convolution Operation + Sigmoid Activation
         // TODO: 5 Lingfeng
-        for (int filter_dim=0; filter_dim<5; filter_dim++) {
-                for (int i=0; i<28; i++) {
-                        for (int j=0; j<28; j++) {
-                                max_pooling[filter_dim][i][j] = 0;
+        // for (int filter_dim=0; filter_dim<5; filter_dim++) {
+        //         for (int i=0; i<28; i++) {
+        //                 for (int j=0; j<28; j++) {
+        //                         max_pooling[filter_dim][i][j] = 0;
+        //                         conv_layer[filter_dim][i][j] = 0;
+        //                         sig_layer[filter_dim][i][j] = 0;
+        //                         for (int k=0; k<filter_size; k++) {
+        //                                 for (int l=0; l<filter_size; l++) {
+        //                                         conv_layer[filter_dim][i][j] += img[i+k+1][j+l-2]*conv_w[filter_dim][k][l];
+        //                                 }
+        //                         }
+        //                         sig_layer[filter_dim][i][j] = sigmoid(conv_layer[filter_dim][i][j] + conv_b[filter_dim][i][j]);
+        //                 }
+        //         }
+        // }
 
-                                conv_layer[filter_dim][i][j] = 0;
-                                sig_layer[filter_dim][i][j] = 0;
-                                for (int k=0; k<filter_size; k++) {
-                                        for (int l=0; l<filter_size; l++) {
-                                                conv_layer[filter_dim][i][j] += img[i+k+1][j+l-2]*conv_w[filter_dim][k][l];
+        memset(&max_pooling, 0, 3920);
+        // // for(int filter_dim = 0; filter_dim < 5; filter_dim++) {
+        // //         for(int i = 0; i < 28; i++) {
+        // //                 for(int j = 0; j < 28; j += 32) {
+        // //                         _mm256_store_pd(&max_pooling[filter_dim][i][j], v_zeros);
+        // //                 }
+        // //         }
+        // // }
+
+        double img_double[35][32];
+        for(int i = 0; i < 35; i++)
+                for(int j = 0; j < 32; j++)
+                        img_double[i][j] = (double) img [i][j];
+        for(int filter_dim = 0; filter_dim < 5; filter_dim++) {
+                for(int i = 0; i < 28; i++) {
+                        double conv_sum[28][4];
+                        for(int j = 0; j < 28; j++) {
+                                __m256d v_conv_sum = _mm256_setzero_pd();
+                                for(int k = 0; k < filter_size; k++) {
+                                        for(int l = 0; l < filter_size; l += 4) {
+                                                __m256d v_conv_w = _mm256_load_pd(&conv_w[filter_dim][k][l]);
+                                                __m256d v_img = _mm256_load_pd(&img_double[i+k+1][j+l-2]);
+                                                v_conv_sum = _mm256_fmadd_pd(v_conv_w, v_img, v_conv_sum);
                                         }
                                 }
-                                sig_layer[filter_dim][i][j] = sigmoid(conv_layer[filter_dim][i][j] + conv_b[filter_dim][i][j]);
+                                _mm256_store_pd(&conv_sum[j][0], v_conv_sum);
+                                for (int k = 1; k < 4; k++)
+                                        conv_sum[j][0] += conv_sum[j][k];
+                                
+                        }
+                        double sum[28];
+                        for (int k = 0; k < 28; k++)
+                                sum[k] = conv_sum[k][0];
+                        for (int j = 0; j < 28; j += 4) {
+                                __m256d v_sum = _mm256_load_pd(&sum[j]);
+                                _mm256_store_pd(&conv_layer[filter_dim][i][j], v_sum);
+                        }
+                        
+                        
+                }
+        }
+        for(int filter_dim = 0; filter_dim < 5; filter_dim++) {
+                for(int i = 0; i < 28; i++) {
+                        for(int j = 0; j < 28; j += 4) {
+                                __m256d v_conv_b = _mm256_load_pd(&conv_b[filter_dim][i][j]);
+                                __m256d v_conv_layer = _mm256_load_pd(&conv_layer[filter_dim][i][j]);
+                                __m256d v_sig_layer = _mm256_add_pd(v_conv_b, v_conv_layer);
+                                _mm256_store_pd(&sig_layer[filter_dim][i][j], v_sig_layer);
+                                for(int k = 0; k < 4; k++) {
+                                        sig_layer[filter_dim][i][j+k] = sigmoid(sig_layer[filter_dim][i][j+k]);
+                                }
+                                
                         }
                 }
         }
@@ -149,14 +209,20 @@ void forward_pass(unsigned char img[][32]) {
         }
 
         // TODO: 3 Lingfeng
-        int k=0;
-        for (int filter_dim=0;filter_dim<5;filter_dim++) {
-                for (int i=0;i<14;i++) {
-                        for (int j=0;j<14;j++) {
-                                dense_input[k] = max_layer[filter_dim][i][j];
-                                k++;
-                        }
-                }
+        // int k=0;
+        // for (int filter_dim=0;filter_dim<5;filter_dim++) {
+        //         for (int i=0;i<14;i++) {
+        //                 for (int j=0;j<14;j++) {
+        //                         dense_input[k] = max_layer[filter_dim][i][j];
+        //                         k++;
+        //                 }
+        //         }
+        // }
+        double *k = (double *) max_layer;
+        for(int i = 0; i < 246; i += 4) {
+                __m256d v_dense_input = _mm256_load_pd(k);
+                _mm256_store_pd(&dense_input[i], v_dense_input);
+                k += 4;
         }
 
         // Dense Layer
@@ -242,15 +308,33 @@ void update_weights() {
         // }
 
         // TODO: 4 Lingfeng
-        for (int i=0; i<5; i++) {
-                for (int k=0; k<7; k++) {
-                        for (int j=0; j<7; j++) {
-                                conv_w[i][k][j] -= eta*dw_conv[i][k][j];
+        // for (int i=0; i<5; i++) {
+        //         for (int k=0; k<7; k++) {
+        //                 for (int j=0; j<7; j++) {
+        //                         conv_w[i][k][j] -= eta*dw_conv[i][k][j];
+        //                 }
+        //         }
+        //         for (int l=0; l<28; l++) {
+        //                 for (int m=0; m<28; m++) {
+        //                         conv_b[i][l][m] -= eta*db_conv[i][l][m];
+        //                 }
+        //         }
+        // }
+        for(int i = 0; i < 5; i++) {
+                for(int k = 0; k < 7; k++) {
+                        for(int j = 0; j < 7; j += 4) {
+                                __m256d v_dw_conv = _mm256_load_pd(&dw_conv[i][k][j]);
+                                __m256d v_conv_w = _mm256_load_pd(&conv_w[i][k][j]);
+                                v_conv_w = _mm256_fnmadd_pd (v_dw_conv, v_eta, v_conv_w);
+                                _mm256_store_pd(&conv_w[i][k][j], v_conv_w);
                         }
                 }
-                for (int l=0; l<28; l++) {
-                        for (int m=0; m<28; m++) {
-                                conv_b[i][l][m] -= eta*db_conv[i][l][m];
+                for(int l = 0; l < 28; l++) {
+                        for(int m = 0; m < 28; m += 4) {
+                                __m256d v_db_conv = _mm256_load_pd(&db_conv[i][l][m]);
+                                __m256d v_conv_b = _mm256_load_pd(&conv_b[i][l][m]);
+                                v_conv_b = _mm256_fnmadd_pd (v_db_conv, v_eta, v_conv_b);
+                                _mm256_store_pd(&conv_b[i][l][m], v_conv_b);
                         }
                 }
         }
