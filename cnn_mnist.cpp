@@ -174,7 +174,7 @@ void forward_pass(unsigned char img[][32]) {
                 __m256d v_dense_sum = _mm256_setzero_pd();
                 for (int j=0; j<980; j++) {
                         __m256d v_dense_w = _mm256_load_pd(&dense_w[j][i]);
-                        __m256d v_dense_input = _mm256_load_pd(&dense_input[j]);
+                        __m256d v_dense_input = _mm256_broadcast_sd(&dense_input[j]);
                         v_dense_sum =  _mm256_fmadd_pd(v_dense_w, v_dense_input, v_dense_sum);
                 }
                 __m256d v_dense_b = _mm256_load_pd(&dense_b[i]);
@@ -187,24 +187,24 @@ void forward_pass(unsigned char img[][32]) {
 
         // Dense Layer 2
         // TODO: 2 Haotian
-        for (int i=0; i<10; i++) {
-                dense_sum2[i]=0;
-                for (int j=0; j<120; j++) {
-                        dense_sum2[i] += dense_w2[j][i] * dense_sigmoid[j];
-                }
-                dense_sum2[i] += dense_b2[i];
-        }
-        // for (int i=0; i<8; i+=4) {
-        //         __m256d v_dense_sum2 = _mm256_setzero_pd();
+        // for (int i=0; i<10; i++) {
+        //         dense_sum2[i]=0;
         //         for (int j=0; j<120; j++) {
-        //                 __m256d v_dense_w2 = _mm256_load_pd(&dense_w2[j][i]);
-        //                 __m256d v_dense_sigmoid = _mm256_load_pd(&dense_sigmoid[j]);
-        //                 v_dense_sum2 =  _mm256_fmadd_pd(v_dense_w2, v_dense_sigmoid, v_dense_sum2);
+        //                 dense_sum2[i] += dense_w2[j][i] * dense_sigmoid[j];
         //         }
-        //         __m256d v_dense_b2 = _mm256_load_pd(&dense_b2[i]);
-        //         v_dense_sum2 = _mm256_add_pd(v_dense_sum2, v_dense_b2);
-        //         _mm256_store_pd(&dense_sum2[i], v_dense_sum2);
+        //         dense_sum2[i] += dense_b2[i];
         // }
+        for (int i=0; i<12; i+=4) {
+                __m256d v_dense_sum2 = _mm256_setzero_pd();
+                for (int j=0; j<120; j++) {
+                        __m256d v_dense_w2 = _mm256_load_pd(&dense_w2[j][i]);
+                        __m256d v_dense_sigmoid = _mm256_broadcast_sd(&dense_sigmoid[j]);
+                        v_dense_sum2 =  _mm256_fmadd_pd(v_dense_w2, v_dense_sigmoid, v_dense_sum2);
+                }
+                __m256d v_dense_b2 = _mm256_load_pd(&dense_b2[i]);
+                v_dense_sum2 = _mm256_add_pd(v_dense_sum2, v_dense_b2);
+                _mm256_store_pd(&dense_sum2[i], v_dense_sum2);
+        }
 
         // __m256d v_dense_sum2 = _mm256_setzero_pd();
         // for (int j=0; j<120; j++) {
