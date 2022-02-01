@@ -261,7 +261,7 @@ void update_weights() {
 /* ************************************************************ */
 /* Backward Pass */
 void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
-        double delta4[12];
+        double delta4[12]={};
         // TODO: 1 Zhuojun
 	for (int i=0; i<12 ; i+=4) {
 		__m256d v_delta4 = _mm256_load_pd (&delta4[i]);
@@ -518,7 +518,7 @@ int main() {
                 for (int j=0; j<batch_size; j++) {
                         num = rand()%60000;
                         unsigned char img[35][32];
-                        int vector_y[12];
+                        int vector_y[12]={};
                         give_y(label_train[num], vector_y);
                         give_img(data_train[num], img);
                         forward_pass(img);
