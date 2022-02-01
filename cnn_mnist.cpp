@@ -34,7 +34,8 @@ double dense_w2[120][12];
 // double dense_b2[10];
 double dense_b2[12];
 double dense_sum2[10];
-double dense_softmax[10];
+// double dense_softmax[10];
+double dense_softmax[12]={};
 
 // double dw2[120][10];
 double dw2[120][12]={};
@@ -260,7 +261,7 @@ void update_weights() {
 /* ************************************************************ */
 /* Backward Pass */
 void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
-        double delta4[10];
+        double delta4[12];
         // TODO: 1 Zhuojun
 	for (int i=0; i<12 ; i+=4) {
 		__m256d v_delta4 = _mm256_load_pd (&delta4[i]);
@@ -334,11 +335,11 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         // TODO: 2 Zhuojun
 	for (int i=0; i<980; i++) {
                 for (int j=0; j<120; j+=4) {
-			__m256d v_dense_input = _mm256_load_pd (&dense_input[i]);
-			__m256d v_delta3 = _mm256_load_pd (&delta3[i]);
-			__m256d v_dw1 = _mm256_load_pd (&dw1[i][j]);
-			v_dw1 = _mm256_mul_pd(v_dense_input,v_delta3);
-			_mm256_store_pd(&dw2[i][j],v_dw1);
+			__m256d v_dense_input = _mm256_broadcast_sd (&dense_input[i]);
+			__m256d v_delta3 = _mm256_load_pd (&delta3[j]);
+			// __m256d v_dw1 = _mm256_load_pd (&dw1[i][j]);
+			__m256d v_dw1 = _mm256_mul_pd(v_dense_input,v_delta3);
+			_mm256_store_pd(&dw1[i][j],v_dw1);
 		 }
         }
 
@@ -517,7 +518,7 @@ int main() {
                 for (int j=0; j<batch_size; j++) {
                         num = rand()%60000;
                         unsigned char img[35][32];
-                        int vector_y[10];
+                        int vector_y[12];
                         give_y(label_train[num], vector_y);
                         give_img(data_train[num], img);
                         forward_pass(img);
