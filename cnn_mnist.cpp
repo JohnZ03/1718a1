@@ -173,7 +173,9 @@ void forward_pass(unsigned char img[][32])
                                         {
                                                 __m256d v_conv_w = _mm256_load_pd(&conv_w[filter_dim][k][l]);
                                                 __m256d v_img = _mm256_load_pd(&img_double[i + k + 1][j + l - 2]);
-                                                v_conv_sum = _mm256_fmadd_pd(v_conv_w, v_img, v_conv_sum);
+                                                __m256d v_conv = _mm256_mul_pd(v_conv_w, v_img);
+                                                v_conv_sum = _mm256_add_pd(v_conv_sum, v_conv);
+                                                // v_conv_sum = _mm256_fmadd_pd(v_conv_w, v_img, v_conv_sum);
                                         }
                                 }
                                 _mm256_store_pd(&conv_sum[j][0], v_conv_sum);
@@ -275,7 +277,9 @@ void forward_pass(unsigned char img[][32])
                 {
                         __m256d v_dense_w = _mm256_load_pd(&dense_w[j][i]);
                         __m256d v_dense_input = _mm256_broadcast_sd(&dense_input[j]);
-                        v_dense_sum = _mm256_fmadd_pd(v_dense_w, v_dense_input, v_dense_sum);
+                        __m256d v_tmp = _mm256_mul_pd(v_dense_w, v_dense_input);
+                        v_dense_sum = _mm256_add_pd(v_dense_sum, v_tmp);
+                        // v_dense_sum = _mm256_fmadd_pd(v_dense_w, v_dense_input, v_dense_sum);
                 }
                 __m256d v_dense_b = _mm256_load_pd(&dense_b[i]);
                 v_dense_sum = _mm256_add_pd(v_dense_sum, v_dense_b);
@@ -302,7 +306,9 @@ void forward_pass(unsigned char img[][32])
                 {
                         __m256d v_dense_w2 = _mm256_load_pd(&dense_w2[j][i]);
                         __m256d v_dense_sigmoid = _mm256_broadcast_sd(&dense_sigmoid[j]);
-                        v_dense_sum2 = _mm256_fmadd_pd(v_dense_w2, v_dense_sigmoid, v_dense_sum2);
+                        __m256d v_tmp = _mm256_mul_pd(v_dense_w2, v_dense_sigmoid);
+                        v_dense_sum2 = _mm256_add_pd(v_dense_sum2, v_tmp);
+                        // v_dense_sum2 = _mm256_fmadd_pd(v_dense_w2, v_dense_sigmoid, v_dense_sum2);
                 }
                 __m256d v_dense_b2 = _mm256_load_pd(&dense_b2[i]);
                 v_dense_sum2 = _mm256_add_pd(v_dense_sum2, v_dense_b2);
@@ -350,7 +356,11 @@ void update_weights()
 
                 // Multiply packed double-precision (64-bit) floating-point elements in a and b,
                 // add the negated intermediate result to packed elements in c, and store the results in dst.
-                v_dense_b = _mm256_fnmadd_pd(v_db1, v_eta, v_dense_b);
+                // v_dense_b = _mm256_fnmadd_pd(v_db1, v_eta, v_dense_b);
+
+                __m256d v_tmp = _mm256_mul_pd(v_db1, v_eta);
+                v_dense_b = _mm256_sub_pd(v_dense_b, v_tmp);
+
                 // Store 256-bits (composed of 4 packed double-precision (64-bit) floating-point elements)
                 // from a into memory. mem_addr must be aligned on a 32-byte boundary or a general-protection
                 // exception may be generated.
@@ -363,7 +373,9 @@ void update_weights()
                 {
                         __m256d v_dense_w2 = _mm256_load_pd(&dense_w2[i][j]);
                         __m256d v_dw2 = _mm256_load_pd(&dw2[i][j]);
-                        v_dense_w2 = _mm256_fnmadd_pd(v_dw2, v_eta, v_dense_w2);
+                        // v_dense_w2 = _mm256_fnmadd_pd(v_dw2, v_eta, v_dense_w2);
+                        __m256d v_tmp = _mm256_mul_pd(v_dw2, v_eta);
+                        v_dense_w2 = _mm256_sub_pd(v_dense_w2, v_tmp);
                         _mm256_store_pd(&dense_w2[i][j], v_dense_w2);
                 }
         }
@@ -373,7 +385,9 @@ void update_weights()
                 {
                         __m256d v_dense_w = _mm256_load_pd(&dense_w[k][i]);
                         __m256d v_dw1 = _mm256_load_pd(&dw1[k][i]);
-                        v_dense_w = _mm256_fnmadd_pd(v_dw1, v_eta, v_dense_w);
+                        // v_dense_w = _mm256_fnmadd_pd(v_dw1, v_eta, v_dense_w);
+                        __m256d v_tmp = _mm256_mul_pd(v_dw1, v_eta);
+                        v_dense_w = _mm256_sub_pd(v_dense_w, v_tmp);
                         _mm256_store_pd(&dense_w[k][i], v_dense_w);
                 }
         }
@@ -410,7 +424,9 @@ void update_weights()
                         {
                                 __m256d v_dw_conv = _mm256_load_pd(&dw_conv[i][k][j]);
                                 __m256d v_conv_w = _mm256_load_pd(&conv_w[i][k][j]);
-                                v_conv_w = _mm256_fnmadd_pd(v_dw_conv, v_eta, v_conv_w);
+                                // v_conv_w = _mm256_fnmadd_pd(v_dw_conv, v_eta, v_conv_w);
+                                __m256d v_tmp = _mm256_mul_pd(v_dw_conv, v_eta);
+                                v_conv_w = _mm256_sub_pd(v_conv_w, v_tmp);
                                 _mm256_store_pd(&conv_w[i][k][j], v_conv_w);
                         }
                 }
@@ -420,7 +436,9 @@ void update_weights()
                         {
                                 __m256d v_db_conv = _mm256_load_pd(&db_conv[i][l][m]);
                                 __m256d v_conv_b = _mm256_load_pd(&conv_b[i][l][m]);
-                                v_conv_b = _mm256_fnmadd_pd(v_db_conv, v_eta, v_conv_b);
+                                // v_conv_b = _mm256_fnmadd_pd(v_db_conv, v_eta, v_conv_b);
+                                __m256d v_tmp = _mm256_mul_pd(v_db_conv, v_eta);
+                                v_conv_b = _mm256_sub_pd(v_conv_b, v_tmp);
                                 _mm256_store_pd(&conv_b[i][l][m], v_conv_b);
                         }
                 }
@@ -485,7 +503,10 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32])
                 {
                         __m256d v_dense_w2 = _mm256_load_pd(&dense_w2[i][j]);
                         __m256d v_delta4 = _mm256_load_pd(&delta4[j]);
-                        v_delta3 = _mm256_fmadd_pd(v_dense_w2, v_delta4, v_delta3);
+                        // v_delta3 = _mm256_fmadd_pd(v_dense_w2, v_delta4, v_delta3);
+                        __m256d v_tmp = _mm256_mul_pd(v_dense_w2, v_delta4);
+                        v_delta3 = _mm256_add_pd(v_delta3, v_tmp);
+
                 }
                 __m256d v_dense_w2 = _mm256_load_pd(&dense_w2[i][8]);
                 __m256d v_delta4 = _mm256_load_pd(&delta4[8]);
@@ -558,7 +579,9 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32])
                 {
                         __m256d v_dense_w = _mm256_load_pd(&dense_w[i][j]);
                         __m256d v_delta3 = _mm256_load_pd(&delta3[j]);
-                        v_delta2_i = _mm256_fmadd_pd(v_dense_w, v_delta3, v_delta2_i);
+                        // v_delta2_i = _mm256_fmadd_pd(v_dense_w, v_delta3, v_delta2_i);
+                        __m256d v_tmp = _mm256_mul_pd(v_dense_w, v_delta3);
+                        v_delta2_i = _mm256_add_pd(v_delta2_i, v_tmp);
                 }
                 __m256d s = _mm256_hadd_pd(v_delta2_i, v_delta2_i);
                 delta2[i] = ((double *)&s)[0] + ((double *)&s)[2];
