@@ -6,7 +6,7 @@
 
 using namespace std;
 const int filter_size=7;
-const double eta=0.01;
+const float eta=0.01;
 const int batch_size=200;
 
 unsigned char data_train[60000][784];
@@ -14,46 +14,46 @@ unsigned char data_test[10000][784];
 unsigned char label_train[60000];
 unsigned char label_test[10000];
 
-double conv_w[5][7][7];
-double conv_b[5][28][28];
-double conv_layer[5][28][28];
-double sig_layer[5][28][28];
+float conv_w[5][7][7];
+float conv_b[5][28][28];
+float conv_layer[5][28][28];
+float sig_layer[5][28][28];
 char max_pooling[5][28][28];
-double max_layer[5][14][14];
+float max_layer[5][14][14];
 
-double dense_input[980];
-double dense_w[980][120];
-double dense_b[120];
-double dense_sum[120];
-double dense_sigmoid[120];
-double dense_w2[120][10];
-double dense_b2[10];
-double dense_sum2[10];
-double dense_softmax[10];
+float dense_input[980];
+float dense_w[980][120];
+float dense_b[120];
+float dense_sum[120];
+float dense_sigmoid[120];
+float dense_w2[120][10];
+float dense_b2[10];
+float dense_sum2[10];
+float dense_softmax[10];
 
-double dw2[120][10];
-double db2[10];
-double dw1[980][120];
-double db1[120];
+float dw2[120][10];
+float db2[10];
+float dw1[980][120];
+float db1[120];
 
-double dw_max[5][28][28];
-double dw_conv[5][7][7];
-double db_conv[5][28][28];
+float dw_max[5][28][28];
+float dw_conv[5][7][7];
+float db_conv[5][28][28];
 
 
 /* ************************************************************ */
 /* Helper functions */
-double sigmoid(double x) {
+float sigmoid(float x) {
         if (x>500) x=500;
         if (x<-500) x=-500;
         return 1/(1+exp(-x));
 }
-double d_sigmoid(double x) {
-        double sig = sigmoid(x);
+float d_sigmoid(float x) {
+        float sig = sigmoid(x);
         return sig*(1-sig);
 }
-double softmax_den(double *x, int len) {
-        double val =0;
+float softmax_den(float *x, int len) {
+        float val =0;
         for (int i=0; i<len; i++) {
                 val += exp(x[i]);
         }
@@ -65,29 +65,29 @@ void initialise_weights() {
                 for (int j=0; j<28; j++) {
                         for (int k=0; k<28; k++) {
                                 if (j<7 && k<7) {
-                                        conv_w[i][j][k] = 2*double(rand())/RAND_MAX-1;
+                                        conv_w[i][j][k] = 2*float(rand())/RAND_MAX-1;
                                 }
-                                conv_b[i][j][k] = 2*double(rand())/RAND_MAX-1;
+                                conv_b[i][j][k] = 2*float(rand())/RAND_MAX-1;
                         }
                 }
         }
 
         for (int i=0; i<980; i++) {
                 for (int j=0; j<120; j++) {
-                        dense_w[i][j] = 2*double(rand()) / RAND_MAX-1;
+                        dense_w[i][j] = 2*float(rand()) / RAND_MAX-1;
                 }
         }
         for (int i=0; i<120; i++) {
-                dense_b[i] = 2*double(rand()) / RAND_MAX-1;
+                dense_b[i] = 2*float(rand()) / RAND_MAX-1;
         }
 
         for (int i=0; i<120; i++) {
                 for (int j=0; j<10; j++) {
-                        dense_w2[i][j] = 2*double(rand())/RAND_MAX-1;
+                        dense_w2[i][j] = 2*float(rand())/RAND_MAX-1;
                 }
         }
         for (int i=0; i<10; i++) {
-                dense_b2[i] = 2*double(rand())/RAND_MAX-1;
+                dense_b2[i] = 2*float(rand())/RAND_MAX-1;
         }
 }
 /* ************************************************************ */
@@ -115,7 +115,7 @@ void forward_pass(unsigned char img[][32]) {
         }
 
         // MAX Pooling (max_pooling, max_layer)
-        double cur_max =0;
+        float cur_max =0;
         int max_i=0, max_j=0;
         for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<28; i+=2) {
@@ -149,6 +149,7 @@ void forward_pass(unsigned char img[][32]) {
         }
 
         // Dense Layer
+        // TODO: attempt on OPENCL      Haotian
         for (int i=0; i<120; i++) {
                 dense_sum[i] = 0;
                 dense_sigmoid[i] = 0;
@@ -160,6 +161,7 @@ void forward_pass(unsigned char img[][32]) {
         }
 
         // Dense Layer 2
+        // TODO: attempt on OPENCL      Zhuojun
         for (int i=0; i<10; i++) {
                 dense_sum2[i]=0;
                 for (int j=0; j<120; j++) {
@@ -169,13 +171,14 @@ void forward_pass(unsigned char img[][32]) {
         }
 
         // Softmax Output
-        double den = softmax_den(dense_sum2, 10);
+        float den = softmax_den(dense_sum2, 10);
         for (int i=0; i<10; i++) {
                 dense_softmax[i] = exp(dense_sum2[i])/den;
         }
 }
 
 void update_weights() {
+        // TODO: attempt on OPENCL      Lingfeng
         for (int i=0; i<120; i++) {
                 dense_b[i] -= eta*db1[i];
                 for (int j=0; j<10; j++) {
@@ -204,8 +207,8 @@ void update_weights() {
 
 /* ************************************************************ */
 /* Backward Pass */
-void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
-        double delta4[10];
+void backward_pass(float *y_hat, int *y, unsigned char img[][32]) {
+        float delta4[10];
         for (int i=0; i<10; i++) {
                 delta4[i] = y_hat[i] - y[i]; // Derivative of Softmax + Cross entropy
                 db2[i] = delta4[i]; // Bias Changes
@@ -219,7 +222,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         }
 
         // Delta 3
-        double delta3[120];
+        float delta3[120];
         for (int i=0; i<120; i++) {
                 delta3[i] = 0;
                 for (int j=0; j<10; j++) {
@@ -230,6 +233,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         for (int i=0; i<120; i++) db1[i] = delta3[i]; // Bias Weight change
 
         // Calculate Weight Changes for Dense Layer 1
+        // TODO: attempt on OPENCL (top prio)
         for (int i=0; i<980; i++) {
                 for (int j=0; j<120; j++) {
                         dw1[i][j] = dense_input[i]*delta3[j];
@@ -237,7 +241,8 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         }
 
         // Delta2
-        double delta2[980];
+        // TODO: attempt on OPENCL      Guoxian
+        float delta2[980];
         for (int i=0; i<980; i++) {
                 delta2[i] = 0;
                 for (int j=0; j<120; j++) {
@@ -283,7 +288,7 @@ void backward_pass(double *y_hat, int *y, unsigned char img[][32]) {
         for (int filter_dim=0; filter_dim<5; filter_dim++) {
                 for (int i=0; i<26; i++) {
                         for (int j=0; j<26; j++) {
-                                double cur_val = dw_max[filter_dim][i][j];
+                                float cur_val = dw_max[filter_dim][i][j];
                                 for (int k=0; k<5; k++) {
                                         for (int l=0; l<5; l++) {
                                                 dw_conv[filter_dim][k][l] += img[i+k+1][j+l-2] * cur_val;
@@ -373,7 +378,7 @@ void give_y(int y, int *vector_y) {
         vector_y[y]=1;
 }
 int give_prediction() {
-        double max_val = dense_softmax[0];
+        float max_val = dense_softmax[0];
         int max_pos = 0;
         for (int i=1; i<10; i++) {
                 if (dense_softmax[i] > max_val) {
@@ -423,7 +428,7 @@ int main() {
                 confusion_mat[label_test[i]][pre]++;
                 if (pre == label_test[i]) cor++;
         }
-        float accu = double(cor)/val_len;
+        float accu = float(cor)/val_len;
         cout << "Accuracy: " << accu << endl;
 
         cout << "   0 1 2 3 4 5 6 7 8 9" << endl;
