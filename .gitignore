@@ -36,5 +36,4 @@
 cmake-build-debug/
 .idea/
 CMakeLists.txt
-CL/
 *.zip
