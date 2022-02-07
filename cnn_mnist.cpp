@@ -20,6 +20,15 @@ size_t source_size;
 #endif
 #define MAX_SOURCE_SIZE (0x100000)
 
+float delta3[120];
+cl_mem a_mem_obj;
+cl_mem b_mem_obj;
+cl_mem c_mem_obj;
+
+cl_command_queue command_queue;
+
+cl_kernel kernel;
+
 // SECTION: global variables for openCL
 cl_platform_id platform_id = NULL;
 cl_device_id device_id = NULL;
@@ -294,7 +303,6 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	}
 
 	// Delta 3
-	float delta3[120];
 	for (int i = 0; i < 120; i++)
 	{
 		delta3[i] = 0;
@@ -319,40 +327,11 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	}
 	*/
 
-	// Create an OpenCL context
-	cl_context context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
-
-	// Create a command queue
-	cl_command_queue command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
-
-	// Create memory buffers on the device for each vector
-	cl_mem a_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
-									  sizeof(dense_input), NULL, &ret);
-	cl_mem b_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
-									  sizeof(delta3), NULL, &ret);
-	cl_mem c_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
-									  sizeof(dw1), NULL, &ret);
-
-	// Create a program from the kernel source
-	cl_program program = clCreateProgramWithSource(context, 1,
-												   (const char **)&source_str, (const size_t *)&source_size, &ret);
-
-	// Build the program
-	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
-
-	// Create the OpenCL kernel
-	cl_kernel kernel = clCreateKernel(program, "vector_add", &ret);
-
-	// Set the arguments of the kernel
-	ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&a_mem_obj);
-	ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&b_mem_obj);
-	ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&c_mem_obj);
-
 	// Copy the lists A and B to their respective memory buffers
 	ret = clEnqueueWriteBuffer(command_queue, a_mem_obj, CL_TRUE, 0,
 							   sizeof(dense_input), dense_input, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, b_mem_obj, CL_TRUE, 0,
-							   sizeof(delta3), delta3, 0, NULL, NULL);
+							   120 * sizeof(float), delta3, 0, NULL, NULL);
 
 	// Execute the OpenCL kernel on the list
 	size_t global_item_size[2] = {980, 120}; // Process the entire lists
@@ -363,17 +342,6 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// Read the memory buffer C on the device to the local variable C
 	ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
 							  sizeof(dw1), dw1, 0, NULL, NULL);
-
-	// Clean up
-    ret = clFlush(command_queue);
-    ret = clFinish(command_queue);
-    ret = clReleaseKernel(kernel);
-    ret = clReleaseProgram(program);
-    ret = clReleaseMemObject(a_mem_obj);
-    ret = clReleaseMemObject(b_mem_obj);
-    ret = clReleaseMemObject(c_mem_obj);
-    ret = clReleaseCommandQueue(command_queue);
-    ret = clReleaseContext(context);
 
 	// Delta2
 	// TODO: attempt on OPENCL      Guoxian
@@ -587,6 +555,68 @@ int main()
 	cl_int ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
 	ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_ALL, 1,
 						 &device_id, &ret_num_devices);
+
+
+
+	// Create an OpenCL context
+	cl_context context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
+
+	// Create a command queue
+	command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
+
+	// Create memory buffers on the device for each vector
+	a_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
+									  sizeof(dense_input), NULL, &ret);
+	b_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
+									  120 * sizeof(float), NULL, &ret);
+	c_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
+									  sizeof(dw1), NULL, &ret);
+
+	// Create a program from the kernel source
+	cl_program program = clCreateProgramWithSource(context, 1,
+												   (const char **)&source_str, (const size_t *)&source_size, &ret);
+
+	// Build the program
+	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+
+	// Create the OpenCL kernel
+	kernel = clCreateKernel(program, "vector_add", &ret);
+
+	// Set the arguments of the kernel
+	ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&a_mem_obj);
+	ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&b_mem_obj);
+	ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&c_mem_obj);
+
+	// // Copy the lists A and B to their respective memory buffers
+	// ret = clEnqueueWriteBuffer(command_queue, a_mem_obj, CL_TRUE, 0,
+	// 						   sizeof(dense_input), dense_input, 0, NULL, NULL);
+	// ret = clEnqueueWriteBuffer(command_queue, b_mem_obj, CL_TRUE, 0,
+	// 						   120 * sizeof(float), delta3, 0, NULL, NULL);
+
+	// // Execute the OpenCL kernel on the list
+	// size_t global_item_size[2] = {980, 120}; // Process the entire lists
+	// size_t local_item_size = 64;			 // Process in groups of 64
+	// ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL,
+	// 							 global_item_size, &local_item_size, 0, NULL, NULL);
+
+	// // Read the memory buffer C on the device to the local variable C
+	// ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
+	// 						  sizeof(dw1), dw1, 0, NULL, NULL);
+
+	// Clean up
+    ret = clFlush(command_queue);
+    ret = clFinish(command_queue);
+    ret = clReleaseKernel(kernel);
+    ret = clReleaseProgram(program);
+    ret = clReleaseMemObject(a_mem_obj);
+    ret = clReleaseMemObject(b_mem_obj);
+    ret = clReleaseMemObject(c_mem_obj);
+    ret = clReleaseCommandQueue(command_queue);
+    ret = clReleaseContext(context);
+
+
+
+
 
 	// ! Load Dataset
 	read_test_data();
