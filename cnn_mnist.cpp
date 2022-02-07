@@ -556,8 +556,6 @@ int main()
 	ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_ALL, 1,
 						 &device_id, &ret_num_devices);
 
-
-
 	// Create an OpenCL context
 	cl_context context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
 
@@ -602,19 +600,6 @@ int main()
 	// // Read the memory buffer C on the device to the local variable C
 	// ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
 	// 						  sizeof(dw1), dw1, 0, NULL, NULL);
-
-	// Clean up
-    ret = clFlush(command_queue);
-    ret = clFinish(command_queue);
-    ret = clReleaseKernel(kernel);
-    ret = clReleaseProgram(program);
-    ret = clReleaseMemObject(a_mem_obj);
-    ret = clReleaseMemObject(b_mem_obj);
-    ret = clReleaseMemObject(c_mem_obj);
-    ret = clReleaseCommandQueue(command_queue);
-    ret = clReleaseContext(context);
-
-
 
 
 
@@ -675,6 +660,17 @@ int main()
 		}
 		cout << endl;
 	}
+
+	// SECTION: OpenCL Clean up
+    ret = clFlush(command_queue);
+    ret = clFinish(command_queue);
+    ret = clReleaseKernel(kernel);
+    ret = clReleaseProgram(program);
+    ret = clReleaseMemObject(a_mem_obj);
+    ret = clReleaseMemObject(b_mem_obj);
+    ret = clReleaseMemObject(c_mem_obj);
+    ret = clReleaseCommandQueue(command_queue);
+    ret = clReleaseContext(context);
 
 	return 0;
 }
