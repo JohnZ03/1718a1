@@ -13,6 +13,8 @@ char *source_str;
 size_t source_size;
 
 // SECTION: def for openCL
+#define CL_TARGET_OPENCL_VERSION 120
+
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
 #else
@@ -592,6 +594,7 @@ int main()
 												   (const char **)&source_str, (const size_t *)&source_size, &ret);
 
 	// Build the program
+	// ! Error = -11, CL_BUILD_PROGRAM _FAILURE
 	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
 	printf("Build the program: %d\n", ret);
 
