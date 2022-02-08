@@ -337,11 +337,11 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	// Execute the OpenCL kernel on the list
 	size_t global_item_size[2] = {980, 120}; // Process the entire lists
-	size_t local_item_size = 1;			 // Process in groups of 64 
+	size_t local_item_size[2] = {2, 2};			 // Process in groups of 64 
 	// // ! Error code -48, CL_INVALID_KERNEL
 	// ! Error code = -54, CL_INVALID_WORK_GROUP_SIZE
 	ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL,
-								 global_item_size, &local_item_size, 0, NULL, NULL);
+								 global_item_size, local_item_size, 0, NULL, NULL);
 	printf("Execute the OpenCL kernel on the list: %d\n", ret);
 
 	// Read the memory buffer C on the device to the local variable C
