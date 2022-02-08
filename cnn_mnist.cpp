@@ -337,7 +337,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	// Execute the OpenCL kernel on the list
 	size_t global_item_size[2] = {980, 120}; // Process the entire lists
-	size_t local_item_size[2] = {2, 2};			 // Process in groups of 64 
+	size_t local_item_size[2] = {8, 8};			 // Process in groups of 64 
 	// // ! Error code -48, CL_INVALID_KERNEL
 	// ! Error code = -54, CL_INVALID_WORK_GROUP_SIZE
 	// ! Fixed, requires 2D local_item_size
@@ -596,7 +596,7 @@ int main()
 	b_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
 							   120 * sizeof(float), NULL, &ret);
 	c_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
-							   sizeof(dw1), NULL, &ret);
+							   980 * 120 * sizeof(float), NULL, &ret);
 
 	// Create a program from the kernel source
 	// ! Ret = 0, correct
