@@ -339,7 +339,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL,
 								 global_item_size, &local_item_size, 0, NULL, NULL);
 	
-	cout << ret << endl;
+	printf("%d", ret);
 
 	// Read the memory buffer C on the device to the local variable C
 	ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
@@ -355,7 +355,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 			dw1_1[i][j] = dense_input[i] * delta3[j];
 			if (dw1_1[i][j] != dw1[i][j])
 			{
-				printf("i=%d,j=%d,dw_opencl=%f,dw_origin=%f\n", i, j, dw1[i][j], dw1_1[i][j]);
+				// printf("i=%d,j=%d,dw_opencl=%f,dw_origin=%f\n", i, j, dw1[i][j], dw1_1[i][j]);
 			}
 		}
 	}
