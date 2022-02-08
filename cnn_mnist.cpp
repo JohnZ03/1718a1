@@ -337,7 +337,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	// Execute the OpenCL kernel on the list
 	size_t global_item_size[2] = {980, 120}; // Process the entire lists
-	size_t local_item_size[2] = {8, 8};			 // Process in groups of 64 
+	size_t local_item_size[2] = {4, 4};			 // Process in groups of 64 
 	// // ! Error code -48, CL_INVALID_KERNEL
 	// ! Error code = -54, CL_INVALID_WORK_GROUP_SIZE
 	// ! Fixed, requires 2D local_item_size
