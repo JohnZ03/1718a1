@@ -356,8 +356,12 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 			dw1_1[i][j] = dense_input[i] * delta3[j];
 			if (dw1_1[i][j] != dw1[i][j])
 			{
-				// printf("i=%d,j=%d,dw_opencl=%f,dw_origin=%f\n", i, j, dw1[i][j], dw1_1[i][j]);
+				printf("i=%d,j=%d,dw_opencl=%f,dw_origin=%f\n", i, j, dw1[i][j], dw1_1[i][j]);
+			} else
+			{
+				printf("Matched values.\n");
 			}
+			
 		}
 	}
 
