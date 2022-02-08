@@ -343,6 +343,21 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
 							  sizeof(dw1), dw1, 0, NULL, NULL);
 
+	float dw1_1[980][120];
+	// Calculate Weight Changes for Dense Layer 1
+
+	for (int i = 0; i < 980; i++)
+	{
+		for (int j = 0; j < 120; j++)
+		{
+			dw1_1[i][j] = dense_input[i] * delta3[j];
+			if (dw1_1[i][j] != dw1[i][j])
+			{
+				printf("i=%d,j=%d,dw_opencl=%f,dw_origin=%f\n", i, j, dw1[i][j], dw1_1[i][j]);
+			}
+		}
+	}
+
 	// Delta2
 	// TODO: attempt on OPENCL      Guoxian
 	float delta2[980];
@@ -564,11 +579,11 @@ int main()
 
 	// Create memory buffers on the device for each vector
 	a_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
-									  sizeof(dense_input), NULL, &ret);
+							   sizeof(dense_input), NULL, &ret);
 	b_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
-									  120 * sizeof(float), NULL, &ret);
+							   120 * sizeof(float), NULL, &ret);
 	c_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
-									  sizeof(dw1), NULL, &ret);
+							   sizeof(dw1), NULL, &ret);
 
 	// Create a program from the kernel source
 	cl_program program = clCreateProgramWithSource(context, 1,
@@ -600,8 +615,6 @@ int main()
 	// // Read the memory buffer C on the device to the local variable C
 	// ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
 	// 						  sizeof(dw1), dw1, 0, NULL, NULL);
-
-
 
 	// ! Load Dataset
 	read_test_data();
@@ -662,15 +675,15 @@ int main()
 	}
 
 	// SECTION: OpenCL Clean up
-    ret = clFlush(command_queue);
-    ret = clFinish(command_queue);
-    ret = clReleaseKernel(kernel);
-    ret = clReleaseProgram(program);
-    ret = clReleaseMemObject(a_mem_obj);
-    ret = clReleaseMemObject(b_mem_obj);
-    ret = clReleaseMemObject(c_mem_obj);
-    ret = clReleaseCommandQueue(command_queue);
-    ret = clReleaseContext(context);
+	ret = clFlush(command_queue);
+	ret = clFinish(command_queue);
+	ret = clReleaseKernel(kernel);
+	ret = clReleaseProgram(program);
+	ret = clReleaseMemObject(a_mem_obj);
+	ret = clReleaseMemObject(b_mem_obj);
+	ret = clReleaseMemObject(c_mem_obj);
+	ret = clReleaseCommandQueue(command_queue);
+	ret = clReleaseContext(context);
 
 	return 0;
 }
