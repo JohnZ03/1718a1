@@ -341,6 +341,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// ! Error code -48, CL_INVALID_KERNEL
 	ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL,
 								 global_item_size, &local_item_size, 0, NULL, NULL);
+	printf("Execute the OpenCL kernel on the list: %d\n", ret);
 
 	// Read the memory buffer C on the device to the local variable C
 	// ! Ret = 0, correct
