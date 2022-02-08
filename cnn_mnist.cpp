@@ -349,21 +349,21 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	float dw1_1[980][120];
 	// Calculate Weight Changes for Dense Layer 1
 
-	for (int i = 0; i < 980; i++)
-	{
-		for (int j = 0; j < 120; j++)
-		{
-			dw1_1[i][j] = dense_input[i] * delta3[j];
-			if (dw1_1[i][j] != dw1[i][j])
-			{
-				printf("i=%d,j=%d,dw_opencl=%f,dw_origin=%f\n", i, j, dw1[i][j], dw1_1[i][j]);
-			} else
-			{
-				printf("Matched values.\n");
-			}
+	// for (int i = 0; i < 980; i++)
+	// {
+	// 	for (int j = 0; j < 120; j++)
+	// 	{
+	// 		dw1_1[i][j] = dense_input[i] * delta3[j];
+	// 		if (dw1_1[i][j] != dw1[i][j])
+	// 		{
+	// 			printf("i=%d,j=%d,dw_opencl=%f,dw_origin=%f\n", i, j, dw1[i][j], dw1_1[i][j]);
+	// 		} else
+	// 		{
+	// 			printf("Matched values.\n");
+	// 		}
 			
-		}
-	}
+	// 	}
+	// }
 
 	// Delta2
 	// TODO: attempt on OPENCL      Guoxian
