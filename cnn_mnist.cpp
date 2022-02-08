@@ -587,12 +587,13 @@ int main()
 							   sizeof(dw1), NULL, &ret);
 
 	// Create a program from the kernel source
+	// ! Ret = 0, correct
 	cl_program program = clCreateProgramWithSource(context, 1,
 												   (const char **)&source_str, (const size_t *)&source_size, &ret);
-	printf("Create a program from the kernel source: %d", ret);
 
 	// Build the program
 	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+	printf("Build the program: %d\n", ret);
 
 	// Create the OpenCL kernel
 	kernel = clCreateKernel(program, "vector_add", &ret);
