@@ -345,6 +345,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// Read the memory buffer C on the device to the local variable C
 	ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
 							  sizeof(dw1), dw1, 0, NULL, NULL);
+	printf("Build the program: %d\n", ret);
 
 	float dw1_1[980][120];
 	// Calculate Weight Changes for Dense Layer 1
