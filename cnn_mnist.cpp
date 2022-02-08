@@ -346,7 +346,8 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	printf("Execute the OpenCL kernel on the list: %d\n", ret);
 
 	// Read the memory buffer C on the device to the local variable C
-	// ! Ret = 0, correct
+	// // ! Ret = 0, correct
+	// ! Error code = -5, CL_OUT_OF_RESOURCES
 	ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
 							  sizeof(dw1), dw1, 0, NULL, NULL);
 	printf("Read the memory buffer C on the device to the local variable C: %d\n", ret);
