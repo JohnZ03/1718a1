@@ -331,13 +331,15 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	ret = clEnqueueWriteBuffer(command_queue, a_mem_obj, CL_TRUE, 0,
 							   sizeof(dense_input), dense_input, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, b_mem_obj, CL_TRUE, 0,
-							   120 * sizeof(float), delta3, 0, NULL, NULL);
+							   sizeof(delta3), delta3, 0, NULL, NULL);
 
 	// Execute the OpenCL kernel on the list
 	size_t global_item_size[2] = {980, 120}; // Process the entire lists
 	size_t local_item_size = 64;			 // Process in groups of 64
 	ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL,
 								 global_item_size, &local_item_size, 0, NULL, NULL);
+	
+	cout << ret << endl;
 
 	// Read the memory buffer C on the device to the local variable C
 	ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
