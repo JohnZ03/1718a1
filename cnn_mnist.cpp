@@ -76,6 +76,8 @@ float db_conv[5][28][28];
 
 /* ************************************************************ */
 /* Helper functions */
+
+// TODO: Kernel
 float sigmoid(float x)
 {
 	if (x > 500)
@@ -84,11 +86,15 @@ float sigmoid(float x)
 		x = -500;
 	return 1 / (1 + exp(-x));
 }
+
+// TODO: Kernel
 float d_sigmoid(float x)
 {
 	float sig = sigmoid(x);
 	return sig * (1 - sig);
 }
+
+// TODO: Kernel
 float softmax_den(float *x, int len)
 {
 	float val = 0;
@@ -140,6 +146,9 @@ void initialise_weights()
 		dense_b2[i] = 2 * float(rand()) / RAND_MAX - 1;
 	}
 }
+
+// TODO: Move initialized weights to buffer
+
 /* ************************************************************ */
 
 /* ************************************************************ */
