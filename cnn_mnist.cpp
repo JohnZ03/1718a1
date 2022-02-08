@@ -336,10 +336,9 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// Execute the OpenCL kernel on the list
 	size_t global_item_size[2] = {980, 120}; // Process the entire lists
 	size_t local_item_size = 64;			 // Process in groups of 64
+	// ! Error code -48, CL_INVALID_KERNEL
 	ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL,
 								 global_item_size, &local_item_size, 0, NULL, NULL);
-	
-	printf("%d", ret);
 
 	// Read the memory buffer C on the device to the local variable C
 	ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
@@ -590,6 +589,7 @@ int main()
 	// Create a program from the kernel source
 	cl_program program = clCreateProgramWithSource(context, 1,
 												   (const char **)&source_str, (const size_t *)&source_size, &ret);
+	printf("Create a program from the kernel source: %d", ret);
 
 	// Build the program
 	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
