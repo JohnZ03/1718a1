@@ -600,6 +600,7 @@ int main()
 
 	// Create the OpenCL kernel
 	kernel = clCreateKernel(program, "vector_add", &ret);
+	printf("Create the OpenCL kernel: %d\n", ret);
 
 	// Set the arguments of the kernel
 	ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&a_mem_obj);
