@@ -343,13 +343,13 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// ! Fixed, requires 2D local_item_size
 	ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL,
 								 global_item_size, local_item_size, 0, NULL, NULL);
-	// printf("Execute the OpenCL kernel on the list: %d\n", ret);
+	printf("Execute the OpenCL kernel on the list: %d\n", ret);
 
 	// Read the memory buffer C on the device to the local variable C
 	// ! Ret = 0, correct
 	ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
 							  sizeof(dw1), dw1, 0, NULL, NULL);
-	// printf("Read the memory buffer C on the device to the local variable C: %d\n", ret);
+	printf("Read the memory buffer C on the device to the local variable C: %d\n", ret);
 
 	float dw1_1[980][120];
 	// Calculate Weight Changes for Dense Layer 1
