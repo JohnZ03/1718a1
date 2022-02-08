@@ -5,7 +5,7 @@ __kernel void vector_add(__global float *A, __global float *B, __global float *C
     int j = get_global_id(1);
 
     // Do the operation
-    C[i*980 + j] = A[i] * B[j];
+    C[i*120 + j] = A[i] * B[j];
 }
 // __kernel void vector_add(__global int *A, __global int *B, __global int *C) {
     
