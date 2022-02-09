@@ -269,21 +269,22 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32]) {
 	size_t global_item_size[2] = {120,960}; // Process the entire list
 	size_t local_item_size[2] = {4,4}; // Process in groups of 120
 	ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL, global_item_size, local_item_size, 0, NULL, NULL);
-	printf("%d\0",ret);
-	ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0, 960 * 120 * sizeof(float), dw1, 0, NULL, NULL);
-	printf("%f \n",dw1[0][4]);
-	//float dw1_1[980][120];
+	//ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0, 960 * 120 * sizeof(float), dw1, 0, NULL, NULL);
+	ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0, 960 * 120 * sizeof(float), dw1[0], 0, NULL, NULL);
+	printf("%d\n",ret);
+	printf("%f\n",dw1[0][3]);
         // Calculate Weight Changes for Dense Layer 1
         // TODO: attempt on OPENCL (top prio)
-		/*
+		 
+	    float dw1_1[980][120];
         for (int i=0; i<980; i++) {
                 for (int j=0; j<120; j++) {
                         dw1_1[i][j] = dense_input[i]*delta3[j];
 						if(dw1_1[i][j]!=dw1[i][j]){
-				//			printf("i=%d,j=%d,dw_opencl=%f,dw_origin=%f\n",i,j,dw1[i][j],dw1_1[i][j]);
+							printf("i=%d,j=%d,dw_opencl=%f,dw_origin=%f\n",i,j,dw1[i][j],dw1_1[i][j]);
 						}
                 }
-        }*/
+        }
 
 
         // Delta2
