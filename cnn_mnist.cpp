@@ -266,12 +266,12 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32]) {
 	ret = clEnqueueWriteBuffer(command_queue, b_mem_obj, CL_TRUE, 0, 120 * sizeof(float), delta3, 0, NULL, NULL);
 
 	// Execute the OpenCL kernel on the list
-	size_t global_item_size = 120*960; // Process the entire list
-	size_t local_item_size = 120; // Process in groups of 120
-	ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_item_size, &local_item_size, 0, NULL, NULL);
-
+	size_t global_item_size[2] = {120,960}; // Process the entire list
+	size_t local_item_size[2] = {4,4}; // Process in groups of 120
+	ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL, global_item_size, local_item_size, 0, NULL, NULL);
+	printf("%d\0",ret);
 	ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0, 960 * 120 * sizeof(float), dw1, 0, NULL, NULL);
-	//printf("%f \n",dw1[0][4]);
+	printf("%f \n",dw1[0][4]);
 	//float dw1_1[980][120];
         // Calculate Weight Changes for Dense Layer 1
         // TODO: attempt on OPENCL (top prio)
