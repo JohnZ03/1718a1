@@ -7,10 +7,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <cstring>
 // SECTION: def for cl file
 FILE *fp1;
 char *source_str1;
 size_t source_size1;
+FILE *fp_wgx;
+char *source_str1_wgx;
+size_t source_size1_wgx;
 
 // SECTION: def for openCL
 #define CL_TARGET_OPENCL_VERSION 120
@@ -25,11 +29,14 @@ size_t source_size1;
 float delta3[120];
 cl_mem dense_input_mem_obj;
 cl_mem delta3_mem_obj;
+cl_mem delta2_mid_mem_obj;
+cl_mem dense_w_mem_obj;
 cl_mem dw1_mem_obj;
 
 cl_command_queue command_queue;
 
 cl_kernel kernel;
+cl_kernel kernel_wgx;
 
 // SECTION: global variables for openCL
 cl_platform_id platform_id = NULL;
@@ -361,7 +368,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 							  sizeof(dw1), dw1, 0, NULL, NULL);
 	// printf("Read the memory buffer C on the device to the local variable C: %d\n", ret);
 
-	float dw1_1[980][120];
+	//float dw1_1[980][120];
 	// Calculate Weight Changes for Dense Layer 1
 
 	// for (int i = 0; i < 980; i++)
@@ -382,16 +389,49 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	// Delta2
 	// TODO: attempt on OPENCL      Guoxian
+	
+    
 	float delta2[980];
-	for (int i = 0; i < 980; i++)
-	{
-		delta2[i] = 0;
-		for (int j = 0; j < 120; j++)
-		{
-			delta2[i] += dense_w[i][j] * delta3[j];
-		}
+	memset(delta2,0,sizeof(delta2));
+	float z1_wgx = 0;
+//	ret = clEnqueueFillBuffer(command_queue, delta2_mid_mem_obj, &z1_wgx, sizeof(z1_wgx),
+//			0, sizeof(delta2), 0, NULL, NULL);
+	ret = clEnqueueWriteBuffer(command_queue, delta2_mid_mem_obj, CL_TRUE, 0,
+							   sizeof(delta2), delta2, 0, NULL, NULL);
+	//printf("WriteBuffer: %d\n", ret);
+	ret = clEnqueueWriteBuffer(command_queue, dense_w_mem_obj, CL_TRUE, 0,
+							   sizeof(dense_w), dense_w, 0, NULL, NULL);
+	//printf("WriteBuffer: %d\n", ret);
+	//ret = clEnqueueWriteBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
+	//						   sizeof(delta3), delta3, 0, NULL, NULL);
+	//printf("WriteBuffer: %d\n", ret);
+
+	size_t global_item_size_wgx1 = 980; // Process the entire lists
+	size_t local_item_size_wgx1 = 49;			 // Process in groups of 20
+   	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx, 1, NULL,
+								 &global_item_size_wgx1, &local_item_size_wgx1, 0, NULL, NULL);
+	//printf("NDRangeKernel: %d\n", ret);
+	ret = clEnqueueReadBuffer(command_queue, delta2_mid_mem_obj, CL_TRUE, 0,
+							  sizeof(delta2), delta2, 0, NULL, NULL);
+	//printf("ReadBuffer: %d\n", ret);
+	for(int i=0; i<980; i++){
 		delta2[i] *= d_sigmoid(dense_input[i]);
 	}
+/*
+	float delta2_1[980];
+	
+	for (int i = 0; i < 980; i++)
+	{
+		delta2_1[i] = 0;
+		for (int j = 0; j < 120; j++)
+		{
+			delta2_1[i] += dense_w[i][j] * delta3[j];
+		}
+		delta2_1[i] *= d_sigmoid(dense_input[i]);
+		//if(delta2_1[i]!=delta2[i])	
+		//	printf("delta2_1: origin %f, new %f\n",delta2_1[i],delta2[i]);
+	}
+*/	
 
 	// Calc back-propagated max layer dw_max
 	int k = 0;
@@ -586,6 +626,17 @@ int main()
 	source_str1 = (char *)malloc(MAX_SOURCE_SIZE);
 	source_size1 = fread(source_str1, 1, MAX_SOURCE_SIZE, fp1);
 	fclose(fp1);
+	
+	fp_wgx = fopen("multi_add_kernel.cl", "r");
+	//fp_wgx = fopen("mul_kernel.cl", "r");
+	if (!fp_wgx)
+	{
+		fprintf(stderr, "Failed to load kernel.\n");
+		exit(1);
+	}
+	source_str1_wgx = (char *)malloc(MAX_SOURCE_SIZE);
+	source_size1_wgx = fread(source_str1_wgx, 1, MAX_SOURCE_SIZE, fp_wgx);
+	fclose(fp_wgx);
 
 	// SECTION: openCL setup
 	// Get platform and device information
@@ -607,18 +658,30 @@ int main()
 	dw1_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
 							   980 * 120 * sizeof(float), NULL, &ret);
 
+	// ! Error = -38, CL_INVALID_MEM_OBJECT if not added
+	delta2_mid_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
+							   980 * sizeof(float), NULL, &ret);
+	dense_w_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
+							   sizeof(dense_w), NULL, &ret);
+
 	// Create a program from the kernel source
 	// ! Ret = 0, correct
 	cl_program program = clCreateProgramWithSource(context, 1,
 												   (const char **)&source_str1, (const size_t *)&source_size1, &ret);
+	cl_program program_wgx = clCreateProgramWithSource(context, 1,
+												   (const char **)&source_str1_wgx, (const size_t *)&source_size1_wgx, &ret);
 
 	// Build the program
 	// ! Error = -11, CL_BUILD_PROGRAM _FAILURE
 	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
 	printf("Build the program: %d\n", ret);
+	ret = clBuildProgram(program_wgx, 1, &device_id, NULL, NULL, NULL);
+	printf("Build the program: %d\n", ret);
 
 	// Create the OpenCL kernel
 	kernel = clCreateKernel(program, "mul_kernel", &ret);
+	printf("Create the OpenCL kernel: %d\n", ret);
+	kernel_wgx = clCreateKernel(program_wgx, "multi_add", &ret);
 	printf("Create the OpenCL kernel: %d\n", ret);
 
 	// Set the arguments of the kernel
@@ -626,6 +689,12 @@ int main()
 	ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&delta3_mem_obj);
 	ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&dw1_mem_obj);
 
+	cl_int kernel_wgx_size = 120;
+	ret = clSetKernelArg(kernel_wgx, 0, sizeof(cl_mem), (void *)&dense_w_mem_obj);
+	ret = clSetKernelArg(kernel_wgx, 1, sizeof(cl_mem), (void *)&delta3_mem_obj);
+	ret = clSetKernelArg(kernel_wgx, 2, sizeof(cl_mem), (void *)&delta2_mid_mem_obj);
+	ret = clSetKernelArg(kernel_wgx, 3, sizeof(cl_int), (void *)&kernel_wgx_size);
+	printf("Set kernel Arg: %d\n", ret);
 	// ! Load Dataset
 	read_test_data();
 	read_train_data();
