@@ -27,9 +27,14 @@ cl_mem a_mem_obj;
 cl_mem b_mem_obj;
 cl_mem c_mem_obj;
 
+cl_mem sig_layer_mem_obj;
+cl_mem max_pooling_mem_obj;
+cl_mem max_layer_mem_obj;
+
 cl_command_queue command_queue;
 
 cl_kernel kernel;
+cl_kernel max_pooling_kernel;
 
 // SECTION: global variables for openCL
 cl_platform_id platform_id = NULL;
@@ -180,34 +185,56 @@ void forward_pass(unsigned char img[][32])
 	}
 
 	// MAX Pooling (max_pooling, max_layer)
-	float cur_max = 0;
-	int max_i = 0, max_j = 0;
-	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-	{
-		for (int i = 0; i < 28; i += 2)
-		{
-			for (int j = 0; j < 28; j += 2)
-			{
-				max_i = i;
-				max_j = j;
-				cur_max = sig_layer[filter_dim][i][j];
-				for (int k = 0; k < 2; k++)
-				{
-					for (int l = 0; l < 2; l++)
-					{
-						if (sig_layer[filter_dim][i + k][j + l] > cur_max)
-						{
-							max_i = i + k;
-							max_j = j + l;
-							cur_max = sig_layer[filter_dim][max_i][max_j];
-						}
-					}
-				}
-				max_pooling[filter_dim][max_i][max_j] = 1;
-				max_layer[filter_dim][i / 2][j / 2] = cur_max;
-			}
-		}
-	}
+	// float cur_max = 0;
+	// int max_i = 0, max_j = 0;
+	// for (int filter_dim = 0; filter_dim < 5; filter_dim++)
+	// {
+	// 	for (int i = 0; i < 28; i += 2)
+	// 	{
+	// 		for (int j = 0; j < 28; j += 2)
+	// 		{
+	// 			max_i = i;
+	// 			max_j = j;
+	// 			cur_max = sig_layer[filter_dim][i][j];
+	// 			for (int k = 0; k < 2; k++)
+	// 			{
+	// 				for (int l = 0; l < 2; l++)
+	// 				{
+	// 					if (sig_layer[filter_dim][i + k][j + l] > cur_max)
+	// 					{
+	// 						max_i = i + k;
+	// 						max_j = j + l;
+	// 						cur_max = sig_layer[filter_dim][max_i][max_j];
+	// 					}
+	// 				}
+	// 			}
+	// 			max_pooling[filter_dim][max_i][max_j] = 1;
+	// 			max_layer[filter_dim][i / 2][j / 2] = cur_max;
+	// 		}
+	// 	}
+	// }
+	// Copy the lists A and B to their respective memory buffers
+	ret = clEnqueueWriteBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
+							   sizeof(sig_layer), sig_layer, 0, NULL, NULL);
+
+	// Execute the OpenCL kernel on the list
+	size_t global_item_size[3] = {5, 28, 28}; // Process the entire lists
+	// size_t local_item_size[2] = {4, 4};		 // Process in groups of 64
+	// // ! Error code -48, CL_INVALID_KERNEL
+	// ! Error code = -54, CL_INVALID_WORK_GROUP_SIZE
+	// ! Fixed, requires 2D local_item_size
+	ret = clEnqueueNDRangeKernel(command_queue, max_pooling_kernel, 3, NULL,
+								 global_item_size, NULL, 0, NULL, NULL);
+	// printf("Execute the OpenCL kernel on the list: %d\n", ret);
+
+	// Read the memory buffer C on the device to the local variable C
+	// // ! Ret = 0, correct
+	// ! Error code = -5, CL_OUT_OF_RESOURCES
+	ret = clEnqueueReadBuffer(command_queue, max_pooling_mem_obj, CL_TRUE, 0,
+							  sizeof(max_pooling), max_pooling, 0, NULL, NULL);
+	ret = clEnqueueReadBuffer(command_queue, max_layer_mem_obj, CL_TRUE, 0,
+							  sizeof(max_layer), max_layer, 0, NULL, NULL);
+	// printf("Read the memory buffer C on the device to the local variable C: %d\n", ret);
 
 	int k = 0;
 	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
@@ -346,7 +373,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	// Execute the OpenCL kernel on the list
 	size_t global_item_size[2] = {980, 120}; // Process the entire lists
-	size_t local_item_size[2] = {4, 4};			 // Process in groups of 64 
+	size_t local_item_size[2] = {4, 4};		 // Process in groups of 64
 	// // ! Error code -48, CL_INVALID_KERNEL
 	// ! Error code = -54, CL_INVALID_WORK_GROUP_SIZE
 	// ! Fixed, requires 2D local_item_size
@@ -376,7 +403,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// 		{
 	// 			printf("Matched values.\n");
 	// 		}
-			
+
 	// 	}
 	// }
 
@@ -626,21 +653,43 @@ int main()
 	ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&b_mem_obj);
 	ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&c_mem_obj);
 
-	// // Copy the lists A and B to their respective memory buffers
-	// ret = clEnqueueWriteBuffer(command_queue, a_mem_obj, CL_TRUE, 0,
-	// 						   sizeof(dense_input), dense_input, 0, NULL, NULL);
-	// ret = clEnqueueWriteBuffer(command_queue, b_mem_obj, CL_TRUE, 0,
-	// 						   120 * sizeof(float), delta3, 0, NULL, NULL);
+	// SECTION: max pooling setup
+	fp = fopen("max_pooling_kernel.cl", "r");
+	if (!fp)
+	{
+		fprintf(stderr, "Failed to load kernel.\n");
+		exit(1);
+	}
+	source_str = (char *)malloc(MAX_SOURCE_SIZE);
+	source_size = fread(source_str, 1, MAX_SOURCE_SIZE, fp);
+	fclose(fp);
 
-	// // Execute the OpenCL kernel on the list
-	// size_t global_item_size[2] = {980, 120}; // Process the entire lists
-	// size_t local_item_size = 64;			 // Process in groups of 64
-	// ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL,
-	// 							 global_item_size, &local_item_size, 0, NULL, NULL);
+	// Create memory buffers on the device for each vector
+	sig_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
+									   sizeof(sig_layer), NULL, &ret);
+	max_pooling_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
+										 sizeof(max_pooling), NULL, &ret);
+	max_layer_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
+									   sizeof(max_layer), NULL, &ret);
 
-	// // Read the memory buffer C on the device to the local variable C
-	// ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
-	// 						  sizeof(dw1), dw1, 0, NULL, NULL);
+	// Create a program from the kernel source
+	// ! Ret = 0, correct
+	cl_program max_pooling_program = clCreateProgramWithSource(context, 1,
+															   (const char **)&source_str, (const size_t *)&source_size, &ret);
+
+	// Build the program
+	// ! Error = -11, CL_BUILD_PROGRAM _FAILURE
+	ret = clBuildProgram(max_pooling_program, 1, &device_id, NULL, NULL, NULL);
+	printf("Build the program: %d\n", ret);
+
+	// Create the OpenCL kernel
+	max_pooling_kernel = clCreateKernel(max_pooling_program, "max_pooling_kernel", &ret);
+	printf("Create the OpenCL kernel: %d\n", ret);
+
+	// Set the arguments of the kernel
+	ret = clSetKernelArg(max_pooling_kernel, 0, sizeof(cl_mem), (void *)&sig_layer_mem_obj);
+	ret = clSetKernelArg(max_pooling_kernel, 1, sizeof(cl_mem), (void *)&max_pooling_mem_obj);
+	ret = clSetKernelArg(max_pooling_kernel, 2, sizeof(cl_mem), (void *)&max_layer_mem_obj);
 
 	// ! Load Dataset
 	read_test_data();
