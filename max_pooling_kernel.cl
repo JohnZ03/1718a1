@@ -6,9 +6,9 @@ __kernel void max_pooling_kernel(__global float *sig_layer,
   int i = get_global_id(1) * 2;
   int j = get_global_id(2) * 2;
 
-  float cur_max = i;
+  float cur_max = sig_layer[filter_dim * 784 + i * 28 + j];
   int max_i = j;
-  int max_j = sig_layer[filter_dim * 784 + i * 28 + j];
+  int max_j = j;
 
 	int m = get_global_id(1);
 	int n = get_global_id(2);
