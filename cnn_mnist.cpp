@@ -458,7 +458,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	//printf("WriteBuffer: %d\n", ret);
 
 	size_t global_item_size_wgx1 = 980; // Process the entire lists
-	size_t local_item_size_wgx1 = 49;			 // Process in groups of 20
+	size_t local_item_size_wgx1 = 20;			 // Process in groups of 20
    	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx, 1, NULL,
 								 &global_item_size_wgx1, &local_item_size_wgx1, 0, NULL, NULL);
 	//printf("NDRangeKernel: %d\n", ret);
