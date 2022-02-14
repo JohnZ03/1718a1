@@ -218,7 +218,7 @@ void forward_pass(unsigned char img[][32])
 							   sizeof(sig_layer), sig_layer, 0, NULL, NULL);
 
 	// Execute the OpenCL kernel on the list
-	size_t global_item_size[3] = {5, 28, 28}; // Process the entire lists
+	size_t global_item_size[3] = {5, 14, 14}; // Process the entire lists
 	// size_t local_item_size[2] = {4, 4};		 // Process in groups of 64
 	// // ! Error code -48, CL_INVALID_KERNEL
 	// ! Error code = -54, CL_INVALID_WORK_GROUP_SIZE
