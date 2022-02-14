@@ -856,9 +856,20 @@ int main()
 	ret = clFinish(command_queue);
 	ret = clReleaseKernel(kernel);
 	ret = clReleaseProgram(program);
+	ret = clReleaseProgram(program_wgx);
+	
 	ret = clReleaseMemObject(dense_input_mem_obj);
+	ret = clReleaseMemObject(delta3_mid_mem_obj);
 	ret = clReleaseMemObject(delta3_mem_obj);
+	ret = clReleaseMemObject(delta2_mid_mem_obj);
+	ret = clReleaseMemObject(delta2_mem_obj);
+	ret = clReleaseMemObject(dense_w_mem_obj);
 	ret = clReleaseMemObject(dw1_mem_obj);
+	ret = clReleaseMemObject(d_sigmoid_dense_input_mem_obj);
+	ret = clReleaseMemObject(dense_w2_mem_obj);
+	ret = clReleaseMemObject(delta4_mem_obj);
+	ret = clReleaseMemObject(d_sigmoid_dense_sum_mem_obj);
+
 	ret = clReleaseCommandQueue(command_queue);
 	ret = clReleaseContext(context);
 
