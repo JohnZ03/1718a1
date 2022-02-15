@@ -433,6 +433,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	ret = clEnqueueReadBuffer(command_queue, delta2_mem_obj, CL_TRUE, 0,
 							  sizeof(delta2), delta2, 0, NULL, NULL);
 
+	// TODO: Haotian
 	// Calc back-propagated max layer dw_max
 	int k = 0;
 	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
@@ -479,6 +480,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 		}
 	}
 
+	// TODO: Haotian
 	// Calculate Weight Changes for Conv Layer
 	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
 	{
