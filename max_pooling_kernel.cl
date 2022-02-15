@@ -24,5 +24,5 @@ __kernel void max_pooling_kernel(__global float *sig_layer,
   }
 
   max_pooling[filter_dim * 784 + max_i * 28 + max_j] = 1;
-  max_layer[filter_dim * 784 + m * 28 + n] = cur_max;
+  max_layer[filter_dim * 196 + m * 14 + n] = cur_max;
 }
