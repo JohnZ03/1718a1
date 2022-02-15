@@ -9,18 +9,17 @@ __kernel void multi_add(__global float *A, __global float *B, __global float *C,
 
 }
 
-
-__kernel void multi_add1(__global float *A, __global float *B, __global float *C,__global float *D, int wB) {
+__kernel void multi_add2(__global float *A, __global float *B, __global float *C,__global float *D, int wA, int wB) {
     
     int i = get_global_id(0);
 	float value = 0;
-	for(int j=0; j<980 ;j++){
+	for(int j=0; j<wA ;j++){
 		value += A[j*wB+i] * B[j];
 	}
 	value += D[i];
     C[i] = value;
-
 }
+
 __kernel void vector_multi(__global float *A, __global float *B, __global float *C) {
     
     // Get the index of the current element
