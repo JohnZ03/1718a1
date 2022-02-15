@@ -10,8 +10,8 @@ __kernel void max_pooling_kernel(__global float *sig_layer,
   int max_i = j;
   int max_j = j;
 
-	int m = get_global_id(1);
-	int n = get_global_id(2);
+  int m = get_global_id(1);
+  int n = get_global_id(2);
 
   for (int k = 0; k < 2; k++) {
     for (int l = 0; l < 2; l++) {
@@ -24,5 +24,5 @@ __kernel void max_pooling_kernel(__global float *sig_layer,
   }
 
   max_pooling[filter_dim * 784 + max_i * 28 + max_j] = 1;
-	max_layer[filter_dim * 784 + m * 28 + n] = cur_max;
+  max_layer[filter_dim * 784 + m * 28 + n] = cur_max;
 }
