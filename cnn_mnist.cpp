@@ -312,9 +312,9 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	// Calculate Weight Changes for Dense Layer 1
 	// Copy the lists A and B to their respective memory buffers
-	ret = clEnqueueWriteBuffer(command_queue, a_mem_obj, CL_TRUE, 0,
+	ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
 							   sizeof(dense_input), dense_input, 0, NULL, NULL);
-	ret = clEnqueueWriteBuffer(command_queue, b_mem_obj, CL_TRUE, 0,
+	ret = clEnqueueWriteBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
 							   sizeof(delta3), delta3, 0, NULL, NULL);
 
 	// Execute the OpenCL kernel on the list
@@ -324,7 +324,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// printf("Execute the OpenCL kernel on the list: %d\n", ret);
 
 	// Read the memory buffer C on the device to the local variable C
-	ret = clEnqueueReadBuffer(command_queue, c_mem_obj, CL_TRUE, 0,
+	ret = clEnqueueReadBuffer(command_queue, dw1_mem_obj, CL_TRUE, 0,
 							  sizeof(dw1), dw1, 0, NULL, NULL);
 
 	// Delta2
