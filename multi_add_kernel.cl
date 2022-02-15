@@ -10,6 +10,17 @@ __kernel void multi_add(__global float *A, __global float *B, __global float *C,
 }
 
 
+__kernel void multi_add1(__global float *A, __global float *B, __global float *C,__global float *D, int wB) {
+    
+    int i = get_global_id(0);
+	float value = 0;
+	for(int j=0; j<980 ;j++){
+		value += A[j*wB+i] * B[j];
+	}
+	value += D[i];
+    C[i] = value;
+
+}
 __kernel void vector_multi(__global float *A, __global float *B, __global float *C) {
     
     // Get the index of the current element
@@ -34,7 +45,7 @@ __kernel void sigmoid(__global float *A, __global float *B) {
     
     int i = get_global_id(0);
 	float x=A[i];
-	float sigmoid_x;
 	if(A[i] >  500) x =  500;
 	if(A[i] < -500) x = -500;
     B[i] = 1 / (1 + exp(-x));
+}
