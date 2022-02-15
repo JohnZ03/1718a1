@@ -328,8 +328,8 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
    	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx4, 1, NULL,
 								 &global_item_size_wgx4, &local_item_size_wgx4, 0, NULL, NULL);
 
-	ret = clEnqueueReadBuffer(command_queue, d_sigmoid_dense_sum_mem_obj, CL_TRUE, 0,
-							  sizeof(d_sigmoid_dense_sum), d_sigmoid_dense_sum, 0, NULL, NULL);
+	//ret = clEnqueueReadBuffer(command_queue, d_sigmoid_dense_sum_mem_obj, CL_TRUE, 0,
+	//						  sizeof(d_sigmoid_dense_sum), d_sigmoid_dense_sum, 0, NULL, NULL);
 /*
 	for (int i = 0; i < 120; i++)
 	{
@@ -350,8 +350,8 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx2, 1, NULL,
 								 &global_item_size_wgx3, &local_item_size_wgx3, 0, NULL, NULL);
 
-	ret = clEnqueueWriteBuffer(command_queue, d_sigmoid_dense_sum_mem_obj, CL_TRUE, 0,
-							   sizeof(d_sigmoid_dense_sum), d_sigmoid_dense_sum, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, d_sigmoid_dense_sum_mem_obj, CL_TRUE, 0,
+	//						   sizeof(d_sigmoid_dense_sum), d_sigmoid_dense_sum, 0, NULL, NULL);
 
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx3, 1, NULL,
 								 &global_item_size_wgx3, &local_item_size_wgx3, 0, NULL, NULL);
@@ -393,8 +393,8 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
    	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx5, 1, NULL,
 								 &global_item_size_wgx5, &local_item_size_wgx5, 0, NULL, NULL);
 
-	ret = clEnqueueReadBuffer(command_queue, d_sigmoid_dense_input_mem_obj, CL_TRUE, 0,
-							  sizeof(d_sigmoid_dense_input), d_sigmoid_dense_input, 0, NULL, NULL);
+	//ret = clEnqueueReadBuffer(command_queue, d_sigmoid_dense_input_mem_obj, CL_TRUE, 0,
+	//						  sizeof(d_sigmoid_dense_input), d_sigmoid_dense_input, 0, NULL, NULL);
 
 
 	float delta2[980];
@@ -422,8 +422,8 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 		}
 	*/
 
-	ret = clEnqueueWriteBuffer(command_queue, d_sigmoid_dense_input_mem_obj, CL_TRUE, 0,
-							   sizeof(d_sigmoid_dense_input), d_sigmoid_dense_input, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, d_sigmoid_dense_input_mem_obj, CL_TRUE, 0,
+	//						   sizeof(d_sigmoid_dense_input), d_sigmoid_dense_input, 0, NULL, NULL);
 	// printf("WriteBuffer: %d\n", ret);
 
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx1, 1, NULL,
