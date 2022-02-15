@@ -19,10 +19,13 @@ __kernel void vector_multi(__global float *A, __global float *B, __global float 
     C[i] = A[i] * B[i];
 }
 
-__kernel void sigmoid(__global float *A, __global float *B) {
+__kernel void d_sigmoid(__global float *A, __global float *B) {
+    
     int i = get_global_id(0);
 	float x=A[i];
+	float sigmoid_x;
 	if(A[i] >  500) x =  500;
 	if(A[i] < -500) x = -500;
-    B[i] = 1 / (1 + exp(-x));
+    sigmoid_x = 1 / (1 + exp(-x));
+	B[i] = sigmoid_x * (1 - sigmoid_x);
 }
