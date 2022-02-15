@@ -219,9 +219,14 @@ void forward_pass(unsigned char img[][32])
 	ret = clEnqueueReadBuffer(command_queue, max_layer_mem_obj, CL_TRUE, 0,
 								sizeof(max_layer), max_layer, 0, NULL, NULL);
 
+	//ret = clEnqueueReadBuffer(command_queue, max_layer_mem_obj, CL_TRUE, 0,
+	//							sizeof(dense_input), dense_input, 0, NULL, NULL);
+	ret = clEnqueueCopyBuffer(command_queue, max_layer_mem_obj, dense_input_mem_obj, 0,
+							0,sizeof(dense_input), 0, NULL, NULL);
+	/*
 	int k = 0;
 	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-	{
+	{/
 		for (int i = 0; i < 14; i++)
 		{
 			for (int j = 0; j < 14; j++)
@@ -230,14 +235,14 @@ void forward_pass(unsigned char img[][32])
 				k++;
 			}
 		}
-	}
+	}*/
 
 
 	// Dense Layer
 	ret = clEnqueueWriteBuffer(command_queue, dense_w_mem_obj, CL_TRUE, 0,
 							   sizeof(dense_w), dense_w, 0, NULL, NULL);
-	ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
-							   sizeof(dense_input), dense_input, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
+	//						   sizeof(dense_input), dense_input, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, dense_b_mem_obj, CL_TRUE, 0,
 							   sizeof(dense_b), dense_b, 0, NULL, NULL);
 
@@ -247,8 +252,8 @@ void forward_pass(unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx6, 1, NULL,
 								 &global_item_size_wgx6, &local_item_size_wgx6, 0, NULL, NULL);
 
-	ret = clEnqueueReadBuffer(command_queue, dense_sum_mem_obj, CL_TRUE, 0,
-							  sizeof(dense_sum), dense_sum, 0, NULL, NULL);
+	//ret = clEnqueueReadBuffer(command_queue, dense_sum_mem_obj, CL_TRUE, 0,
+	//						  sizeof(dense_sum), dense_sum, 0, NULL, NULL);
 
 	size_t global_item_size_wgx7 = 120; // Process the entire lists
 	size_t local_item_size_wgx7 = 10;	// Process in groups of 20
@@ -378,8 +383,8 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// Delta 3
 
     float d_sigmoid_dense_sum[120];
-	ret = clEnqueueWriteBuffer(command_queue, dense_sum_mem_obj, CL_TRUE, 0,
-							   sizeof(dense_sum), dense_sum, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, dense_sum_mem_obj, CL_TRUE, 0,
+	//						   sizeof(dense_sum), dense_sum, 0, NULL, NULL);
 
 	size_t global_item_size_wgx4 = 120; // Process the entire lists
 	size_t local_item_size_wgx4 = 10;			 // Process in groups of 10
@@ -415,18 +420,18 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx3, 1, NULL,
 								 &global_item_size_wgx3, &local_item_size_wgx3, 0, NULL, NULL);
 
-	ret = clEnqueueReadBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
-							  sizeof(delta3), delta3, 0, NULL, NULL);
+	//ret = clEnqueueReadBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
+	//						  sizeof(delta3), delta3, 0, NULL, NULL);
 
 	ret = clEnqueueReadBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
 							  sizeof(db1), db1, 0, NULL, NULL);
 
 	// Calculate Weight Changes for Dense Layer 1
 	// Copy the lists A and B to their respective memory buffers
-	ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
-							   sizeof(dense_input), dense_input, 0, NULL, NULL);
-	ret = clEnqueueWriteBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
-							   sizeof(delta3), delta3, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
+	//						   sizeof(dense_input), dense_input, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
+	//						   sizeof(delta3), delta3, 0, NULL, NULL);
 
 	// Execute the OpenCL kernel on the list
 	size_t global_item_size[2] = {980, 120}; // Process the entire lists
@@ -443,8 +448,8 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	float d_sigmoid_dense_input[980];
 
-	ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
-							   sizeof(dense_input), dense_input, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
+	//						   sizeof(dense_input), dense_input, 0, NULL, NULL);
 
 	size_t global_item_size_wgx5 = 980; // Process the entire lists
 	size_t local_item_size_wgx5 = 20;			 // Process in groups of 10
