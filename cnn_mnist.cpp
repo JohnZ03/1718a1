@@ -16,7 +16,6 @@ size_t source_size;
 FILE *fp_wgx;
 char *source_str1_wgx;
 
-
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
 #else
@@ -46,7 +45,6 @@ cl_mem dense_b_mem_obj;
 cl_mem dense_sigmoid_mem_obj;
 cl_mem dense_sum2_mem_obj;
 cl_mem dense_b2_mem_obj;
-
 
 cl_kernel kernel;
 cl_kernel max_pooling_kernel;
@@ -146,9 +144,9 @@ float sigmoid(float x)
 		x = -500;
 	return 1 / (1 + exp(-x));
 }
-		val += exp(x[i]);
-	}
-	return val;
+val += exp(x[i]);
+}
+return val;
 }
 
 void initialise_weights()
@@ -273,13 +271,12 @@ void forward_pass(unsigned char img[][32])
 	// }
 	// cout << endl;
 	// cout << endl;
-	
-	
+
 	// //! TEST
 	// // Write buffer with origin conv_layer, and execute sigmoid kernel
 	// ret = clEnqueueWriteBuffer(command_queue, conv_layer_mem_obj, CL_TRUE, 0,
 	// 						   sizeof(conv_layer), conv_layer, 0, NULL, NULL);
-	
+
 	// // Sigmoid
 	// ret = clEnqueueWriteBuffer(command_queue, conv_b_mem_obj, CL_TRUE, 0,
 	// 						   sizeof(conv_b), conv_b, 0, NULL, NULL);
@@ -289,8 +286,6 @@ void forward_pass(unsigned char img[][32])
 	// ret = clEnqueueReadBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
 	// 						  sizeof(sig_layer), sig_layer, 0, NULL, NULL);
 
-
-	
 	// Convolution Operation + Sigmoid Activation
 	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
 	{
@@ -313,7 +308,6 @@ void forward_pass(unsigned char img[][32])
 			}
 		}
 	}
-
 
 	// MAX Pooling (max_pooling, max_layer)
 	float cur_max = 0;
@@ -356,24 +350,23 @@ void forward_pass(unsigned char img[][32])
 				k++;
 			}
 		}
-	}*/
+	}
+	* /
 
-
-	// Dense Layer
-	ret = clEnqueueWriteBuffer(command_queue, dense_w_mem_obj, CL_TRUE, 0,
-							   sizeof(dense_w), dense_w, 0, NULL, NULL);
-	//ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
+		// Dense Layer
+		ret = clEnqueueWriteBuffer(command_queue, dense_w_mem_obj, CL_TRUE, 0,
+								   sizeof(dense_w), dense_w, 0, NULL, NULL);
+	// ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_input), dense_input, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, dense_b_mem_obj, CL_TRUE, 0,
 							   sizeof(dense_b), dense_b, 0, NULL, NULL);
-
 
 	size_t global_item_size_wgx6 = 120; // Process the entire lists
 	size_t local_item_size_wgx6 = 10;	// Process in groups of 20
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx6, 1, NULL,
 								 &global_item_size_wgx6, &local_item_size_wgx6, 0, NULL, NULL);
 
-	//ret = clEnqueueReadBuffer(command_queue, dense_sum_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueReadBuffer(command_queue, dense_sum_mem_obj, CL_TRUE, 0,
 	//						  sizeof(dense_sum), dense_sum, 0, NULL, NULL);
 
 	size_t global_item_size_wgx7 = 120; // Process the entire lists
@@ -381,42 +374,41 @@ void forward_pass(unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx7, 1, NULL,
 								 &global_item_size_wgx7, &local_item_size_wgx7, 0, NULL, NULL);
 
-	//ret = clEnqueueReadBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueReadBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
 	//						  sizeof(dense_sigmoid), dense_sigmoid, 0, NULL, NULL);
 
-/*	
-	float dense_sum_1[120];
-	float dense_sigmoid_1[120];
-	for (int i = 0; i < 120; i++)
-	{
-		dense_sum_1[i] = 0;
-		dense_sigmoid_1[i] = 0;
-		for (int j = 0; j < 980; j++)
+	/*
+		float dense_sum_1[120];
+		float dense_sigmoid_1[120];
+		for (int i = 0; i < 120; i++)
 		{
-			dense_sum_1[i] += dense_w[j][i] * dense_input[j];
+			dense_sum_1[i] = 0;
+			dense_sigmoid_1[i] = 0;
+			for (int j = 0; j < 980; j++)
+			{
+				dense_sum_1[i] += dense_w[j][i] * dense_input[j];
+			}
+			dense_sum_1[i] += dense_b[i];
+			if(dense_sum_1[i]-dense_sum[i]>0.00001 ||dense_sum_1[i]-dense_sum[i]<-0.00001)
+				printf("o=%f, n=%f, dense_b=%f, dense_w=%f\n",dense_sum_1[i],dense_sum[i],dense_b[i],dense_w[0][i]);
+			dense_sigmoid_1[i] = sigmoid(dense_sum_1[i]);
+			if(dense_sigmoid[i]-dense_sigmoid_1[i]>0.00001 ||dense_sigmoid[i]-dense_sigmoid_1[i]<-0.00001)
+				printf("o_s=%f, n_s=%f, dense_b=%f, dense_w=%f\n",dense_sigmoid_1[i],dense_sigmoid[i],dense_b[i],dense_w[0][i]);
 		}
-		dense_sum_1[i] += dense_b[i];
-		if(dense_sum_1[i]-dense_sum[i]>0.00001 ||dense_sum_1[i]-dense_sum[i]<-0.00001)
-			printf("o=%f, n=%f, dense_b=%f, dense_w=%f\n",dense_sum_1[i],dense_sum[i],dense_b[i],dense_w[0][i]);
-		dense_sigmoid_1[i] = sigmoid(dense_sum_1[i]);
-		if(dense_sigmoid[i]-dense_sigmoid_1[i]>0.00001 ||dense_sigmoid[i]-dense_sigmoid_1[i]<-0.00001)
-			printf("o_s=%f, n_s=%f, dense_b=%f, dense_w=%f\n",dense_sigmoid_1[i],dense_sigmoid[i],dense_b[i],dense_w[0][i]);
-	}
-*/
+	*/
 
 	// Dense Layer 2
 	// TODO: attempt on OPENCL      Zhuojun
 
 	ret = clEnqueueWriteBuffer(command_queue, dense_w2_mem_obj, CL_TRUE, 0,
 							   sizeof(dense_w2), dense_w2, 0, NULL, NULL);
-	//ret = clEnqueueWriteBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueWriteBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_sigmoid), dense_sigmoid, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, dense_b2_mem_obj, CL_TRUE, 0,
 							   sizeof(dense_b2), dense_b2, 0, NULL, NULL);
 
-
 	size_t global_item_size_wgx8 = 10; // Process the entire lists
-	size_t local_item_size_wgx8 = 10;	// Process in groups of 20
+	size_t local_item_size_wgx8 = 10;  // Process in groups of 20
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx8, 1, NULL,
 								 &global_item_size_wgx8, &local_item_size_wgx8, 0, NULL, NULL);
 
@@ -561,23 +553,23 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	// Delta 3
 
-    float d_sigmoid_dense_sum[120];
-	//ret = clEnqueueWriteBuffer(command_queue, dense_sum_mem_obj, CL_TRUE, 0,
+	float d_sigmoid_dense_sum[120];
+	// ret = clEnqueueWriteBuffer(command_queue, dense_sum_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_sum), dense_sum, 0, NULL, NULL);
 
 	size_t global_item_size_wgx4 = 120; // Process the entire lists
-	size_t local_item_size_wgx4 = 10;			 // Process in groups of 10
+	size_t local_item_size_wgx4 = 10;	// Process in groups of 10
 
-   	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx4, 1, NULL,
+	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx4, 1, NULL,
 								 &global_item_size_wgx4, &local_item_size_wgx4, 0, NULL, NULL);
 
-	//ret = clEnqueueReadBuffer(command_queue, d_sigmoid_dense_sum_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueReadBuffer(command_queue, d_sigmoid_dense_sum_mem_obj, CL_TRUE, 0,
 	//						  sizeof(d_sigmoid_dense_sum), d_sigmoid_dense_sum, 0, NULL, NULL);
-/*
-	for (int i = 0; i < 120; i++)
-	{
-		d_sigmoid_dense_sum[i] = d_sigmoid(dense_sum[i]);
-	}*/
+	/*
+		for (int i = 0; i < 120; i++)
+		{
+			d_sigmoid_dense_sum[i] = d_sigmoid(dense_sum[i]);
+		}*/
 
 	memset(delta3, 0, sizeof(delta3));
 	float z2_wgx = 0;
@@ -593,13 +585,13 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx2, 1, NULL,
 								 &global_item_size_wgx3, &local_item_size_wgx3, 0, NULL, NULL);
 
-	//ret = clEnqueueWriteBuffer(command_queue, d_sigmoid_dense_sum_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueWriteBuffer(command_queue, d_sigmoid_dense_sum_mem_obj, CL_TRUE, 0,
 	//						   sizeof(d_sigmoid_dense_sum), d_sigmoid_dense_sum, 0, NULL, NULL);
 
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx3, 1, NULL,
 								 &global_item_size_wgx3, &local_item_size_wgx3, 0, NULL, NULL);
 
-	//ret = clEnqueueReadBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueReadBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
 	//						  sizeof(delta3), delta3, 0, NULL, NULL);
 
 	ret = clEnqueueReadBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
@@ -607,9 +599,9 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	// Calculate Weight Changes for Dense Layer 1
 	// Copy the lists A and B to their respective memory buffers
-	//ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_input), dense_input, 0, NULL, NULL);
-	//ret = clEnqueueWriteBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueWriteBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
 	//						   sizeof(delta3), delta3, 0, NULL, NULL);
 
 	// Execute the OpenCL kernel on the list
@@ -627,22 +619,21 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	float d_sigmoid_dense_input[980];
 
-	//ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_input), dense_input, 0, NULL, NULL);
 
 	size_t global_item_size_wgx5 = 980; // Process the entire lists
-	size_t local_item_size_wgx5 = 20;			 // Process in groups of 10
+	size_t local_item_size_wgx5 = 20;	// Process in groups of 10
 
-   	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx5, 1, NULL,
+	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx5, 1, NULL,
 								 &global_item_size_wgx5, &local_item_size_wgx5, 0, NULL, NULL);
 
-	//ret = clEnqueueReadBuffer(command_queue, d_sigmoid_dense_input_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueReadBuffer(command_queue, d_sigmoid_dense_input_mem_obj, CL_TRUE, 0,
 	//						  sizeof(d_sigmoid_dense_input), d_sigmoid_dense_input, 0, NULL, NULL);
-
 
 	float delta2[980];
 	memset(delta2, 0, sizeof(delta2));
-	//float z1_wgx = 0;
+	// float z1_wgx = 0;
 	//	ret = clEnqueueFillBuffer(command_queue, delta2_mid_mem_obj, &z1_wgx, sizeof(z1_wgx),
 	//			0, sizeof(delta2), 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, delta2_mid_mem_obj, CL_TRUE, 0,
@@ -665,9 +656,9 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 		}
 	*/
 
-	//ret = clEnqueueWriteBuffer(command_queue, d_sigmoid_dense_input_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueWriteBuffer(command_queue, d_sigmoid_dense_input_mem_obj, CL_TRUE, 0,
 	//						   sizeof(d_sigmoid_dense_input), d_sigmoid_dense_input, 0, NULL, NULL);
-	// printf("WriteBuffer: %d\n", ret);
+	//  printf("WriteBuffer: %d\n", ret);
 
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx1, 1, NULL,
 								 &global_item_size_wgx1, &local_item_size_wgx1, 0, NULL, NULL);
@@ -874,6 +865,94 @@ int main()
 	// Create a command queue
 	command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
 
+	// Load program from cl
+	fp = fopen("kernel_lw.cl", "r");
+	if (!fp)
+	{
+		fprintf(stderr, "Failed to load kernel.\n");
+		exit(1);
+	}
+	source_str = (char *)malloc(MAX_SOURCE_SIZE);
+	source_size = fread(source_str, 1, MAX_SOURCE_SIZE, fp);
+	fclose(fp);
+
+	// Create Buffers
+	eta_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float), NULL, &ret);
+	dense_b_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(dense_b), NULL, &ret);
+	db1_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(db1), NULL, &ret);
+	dense_b2_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(dense_b2), NULL, &ret);
+	db2_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(db2), NULL, &ret);
+	dense_w2_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(dense_w2), NULL, &ret);
+	dw2_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(dw2), NULL, &ret);
+	dense_w_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(dense_w), NULL, &ret);
+	dw1_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(dw1), NULL, &ret);
+	conv_w_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(conv_w), NULL, &ret);
+	dw_conv_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(dw_conv), NULL, &ret);
+	conv_b_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(conv_b), NULL, &ret);
+	db_conv_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(db_conv), NULL, &ret);
+	sig_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(sig_layer), NULL, &ret);
+	conv_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(conv_layer), NULL, &ret);
+	max_pooling_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(max_pooling), NULL, &ret);
+	img_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 35 * 32 * sizeof(unsigned char), NULL, &ret);
+
+	cl_program program = clCreateProgramWithSource(context, 1,
+												   (const char **)&source_str, (const size_t *)&source_size, &ret);
+
+	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+
+	// Create kernels
+	kernel_update_weights_dense_b = clCreateKernel(program, "update_weights_1d", &ret);
+	ret = clSetKernelArg(kernel_update_weights_dense_b, 0, sizeof(cl_mem), (void *)&eta_mem_obj);
+	ret = clSetKernelArg(kernel_update_weights_dense_b, 1, sizeof(cl_mem), (void *)&db1_mem_obj);
+	ret = clSetKernelArg(kernel_update_weights_dense_b, 2, sizeof(cl_mem), (void *)&dense_b_mem_obj);
+
+	kernel_update_weights_dense_b2 = clCreateKernel(program, "update_weights_1d", &ret);
+	ret = clSetKernelArg(kernel_update_weights_dense_b2, 0, sizeof(cl_mem), (void *)&eta_mem_obj);
+	ret = clSetKernelArg(kernel_update_weights_dense_b2, 1, sizeof(cl_mem), (void *)&db2_mem_obj);
+	ret = clSetKernelArg(kernel_update_weights_dense_b2, 2, sizeof(cl_mem), (void *)&dense_b2_mem_obj);
+
+	kernel_update_weights_dense_w2 = clCreateKernel(program, "update_weights_2d", &ret);
+	ret = clSetKernelArg(kernel_update_weights_dense_w2, 0, sizeof(cl_mem), (void *)&eta_mem_obj);
+	ret = clSetKernelArg(kernel_update_weights_dense_w2, 1, sizeof(cl_mem), (void *)&dw2_mem_obj);
+	ret = clSetKernelArg(kernel_update_weights_dense_w2, 2, sizeof(cl_mem), (void *)&dense_w2_mem_obj);
+	int w1 = 10;
+	ret = clSetKernelArg(kernel_update_weights_dense_w2, 3, sizeof(int), &w1);
+
+	kernel_update_weights_dense_w = clCreateKernel(program, "update_weights_2d", &ret);
+	ret = clSetKernelArg(kernel_update_weights_dense_w, 0, sizeof(cl_mem), (void *)&eta_mem_obj);
+	ret = clSetKernelArg(kernel_update_weights_dense_w, 1, sizeof(cl_mem), (void *)&dw1_mem_obj);
+	ret = clSetKernelArg(kernel_update_weights_dense_w, 2, sizeof(cl_mem), (void *)&dense_w_mem_obj);
+	w1 = 120;
+	ret = clSetKernelArg(kernel_update_weights_dense_w, 3, sizeof(int), &w1);
+
+	kernel_update_weights_conv_w = clCreateKernel(program, "update_weights_3d", &ret);
+	ret = clSetKernelArg(kernel_update_weights_conv_w, 0, sizeof(cl_mem), (void *)&eta_mem_obj);
+	ret = clSetKernelArg(kernel_update_weights_conv_w, 1, sizeof(cl_mem), (void *)&dw_conv_mem_obj);
+	ret = clSetKernelArg(kernel_update_weights_conv_w, 2, sizeof(cl_mem), (void *)&conv_w_mem_obj);
+	w1 = 7;
+	int w2 = 7;
+	ret = clSetKernelArg(kernel_update_weights_conv_w, 3, sizeof(int), &w1);
+	ret = clSetKernelArg(kernel_update_weights_conv_w, 4, sizeof(int), &w2);
+
+	kernel_update_weights_conv_b = clCreateKernel(program, "update_weights_3d", &ret);
+	ret = clSetKernelArg(kernel_update_weights_conv_b, 0, sizeof(cl_mem), (void *)&eta_mem_obj);
+	ret = clSetKernelArg(kernel_update_weights_conv_b, 1, sizeof(cl_mem), (void *)&db_conv_mem_obj);
+	ret = clSetKernelArg(kernel_update_weights_conv_b, 2, sizeof(cl_mem), (void *)&conv_b_mem_obj);
+	w1 = 28;
+	w2 = 28;
+	ret = clSetKernelArg(kernel_update_weights_conv_b, 3, sizeof(int), &w1);
+	ret = clSetKernelArg(kernel_update_weights_conv_b, 4, sizeof(int), &w2);
+
+	kernel_forward_conv = clCreateKernel(program, "forward_conv", &ret);
+	ret = clSetKernelArg(kernel_forward_conv, 0, sizeof(cl_mem), (void *)&img_mem_obj);
+	ret = clSetKernelArg(kernel_forward_conv, 1, sizeof(cl_mem), (void *)&conv_w_mem_obj);
+	ret = clSetKernelArg(kernel_forward_conv, 2, sizeof(cl_mem), (void *)&conv_layer_mem_obj);
+
+	kernel_sig_layer = clCreateKernel(program, "sig_layer", &ret);
+	ret = clSetKernelArg(kernel_sig_layer, 0, sizeof(cl_mem), (void *)&sig_layer_mem_obj);
+	ret = clSetKernelArg(kernel_sig_layer, 1, sizeof(cl_mem), (void *)&conv_layer_mem_obj);
+	ret = clSetKernelArg(kernel_sig_layer, 2, sizeof(cl_mem), (void *)&conv_b_mem_obj);
+
 	// ! Vector add
 	// SECTION: Load the kernel source code into the array source_str
 	fp = fopen("mul_2d.cl", "r");
@@ -902,40 +981,32 @@ int main()
 										 sizeof(dense_input), NULL, &ret);
 	delta3_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 									sizeof(delta3), NULL, &ret);
-	dw1_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
-								 sizeof(dw1), NULL, &ret);
 
 	delta2_mid_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 										980 * sizeof(float), NULL, &ret);
 	delta2_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 									980 * sizeof(float), NULL, &ret);
-	dense_w_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
-									 sizeof(dense_w), NULL, &ret);
 	d_sigmoid_dense_input_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 												   980 * sizeof(float), NULL, &ret);
 
-	dense_w2_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
-									  1200 * sizeof(float), NULL, &ret);
 	delta4_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 									10 * sizeof(float), NULL, &ret);
 	dense_sum_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
-												 120 * sizeof(float), NULL, &ret);
+									   120 * sizeof(float), NULL, &ret);
 	d_sigmoid_dense_sum_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 												 120 * sizeof(float), NULL, &ret);
 	delta3_mid_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 										120 * sizeof(float), NULL, &ret);
 
-	dense_b_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
-										sizeof(dense_b), NULL, &ret);
+
 
 	dense_sigmoid_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
-										sizeof(dense_sigmoid), NULL, &ret);
+										   sizeof(dense_sigmoid), NULL, &ret);
 
 	dense_sum2_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 										sizeof(dense_sum2), NULL, &ret);
 
-	dense_b2_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
-										sizeof(dense_b2), NULL, &ret);
+
 
 	// Create a program from the kernel source
 	cl_program program = clCreateProgramWithSource(context, 1,
@@ -1025,7 +1096,6 @@ int main()
 	ret = clSetKernelArg(kernel_wgx8, 4, sizeof(cl_int), (void *)&kernel_wgx_size8_1);
 	ret = clSetKernelArg(kernel_wgx8, 5, sizeof(cl_int), (void *)&kernel_wgx_size8_2);
 
-
 	// ! Max pooling setup (forward pass)
 	fp = fopen("max_pooling_kernel.cl", "r");
 	if (!fp)
@@ -1038,10 +1108,6 @@ int main()
 	fclose(fp);
 
 	// Create memory buffers on the device for each vector
-	sig_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
-									   sizeof(sig_layer), NULL, &ret);
-	max_pooling_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
-										 sizeof(max_pooling), NULL, &ret);
 	max_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 									   sizeof(max_layer), NULL, &ret);
 
@@ -1080,57 +1146,57 @@ int main()
 			give_y(label_train[num], vector_y);
 			give_img(data_train[num], img);
 
-	int val_len = 600;
-	int cor = 0;
-	int confusion_mat[10][10];
-	for (int i = 0; i < 10; i++)
-	{
-		for (int j = 0; j < 10; j++)
-			confusion_mat[i][j] = 0;
-	}
+			int val_len = 600;
+			int cor = 0;
+			int confusion_mat[10][10];
+			for (int i = 0; i < 10; i++)
+			{
+				for (int j = 0; j < 10; j++)
+					confusion_mat[i][j] = 0;
+			}
 
-	cout << "Start Testing." << endl;
-	for (int i = 0; i < val_len; i++)
-	{
-		unsigned char img[35][32];
-		give_img(data_test[i], img);
-		forward_pass(img);
-	}
-	float accu = float(cor) / val_len;
-	cout << "Accuracy: " << accu << endl;
+			cout << "Start Testing." << endl;
+			for (int i = 0; i < val_len; i++)
+			{
+				unsigned char img[35][32];
+				give_img(data_test[i], img);
+				forward_pass(img);
+			}
+			float accu = float(cor) / val_len;
+			cout << "Accuracy: " << accu << endl;
 
-	cout << "   0 1 2 3 4 5 6 7 8 9" << endl;
-	for (int i = 0; i < 10; i++)
-	{
-		cout << i << ": ";
-		for (int j = 0; j < 10; j++)
-		{
-			cout << confusion_mat[i][j] << " ";
+			cout << "   0 1 2 3 4 5 6 7 8 9" << endl;
+			for (int i = 0; i < 10; i++)
+			{
+				cout << i << ": ";
+				for (int j = 0; j < 10; j++)
+				{
+					cout << confusion_mat[i][j] << " ";
+				}
+				cout << endl;
+			}
+
+			// SECTION: OpenCL Clean up
+			ret = clFlush(command_queue);
+			ret = clFinish(command_queue);
+			ret = clReleaseKernel(kernel);
+			ret = clReleaseProgram(program);
+			ret = clReleaseProgram(program_wgx);
+
+			ret = clReleaseMemObject(dense_input_mem_obj);
+			ret = clReleaseMemObject(delta3_mid_mem_obj);
+			ret = clReleaseMemObject(delta3_mem_obj);
+			ret = clReleaseMemObject(delta2_mid_mem_obj);
+			ret = clReleaseMemObject(delta2_mem_obj);
+			ret = clReleaseMemObject(dense_w_mem_obj);
+			ret = clReleaseMemObject(dw1_mem_obj);
+			ret = clReleaseMemObject(d_sigmoid_dense_input_mem_obj);
+			ret = clReleaseMemObject(dense_w2_mem_obj);
+			ret = clReleaseMemObject(delta4_mem_obj);
+			ret = clReleaseMemObject(d_sigmoid_dense_sum_mem_obj);
+
+			ret = clReleaseCommandQueue(command_queue);
+			ret = clReleaseContext(context);
+
+			return 0;
 		}
-		cout << endl;
-	}
-
-	// SECTION: OpenCL Clean up
-	ret = clFlush(command_queue);
-	ret = clFinish(command_queue);
-	ret = clReleaseKernel(kernel);
-	ret = clReleaseProgram(program);
-	ret = clReleaseProgram(program_wgx);
-
-	ret = clReleaseMemObject(dense_input_mem_obj);
-	ret = clReleaseMemObject(delta3_mid_mem_obj);
-	ret = clReleaseMemObject(delta3_mem_obj);
-	ret = clReleaseMemObject(delta2_mid_mem_obj);
-	ret = clReleaseMemObject(delta2_mem_obj);
-	ret = clReleaseMemObject(dense_w_mem_obj);
-	ret = clReleaseMemObject(dw1_mem_obj);
-	ret = clReleaseMemObject(d_sigmoid_dense_input_mem_obj);
-	ret = clReleaseMemObject(dense_w2_mem_obj);
-	ret = clReleaseMemObject(delta4_mem_obj);
-	ret = clReleaseMemObject(d_sigmoid_dense_sum_mem_obj);
-
-	ret = clReleaseCommandQueue(command_queue);
-	ret = clReleaseContext(context);
-
-	return 0;
-}
