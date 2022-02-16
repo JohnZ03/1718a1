@@ -26,25 +26,18 @@ char *source_str1_wgx;
 float delta3[120];
 cl_mem dense_input_mem_obj;
 cl_mem delta3_mem_obj;
-cl_mem dw1_mem_obj;
 
-cl_mem sig_layer_mem_obj;
-cl_mem max_pooling_mem_obj;
 cl_mem max_layer_mem_obj;
 
 cl_mem delta3_mid_mem_obj;
 cl_mem delta2_mid_mem_obj;
 cl_mem delta2_mem_obj;
-cl_mem dense_w_mem_obj;
 cl_mem d_sigmoid_dense_input_mem_obj;
-cl_mem dense_w2_mem_obj;
 cl_mem delta4_mem_obj;
 cl_mem d_sigmoid_dense_sum_mem_obj;
 cl_mem dense_sum_mem_obj;
-cl_mem dense_b_mem_obj;
 cl_mem dense_sigmoid_mem_obj;
 cl_mem dense_sum2_mem_obj;
-cl_mem dense_b2_mem_obj;
 
 cl_kernel kernel;
 cl_kernel max_pooling_kernel;
