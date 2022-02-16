@@ -83,6 +83,10 @@ cl_kernel kernel_update_weights_conv_w;
 cl_kernel kernel_forward_conv;
 cl_kernel kernel_sig_layer;
 
+// ! zht
+cl_kernel conv_weight_kernel;
+cl_kernel max_layer_back_kernel;
+
 // Mem_obj declare
 cl_mem eta_mem_obj;
 
@@ -95,6 +99,9 @@ cl_mem conv_b_mem_obj;
 cl_mem db_conv_mem_obj;
 cl_mem conv_layer_mem_obj;
 cl_mem img_mem_obj;
+
+cl_mem dw_max_mem_obj;
+
 //! TEST
 float test[5][28][28];
 
@@ -691,27 +698,41 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	// TODO: Haotian
 	// Calc back-propagated max layer dw_max
-	int k = 0;
-	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-	{
-		for (int i = 0; i < 28; i += 2)
-		{
-			for (int j = 0; j < 28; j += 2)
-			{
-				for (int l = 0; l < 2; l++)
-				{
-					for (int m = 0; m < 2; m++)
-					{
-						if (max_pooling[filter_dim][i + l][j + m] == 1)
-							dw_max[filter_dim][i][j] = delta2[k];
-						else
-							dw_max[filter_dim][i][j] = 0;
-					}
-				}
-				k++;
-			}
-		}
-	}
+	// int k = 0;
+	// for (int filter_dim = 0; filter_dim < 5; filter_dim++)
+	// {
+	// 	for (int i = 0; i < 28; i += 2)
+	// 	{
+	// 		for (int j = 0; j < 28; j += 2)
+	// 		{
+	// 			for (int l = 0; l < 2; l++)
+	// 			{
+	// 				for (int m = 0; m < 2; m++)
+	// 				{
+	// 					if (max_pooling[filter_dim][i + l][j + m] == 1)
+	// 						dw_max[filter_dim][i][j] = delta2[k];
+	// 					else
+	// 						dw_max[filter_dim][i][j] = 0;
+	// 				}
+	// 			}
+	// 			k++;
+	// 		}
+	// 	}
+	// }
+	ret = clEnqueueWriteBuffer(command_queue, delta2_mem_obj, CL_TRUE, 0,
+							   sizeof(delta2), delta2, 0, NULL, NULL);
+
+	ret = clEnqueueWriteBuffer(command_queue, max_pooling_mem_obj, CL_TRUE, 0,
+							   sizeof(max_pooling), max_pooling, 0, NULL, NULL);
+
+	size_t global_item_size_zht1[3] = {5, 14, 14}; // Process the entire lists
+	ret = clEnqueueNDRangeKernel(command_queue, max_layer_back_kernel, 3, NULL,
+									global_item_size_zht1, NULL, 0, NULL, NULL);
+
+
+	ret = clEnqueueReadBuffer(command_queue, dw_max_mem_obj, CL_TRUE, 0,
+							  sizeof(dw_max), dw_max, 0, NULL, NULL);
+
 	// Calc Conv Bias Changes
 	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
 	{
@@ -738,23 +759,36 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	// TODO: Haotian
 	// Calculate Weight Changes for Conv Layer
-	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-	{
-		for (int i = 0; i < 26; i++)
-		{
-			for (int j = 0; j < 26; j++)
-			{
-				float cur_val = dw_max[filter_dim][i][j];
-				for (int k = 0; k < 5; k++)
-				{
-					for (int l = 0; l < 5; l++)
-					{
-						dw_conv[filter_dim][k][l] += img[i + k + 1][j + l - 2] * cur_val;
-					}
-				}
-			}
-		}
-	}
+	// for (int filter_dim = 0; filter_dim < 5; filter_dim++)
+	// {
+	// 	for (int i = 0; i < 26; i++)
+	// 	{
+	// 		for (int j = 0; j < 26; j++)
+	// 		{
+	// 			float cur_val = dw_max[filter_dim][i][j];
+	// 			for (int k = 0; k < 5; k++)
+	// 			{
+	// 				for (int l = 0; l < 5; l++)
+	// 				{
+	// 					dw_conv[filter_dim][k][l] += img[i + k + 1][j + l - 2] * cur_val;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	ret = clEnqueueWriteBuffer(command_queue, dw_max_mem_obj, CL_TRUE, 0,
+							   sizeof(dw_max), dw_max, 0, NULL, NULL);
+
+	ret = clEnqueueWriteBuffer(command_queue, img_mem_obj, CL_TRUE, 0,
+							   35 * 32 * sizeof(unsigned char), img, 0, NULL, NULL);
+
+	size_t global_item_size_zht2[3] = {26, 26}; // Process the entire lists
+	ret = clEnqueueNDRangeKernel(command_queue, conv_weight_kernel, 2, NULL,
+									global_item_size_zht2, NULL, 0, NULL, NULL);
+
+	ret = clEnqueueReadBuffer(command_queue, dw_conv_mem_obj, CL_TRUE, 0,
+							  sizeof(dw_conv), dw_conv, 0, NULL, NULL);
 }
 /* ************************************************************ */
 
@@ -973,7 +1007,7 @@ int main()
 	ret = clSetKernelArg(kernel_sig_layer, 1, sizeof(cl_mem), (void *)&conv_layer_mem_obj);
 	ret = clSetKernelArg(kernel_sig_layer, 2, sizeof(cl_mem), (void *)&conv_b_mem_obj);
 
-	// ! Vector add
+	// ! kernel zht
 	// SECTION: Load the kernel source code into the array source_str
 	fp = fopen("mul_2d.cl", "r");
 	if (!fp)
@@ -1156,6 +1190,68 @@ int main()
 	ret = clSetKernelArg(max_pooling_kernel, 0, sizeof(cl_mem), (void *)&sig_layer_mem_obj);
 	ret = clSetKernelArg(max_pooling_kernel, 1, sizeof(cl_mem), (void *)&max_pooling_mem_obj);
 	ret = clSetKernelArg(max_pooling_kernel, 2, sizeof(cl_mem), (void *)&max_layer_mem_obj);
+
+	// ! conv weight kernel 
+	fp = fopen("conv_weight_kernel.cl", "r");
+	if (!fp)
+	{
+		fprintf(stderr, "Failed to load kernel.\n");
+		exit(1);
+	}
+	source_str = (char *)malloc(MAX_SOURCE_SIZE);
+	source_size = fread(source_str, 1, MAX_SOURCE_SIZE, fp);
+	fclose(fp);
+
+	// Create memory buffers on the device for each vector
+	dw_max_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
+									   sizeof(dw_max), NULL, &ret);
+
+	// Create a program from the kernel source
+	cl_program conv_weight_kernel_program = clCreateProgramWithSource(context, 1,
+															   (const char **)&source_str, (const size_t *)&source_size, &ret);
+
+	// Build the program
+	ret = clBuildProgram(conv_weight_kernel_program, 1, &device_id, NULL, NULL, NULL);
+	printf("Build the program: %d\n", ret);
+
+	// Create the OpenCL kernel
+	conv_weight_kernel = clCreateKernel(conv_weight_kernel_program, "conv_weight_kernel", &ret);
+	printf("Create the OpenCL kernel: %d\n", ret);
+
+	// Set the arguments of the kernel
+	ret = clSetKernelArg(conv_weight_kernel, 0, sizeof(cl_mem), (void *)&dw_max_mem_obj);
+	ret = clSetKernelArg(conv_weight_kernel, 1, sizeof(cl_mem), (void *)&img_mem_obj);
+	ret = clSetKernelArg(conv_weight_kernel, 2, sizeof(cl_mem), (void *)&dw_conv_mem_obj);
+
+	// ! max_layer_back_kernel 
+	fp = fopen("max_layer_back_kernel.cl", "r");
+	if (!fp)
+	{
+		fprintf(stderr, "Failed to load kernel.\n");
+		exit(1);
+	}
+	source_str = (char *)malloc(MAX_SOURCE_SIZE);
+	source_size = fread(source_str, 1, MAX_SOURCE_SIZE, fp);
+	fclose(fp);
+
+	// Create a program from the kernel source
+	cl_program max_layer_back_kernel_progarm = clCreateProgramWithSource(context, 1,
+															   (const char **)&source_str, (const size_t *)&source_size, &ret);
+
+	// Build the program
+	ret = clBuildProgram(max_layer_back_kernel_progarm, 1, &device_id, NULL, NULL, NULL);
+	printf("Build the program: %d\n", ret);
+
+	// Create the OpenCL kernel
+	max_layer_back_kernel = clCreateKernel(max_layer_back_kernel_progarm, "max_layer_back_kernel", &ret);
+	printf("Create the OpenCL kernel: %d\n", ret);
+
+	// Set the arguments of the kernel
+	ret = clSetKernelArg(max_layer_back_kernel, 0, sizeof(cl_mem), (void *)&max_pooling_mem_obj);
+	ret = clSetKernelArg(max_layer_back_kernel, 1, sizeof(cl_mem), (void *)&delta2_mem_obj);
+	ret = clSetKernelArg(max_layer_back_kernel, 2, sizeof(cl_mem), (void *)&dw_max_mem_obj);
+
+
 
 	// ! Load Dataset
 	read_test_data();

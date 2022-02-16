@@ -1,4 +1,4 @@
-__kernel void max_layer_back_kernel(__global float *dw_max, __global char *img,
+__kernel void conv_weight_kernel(__global float *dw_max, __global char *img,
                                     __global float *dw_conv) {
   // Get the index of the current element
   int i = get_global_id(0);
