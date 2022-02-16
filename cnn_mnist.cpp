@@ -203,24 +203,9 @@ void forward_pass(unsigned char img[][32])
 			}
 		}
 	}
-
-	// Conv
-	cl_char zeros_char = 0;
-	ret = clEnqueueFillBuffer(command_queue, max_pooling_mem_obj, &zeros_char, sizeof(zeros_char), 0,
-							  sizeof(max_pooling), 0, NULL, NULL);
-	cl_float zeros_float = 0;
-	ret = clEnqueueFillBuffer(command_queue, conv_layer_mem_obj, &zeros_float, sizeof(zeros_float), 0,
-							  sizeof(conv_layer), 0, NULL, NULL);
-	ret = clEnqueueFillBuffer(command_queue, sig_layer_mem_obj, &zeros_float, sizeof(zeros_float), 0,
-							  sizeof(sig_layer), 0, NULL, NULL);
-	ret = clEnqueueWriteBuffer(command_queue, conv_w_mem_obj, CL_TRUE, 0,
-							   sizeof(conv_w), &conv_w, 0, NULL, NULL);
-
-	//! TEST
-	// ret = clEnqueueReadBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
-	// 						  sizeof(sig_layer), sig_layer, 0, NULL, NULL);
+	// ! TEST
 	cout << endl
-		 << "mem\t" << endl;
+		 << "memory\t" << endl;
 	for (int filter_dim = 0; filter_dim < 1; filter_dim++)
 	{
 		for (int i = 13; i < 14; i++)
@@ -233,13 +218,27 @@ void forward_pass(unsigned char img[][32])
 			cout << endl;
 		}
 	}
-
+	// Conv
+	cl_char zeros_char = 0;
+	ret = clEnqueueFillBuffer(command_queue, max_pooling_mem_obj, &zeros_char, sizeof(zeros_char), 0,
+							  sizeof(max_pooling), 0, NULL, NULL);
+	cl_float zeros_float = 0;
+	ret = clEnqueueFillBuffer(command_queue, conv_layer_mem_obj, &zeros_float, sizeof(zeros_float), 0,
+							  sizeof(conv_layer), 0, NULL, NULL);
+	ret = clEnqueueFillBuffer(command_queue, sig_layer_mem_obj, &zeros_float, sizeof(zeros_float), 0,
+							  sizeof(sig_layer), 0, NULL, NULL);
+	ret = clEnqueueWriteBuffer(command_queue, conv_w_mem_obj, CL_TRUE, 0,
+							   sizeof(conv_w), &conv_w, 0, NULL, NULL);
 	size_t global_item_size[3] = {5, 28, 28};
 	// ret = clEnqueueNDRangeKernel(command_queue, kernel_forward_conv, 3, NULL,
 	// 							 global_item_size, NULL, 0, NULL, NULL);
 	// ret = clEnqueueReadBuffer(command_queue, conv_layer_mem_obj, CL_TRUE, 0,
 	// 						  sizeof(conv_layer), conv_layer, 0, NULL, NULL);
 
+	//! TEST
+	// Write buffer with origin conv_layer, and execute sigmoid kernel
+	ret = clEnqueueWriteBuffer(command_queue, conv_layer_mem_obj, CL_TRUE, 0,
+							   sizeof(conv_layer), &conv_w, 0, NULL, NULL);
 	// Sigmoid
 	ret = clEnqueueWriteBuffer(command_queue, conv_b_mem_obj, CL_TRUE, 0,
 							   sizeof(conv_b), &conv_b, 0, NULL, NULL);
@@ -248,14 +247,24 @@ void forward_pass(unsigned char img[][32])
 	ret = clEnqueueReadBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
 							  sizeof(sig_layer), sig_layer, 0, NULL, NULL);
 
-	// // !TEST
-
-	// cout << endl
-	// 	 << "buffer\t";
-	// for (int j = 0; j < 28; j++)
-	// 	cout << sig_layer[2][j][3] << " ";
-
 	// !TEST
+	// Print the result of sigmoid kernel
+	cout << endl
+		 << "buffer\t" << endl;
+	for (int filter_dim = 0; filter_dim < 1; filter_dim++)
+	{
+		for (int i = 13; i < 14; i++)
+		{
+			for (int j = 0; j < 28; j++)
+			{
+				cout << sig_layer[filter_dim][i][j] << " ";
+			}
+			cout << endl;
+		}
+	}
+	cout << endl;
+	cout << endl;
+	
 	// Convolution Operation + Sigmoid Activation
 	// for (int filter_dim = 0; filter_dim < 5; filter_dim++)
 	// {
@@ -278,21 +287,7 @@ void forward_pass(unsigned char img[][32])
 	// 		}
 	// 	}
 	// }
-	cout << endl
-		 << "buffer\t" << endl;
-	for (int filter_dim = 0; filter_dim < 1; filter_dim++)
-	{
-		for (int i = 13; i < 14; i++)
-		{
-			for (int j = 0; j < 28; j++)
-			{
-				cout << sig_layer[filter_dim][i][j] << " ";
-			}
-			cout << endl;
-		}
-	}
-	cout << endl;
-	cout << endl;
+
 
 	// MAX Pooling (max_pooling, max_layer)
 	float cur_max = 0;
