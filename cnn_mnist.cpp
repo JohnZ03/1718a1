@@ -327,7 +327,7 @@ void forward_pass(unsigned char img[][32])
 								sizeof(sig_layer), sig_layer, 0, NULL, NULL);
 
 	// Execute the OpenCL kernel on the list
-	size_t global_item_size[3] = {5, 14, 14}; // Process the entire lists
+	global_item_size[3] = {5, 14, 14}; // Process the entire lists
 	ret = clEnqueueNDRangeKernel(command_queue, max_pooling_kernel, 3, NULL,
 									global_item_size, NULL, 0, NULL, NULL);
 
