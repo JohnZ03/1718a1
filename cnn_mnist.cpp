@@ -129,7 +129,7 @@ float db_conv[5][28][28];
 
 /* ************************************************************ */
 /* Helper functions */
-float sigmoid(float x)
+double sigmoid(double x)
 {
 	if (x > 500)
 		x = 500;
@@ -137,9 +137,19 @@ float sigmoid(float x)
 		x = -500;
 	return 1 / (1 + exp(-x));
 }
-val += exp(x[i]);
+double d_sigmoid(double x)
+{
+	double sig = sigmoid(x);
+	return sig * (1 - sig);
 }
-return val;
+double softmax_den(double *x, int len)
+{
+	double val = 0;
+	for (int i = 0; i < len; i++)
+	{
+		val += exp(x[i]);
+	}
+	return val;
 }
 
 void initialise_weights()
@@ -991,15 +1001,11 @@ int main()
 	delta3_mid_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 										120 * sizeof(float), NULL, &ret);
 
-
-
 	dense_sigmoid_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 										   sizeof(dense_sigmoid), NULL, &ret);
 
 	dense_sum2_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 										sizeof(dense_sum2), NULL, &ret);
-
-
 
 	// Create a program from the kernel source
 	cl_program program = clCreateProgramWithSource(context, 1,
