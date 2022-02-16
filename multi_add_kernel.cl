@@ -48,3 +48,13 @@ __kernel void sigmoid(__global float *A, __global float *B) {
 	if(A[i] < -500) x = -500;
     B[i] = 1 / (1 + exp(-x));
 }
+
+__kernel void softmax_den(__global float *A, __global float *B, int len){
+	float value = 0;
+	for ( int j=0; j<len; j++){
+		value += exp(A[j]);
+	}
+	int i = get_global_id(0);
+	B[i] = exp(A[i])/value;
+}	
+
