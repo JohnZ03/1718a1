@@ -131,7 +131,7 @@ float db_conv[5][28][28];
 
 /* ************************************************************ */
 /* Helper functions */
-double sigmoid(double x)
+float sigmoid(float x)
 {
 	if (x > 500)
 		x = 500;
@@ -139,14 +139,14 @@ double sigmoid(double x)
 		x = -500;
 	return 1 / (1 + exp(-x));
 }
-double d_sigmoid(double x)
+float d_sigmoid(float x)
 {
-	double sig = sigmoid(x);
+	float sig = sigmoid(x);
 	return sig * (1 - sig);
 }
-double softmax_den(double *x, int len)
+float softmax_den(float *x, int len)
 {
-	double val = 0;
+	float val = 0;
 	for (int i = 0; i < len; i++)
 	{
 		val += exp(x[i]);
@@ -356,11 +356,10 @@ void forward_pass(unsigned char img[][32])
 			}
 		}
 	}
-	* /
 
-		// Dense Layer
-		ret = clEnqueueWriteBuffer(command_queue, dense_w_mem_obj, CL_TRUE, 0,
-								   sizeof(dense_w), dense_w, 0, NULL, NULL);
+	// Dense Layer
+	ret = clEnqueueWriteBuffer(command_queue, dense_w_mem_obj, CL_TRUE, 0,
+							   sizeof(dense_w), dense_w, 0, NULL, NULL);
 	// ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_input), dense_input, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, dense_b_mem_obj, CL_TRUE, 0,
@@ -1010,8 +1009,8 @@ int main()
 										sizeof(dense_sum2), NULL, &ret);
 
 	// Create a program from the kernel source
-	cl_program program = clCreateProgramWithSource(context, 1,
-												   (const char **)&source_str, (const size_t *)&source_size, &ret);
+	program = clCreateProgramWithSource(context, 1,
+										(const char **)&source_str, (const size_t *)&source_size, &ret);
 
 	cl_program program_wgx = clCreateProgramWithSource(context, 1,
 													   (const char **)&source_str1_wgx, (const size_t *)&source_size1_wgx, &ret);
