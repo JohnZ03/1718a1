@@ -194,27 +194,27 @@ void forward_pass(unsigned char img[][32])
 {
 
 	// Convolution Operation + Sigmoid Activation
-	// for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-	// {
-	// 	for (int i = 0; i < 28; i++)
-	// 	{
-	// 		for (int j = 0; j < 28; j++)
-	// 		{
-	// 			max_pooling[filter_dim][i][j] = 0;
+	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
+	{
+		for (int i = 0; i < 28; i++)
+		{
+			for (int j = 0; j < 28; j++)
+			{
+				max_pooling[filter_dim][i][j] = 0;
 
-	// 			conv_layer[filter_dim][i][j] = 0;
-	// 			sig_layer[filter_dim][i][j] = 0;
-	// 			for (int k = 0; k < filter_size; k++)
-	// 			{
-	// 				for (int l = 0; l < filter_size; l++)
-	// 				{
-	// 					conv_layer[filter_dim][i][j] += img[i + k + 1][j + l - 2] * conv_w[filter_dim][k][l];
-	// 				}
-	// 			}
-	// 			sig_layer[filter_dim][i][j] = sigmoid(conv_layer[filter_dim][i][j] + conv_b[filter_dim][i][j]);
-	// 		}
-	// 	}
-	// }
+				conv_layer[filter_dim][i][j] = 0;
+				sig_layer[filter_dim][i][j] = 0;
+				for (int k = 0; k < filter_size; k++)
+				{
+					for (int l = 0; l < filter_size; l++)
+					{
+						conv_layer[filter_dim][i][j] += img[i + k + 1][j + l - 2] * conv_w[filter_dim][k][l];
+					}
+				}
+				// sig_layer[filter_dim][i][j] = sigmoid(conv_layer[filter_dim][i][j] + conv_b[filter_dim][i][j]);
+			}
+		}
+	}
 	// ! TEST
 	// cout << endl
 	// 	 << "memory\t" << endl;
@@ -230,6 +230,7 @@ void forward_pass(unsigned char img[][32])
 	// 		cout << endl;
 	// 	}
 	// }
+
 	// Conv
 	cl_char zeros_char = 0;
 	ret = clEnqueueFillBuffer(command_queue, max_pooling_mem_obj, &zeros_char, sizeof(zeros_char), 0,
@@ -244,8 +245,8 @@ void forward_pass(unsigned char img[][32])
 	size_t global_item_size[3] = {5, 28, 28};
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_forward_conv, 3, NULL,
 								 global_item_size, NULL, 0, NULL, NULL);
-	ret = clEnqueueReadBuffer(command_queue, conv_layer_mem_obj, CL_TRUE, 0,
-							  sizeof(conv_layer), conv_layer, 0, NULL, NULL);
+	// ret = clEnqueueReadBuffer(command_queue, conv_layer_mem_obj, CL_TRUE, 0,
+	// 						  sizeof(conv_layer), conv_layer, 0, NULL, NULL);
 
 	// !TEST
 	// Print the result of conv kernel
@@ -265,42 +266,42 @@ void forward_pass(unsigned char img[][32])
 	// cout << endl;
 	// cout << endl;
 
-	// //! TEST
-	// // Write buffer with origin conv_layer, and execute sigmoid kernel
-	// ret = clEnqueueWriteBuffer(command_queue, conv_layer_mem_obj, CL_TRUE, 0,
-	// 						   sizeof(conv_layer), conv_layer, 0, NULL, NULL);
+	//! TEST
+	// Write buffer with original conv_layer, and execute sigmoid kernel
+	ret = clEnqueueWriteBuffer(command_queue, conv_layer_mem_obj, CL_TRUE, 0,
+							   sizeof(conv_layer), conv_layer, 0, NULL, NULL);
 
-	// // Sigmoid
-	// ret = clEnqueueWriteBuffer(command_queue, conv_b_mem_obj, CL_TRUE, 0,
-	// 						   sizeof(conv_b), conv_b, 0, NULL, NULL);
-	// // No change with global_item_size
-	// ret = clEnqueueNDRangeKernel(command_queue, kernel_sig_layer, 3, NULL,
-	// 							 global_item_size, NULL, 0, NULL, NULL);
-	// ret = clEnqueueReadBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
-	// 						  sizeof(sig_layer), sig_layer, 0, NULL, NULL);
+	// Sigmoid
+	ret = clEnqueueWriteBuffer(command_queue, conv_b_mem_obj, CL_TRUE, 0,
+							   sizeof(conv_b), conv_b, 0, NULL, NULL);
+	// No change with global_item_size
+	ret = clEnqueueNDRangeKernel(command_queue, kernel_sig_layer, 3, NULL,
+								 global_item_size, NULL, 0, NULL, NULL);
+	ret = clEnqueueReadBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
+							  sizeof(sig_layer), sig_layer, 0, NULL, NULL);
 
 	// Convolution Operation + Sigmoid Activation
-	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-	{
-		for (int i = 0; i < 28; i++)
-		{
-			for (int j = 0; j < 28; j++)
-			{
-				// max_pooling[filter_dim][i][j] = 0;
+	// for (int filter_dim = 0; filter_dim < 5; filter_dim++)
+	// {
+	// 	for (int i = 0; i < 28; i++)
+	// 	{
+	// 		for (int j = 0; j < 28; j++)
+	// 		{
+	// 			// max_pooling[filter_dim][i][j] = 0;
 
-				// test[filter_dim][i][j] = 0;
-				sig_layer[filter_dim][i][j] = 0;
-				for (int k = 0; k < filter_size; k++)
-				{
-					for (int l = 0; l < filter_size; l++)
-					{
-						// test[filter_dim][i][j] += img[i + k + 1][j + l - 2] * conv_w[filter_dim][k][l];
-					}
-				}
-				sig_layer[filter_dim][i][j] = sigmoid(conv_layer[filter_dim][i][j] + conv_b[filter_dim][i][j]);
-			}
-		}
-	}
+	// 			// test[filter_dim][i][j] = 0;
+	// 			sig_layer[filter_dim][i][j] = 0;
+	// 			for (int k = 0; k < filter_size; k++)
+	// 			{
+	// 				for (int l = 0; l < filter_size; l++)
+	// 				{
+	// 					// test[filter_dim][i][j] += img[i + k + 1][j + l - 2] * conv_w[filter_dim][k][l];
+	// 				}
+	// 			}
+	// 			sig_layer[filter_dim][i][j] = sigmoid(conv_layer[filter_dim][i][j] + conv_b[filter_dim][i][j]);
+	// 		}
+	// 	}
+	// }
 
 	// MAX Pooling (max_pooling, max_layer)
 	float cur_max = 0;
