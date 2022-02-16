@@ -24,19 +24,34 @@ __kernel void update_weights_3d(__global float *A, __global float *B,
   C[i * w2 * w1 + j * w1 + k] -= *A * B[i * w2 * w1 + j * w1 + k];
 }
 
-__kernel void forward_conv(__global float *img, __global float *conv_w,
+__kernel void forward_conv(__global unsigned char *img, __global float *conv_w,
                            __global float *conv_layer) {
-
-  int k = get_global_id(0);
-  int l = get_global_id(1);
-  for (int filter_dim = 0; filter_dim < 5; filter_dim++) {
-    for (int i = 0; i < 28; i++)
-      for (int j = 0; j < 28; j++)
-        conv_layer[filter_dim * 784 + i * 28 + j] +=
-            img[(i + k + 1) * 32 + j + l - 2] *
-            conv_w[filter_dim * 784 + k * 28 + l];
-  }
+    int filter_dim = get_global_id(0);
+    int i = get_global_id(1);
+    int j = get_global_id(2);
+//   for (int filter_dim = 0; filter_dim < 5; filter_dim++)
+//     for (int i = 0; i < 28; i++)
+//       for (int j = 0; j < 28; j++)
+        for (int k = 0; k < 7; k++)
+          for (int l = 0; l < 7; l++)
+            conv_layer[filter_dim * 784 + i * 28 + j] +=
+                img[(i + k + 1) * 32 + j + l - 2] *
+                conv_w[filter_dim * 49 + k * 7 + l];
 }
+
+// __kernel void forward_conv(__global unsigned char *img, __global float *conv_w,
+//                            __global float *conv_layer) {
+
+//   int k = get_global_id(0);
+//   int l = get_global_id(1);
+//   for (int filter_dim = 0; filter_dim < 5; filter_dim++) {
+//     for (int i = 0; i < 28; i++)
+//       for (int j = 0; j < 28; j++)
+//         conv_layer[filter_dim * 784 + i * 28 + j] +=
+//             img[(i + k + 1) * 32 + j + l - 2] *
+//             conv_w[filter_dim * 49 + k * 7 + l];
+//   }
+// }
 
 float sigmoid(float x) {
   if (x > 500)
@@ -45,10 +60,12 @@ float sigmoid(float x) {
     x = -500;
   return 1 / (1 + exp(-x));
 }
-__kernel void sig_layer(__global float *sig_layer, __global float *conv_layer, __global float *conv_b) {
+__kernel void sig_layer(__global float *sig_layer, __global float *conv_layer,
+                        __global float *conv_b) {
   int filter_dim = get_global_id(0);
   int i = get_global_id(1);
   int j = get_global_id(2);
   sig_layer[filter_dim * 784 + i * 28 + j] =
-      sigmoid(conv_layer[filter_dim * 784 + i * 28 + j] + conv_b[filter_dim * 784 + i * 28 + j]);
+      sigmoid(conv_layer[filter_dim * 784 + i * 28 + j] +
+              conv_b[filter_dim * 784 + i * 28 + j]);
 }

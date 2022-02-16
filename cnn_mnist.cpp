@@ -22,8 +22,6 @@ size_t source_size;
 #endif
 #define MAX_SOURCE_SIZE (0x100000)
 
-
-
 cl_command_queue command_queue;
 
 cl_kernel kernel_update_weights_dense_b;
@@ -34,8 +32,6 @@ cl_kernel kernel_update_weights_conv_b;
 cl_kernel kernel_update_weights_conv_w;
 cl_kernel kernel_forward_conv;
 cl_kernel kernel_sig_layer;
-
-
 
 // SECTION: global variables for openCL
 cl_platform_id platform_id = NULL;
@@ -62,12 +58,15 @@ cl_mem sig_layer_mem_obj;
 cl_mem conv_layer_mem_obj;
 cl_mem img_mem_obj;
 cl_mem max_pooling_mem_obj;
-
+//! TEST
+float test[5][28][28];
 
 using namespace std;
 const int filter_size = 7;
 const float eta = 0.01;
-const int batch_size = 200;
+//! TEST
+const int batch_size = 1;
+// const int batch_size = 200;
 
 unsigned char data_train[60000][784];
 unsigned char data_test[10000][784];
@@ -99,8 +98,6 @@ float db1[120];
 float dw_max[5][28][28];
 float dw_conv[5][7][7];
 float db_conv[5][28][28];
-unsigned char img[35][32];
-
 
 /* ************************************************************ */
 /* Helper functions */
@@ -185,55 +182,117 @@ void forward_pass(unsigned char img[][32])
 {
 
 	// Convolution Operation + Sigmoid Activation
+	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
+	{
+		for (int i = 0; i < 28; i++)
+		{
+			for (int j = 0; j < 28; j++)
+			{
+				max_pooling[filter_dim][i][j] = 0;
+
+				conv_layer[filter_dim][i][j] = 0;
+				sig_layer[filter_dim][i][j] = 0;
+				for (int k = 0; k < filter_size; k++)
+				{
+					for (int l = 0; l < filter_size; l++)
+					{
+						conv_layer[filter_dim][i][j] += img[i + k + 1][j + l - 2] * conv_w[filter_dim][k][l];
+					}
+				}
+				sig_layer[filter_dim][i][j] = sigmoid(conv_layer[filter_dim][i][j] + conv_b[filter_dim][i][j]);
+			}
+		}
+	}
+
+	// Conv
+	cl_char zeros_char = 0;
+	ret = clEnqueueFillBuffer(command_queue, max_pooling_mem_obj, &zeros_char, sizeof(zeros_char), 0,
+							  sizeof(max_pooling), 0, NULL, NULL);
+	cl_float zeros_float = 0;
+	ret = clEnqueueFillBuffer(command_queue, conv_layer_mem_obj, &zeros_float, sizeof(zeros_float), 0,
+							  sizeof(conv_layer), 0, NULL, NULL);
+	ret = clEnqueueFillBuffer(command_queue, sig_layer_mem_obj, &zeros_float, sizeof(zeros_float), 0,
+							  sizeof(sig_layer), 0, NULL, NULL);
+	ret = clEnqueueWriteBuffer(command_queue, conv_w_mem_obj, CL_TRUE, 0,
+							   sizeof(conv_w), &conv_w, 0, NULL, NULL);
+
+	//! TEST
+	// ret = clEnqueueReadBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
+	// 						  sizeof(sig_layer), sig_layer, 0, NULL, NULL);
+	cout << endl
+		 << "mem\t" << endl;
+	for (int filter_dim = 0; filter_dim < 1; filter_dim++)
+	{
+		for (int i = 13; i < 14; i++)
+
+		{
+			for (int j = 0; j < 28; j++)
+			{
+				cout << sig_layer[filter_dim][i][j] << " ";
+			}
+			cout << endl;
+		}
+	}
+
+	size_t global_item_size[3] = {5, 28, 28};
+	// ret = clEnqueueNDRangeKernel(command_queue, kernel_forward_conv, 3, NULL,
+	// 							 global_item_size, NULL, 0, NULL, NULL);
+	// ret = clEnqueueReadBuffer(command_queue, conv_layer_mem_obj, CL_TRUE, 0,
+	// 						  sizeof(conv_layer), conv_layer, 0, NULL, NULL);
+
+	// Sigmoid
+	ret = clEnqueueWriteBuffer(command_queue, conv_b_mem_obj, CL_TRUE, 0,
+							   sizeof(conv_b), &conv_b, 0, NULL, NULL);
+	ret = clEnqueueNDRangeKernel(command_queue, kernel_sig_layer, 3, NULL,
+								 global_item_size, NULL, 0, NULL, NULL);
+	ret = clEnqueueReadBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
+							  sizeof(sig_layer), sig_layer, 0, NULL, NULL);
+
+	// // !TEST
+
+	// cout << endl
+	// 	 << "buffer\t";
+	// for (int j = 0; j < 28; j++)
+	// 	cout << sig_layer[2][j][3] << " ";
+
+	// !TEST
+	// Convolution Operation + Sigmoid Activation
 	// for (int filter_dim = 0; filter_dim < 5; filter_dim++)
 	// {
 	// 	for (int i = 0; i < 28; i++)
 	// 	{
 	// 		for (int j = 0; j < 28; j++)
 	// 		{
-	// 			max_pooling[filter_dim][i][j] = 0;
+	// 			// max_pooling[filter_dim][i][j] = 0;
 
-	// 			conv_layer[filter_dim][i][j] = 0;
+	// 			// test[filter_dim][i][j] = 0;
 	// 			sig_layer[filter_dim][i][j] = 0;
 	// 			for (int k = 0; k < filter_size; k++)
 	// 			{
 	// 				for (int l = 0; l < filter_size; l++)
 	// 				{
-	// 					conv_layer[filter_dim][i][j] += img[i + k + 1][j + l - 2] * conv_w[filter_dim][k][l];
+	// 					// test[filter_dim][i][j] += img[i + k + 1][j + l - 2] * conv_w[filter_dim][k][l];
 	// 				}
 	// 			}
 	// 			sig_layer[filter_dim][i][j] = sigmoid(conv_layer[filter_dim][i][j] + conv_b[filter_dim][i][j]);
 	// 		}
 	// 	}
 	// }
-
-	cl_char zeros_char = 0;
-	ret = clEnqueueFillBuffer(command_queue, max_pooling_mem_obj, &zeros_char, sizeof(zeros_char), 0,
-							   sizeof(max_pooling), 0, NULL, NULL);
-	cl_float zeros_float = 0;
-	ret = clEnqueueFillBuffer(command_queue, conv_layer_mem_obj, &zeros_float, sizeof(zeros_float), 0,
-							   sizeof(conv_layer), 0, NULL, NULL);	
-	ret = clEnqueueFillBuffer(command_queue, sig_layer_mem_obj, &zeros_float, sizeof(zeros_float), 0,
-							   sizeof(sig_layer), 0, NULL, NULL);
-	ret = clEnqueueWriteBuffer(command_queue, conv_w_mem_obj, CL_TRUE, 0,
-							   sizeof(conv_w), &conv_w, 0, NULL, NULL);
-	ret = clEnqueueReadBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
-							   sizeof(sig_layer), sig_layer, 0, NULL, NULL);
-	// cout << "Read buffer status " << ret << endl;
-	// cout << sig_layer[0][0][0] << endl;
-	size_t global_item_size[2] = {7, 7};
-	ret = clEnqueueNDRangeKernel(command_queue, kernel_forward_conv, 2, NULL,
-								 global_item_size, NULL, 0, NULL, NULL);
-
-	ret = clEnqueueWriteBuffer(command_queue, conv_b_mem_obj, CL_TRUE, 0,
-							   sizeof(conv_b), &conv_b, 0, NULL, NULL);
-	ret = clEnqueueNDRangeKernel(command_queue, kernel_sig_layer, 2, NULL,
-								 global_item_size, NULL, 0, NULL, NULL);
-	
-	ret = clEnqueueReadBuffer(command_queue, conv_layer_mem_obj, CL_TRUE, 0,
-							   sizeof(conv_layer), conv_layer, 0, NULL, NULL);
-	ret = clEnqueueReadBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
-							   sizeof(sig_layer), sig_layer, 0, NULL, NULL);
+	cout << endl
+		 << "buffer\t" << endl;
+	for (int filter_dim = 0; filter_dim < 1; filter_dim++)
+	{
+		for (int i = 13; i < 14; i++)
+		{
+			for (int j = 0; j < 28; j++)
+			{
+				cout << sig_layer[filter_dim][i][j] << " ";
+			}
+			cout << endl;
+		}
+	}
+	cout << endl;
+	cout << endl;
 
 	// MAX Pooling (max_pooling, max_layer)
 	float cur_max = 0;
@@ -362,9 +421,6 @@ void update_weights()
 	ret = clEnqueueWriteBuffer(command_queue, db_conv_mem_obj, CL_TRUE, 0,
 							   sizeof(db_conv), db_conv, 0, NULL, NULL);
 
-
-
-
 	size_t global_item_size[3] = {120};
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_update_weights_dense_b, 1, NULL,
 								 global_item_size, NULL, 0, NULL, NULL);
@@ -395,22 +451,18 @@ void update_weights()
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_update_weights_conv_b, 3, NULL,
 								 global_item_size, NULL, 0, NULL, NULL);
 
-
-
 	ret = clEnqueueReadBuffer(command_queue, dense_b_mem_obj, CL_TRUE, 0,
-							   sizeof(dense_b), dense_b, 0, NULL, NULL);
+							  sizeof(dense_b), dense_b, 0, NULL, NULL);
 	ret = clEnqueueReadBuffer(command_queue, dense_b2_mem_obj, CL_TRUE, 0,
-							   sizeof(dense_b2), dense_b2, 0, NULL, NULL);
+							  sizeof(dense_b2), dense_b2, 0, NULL, NULL);
 	ret = clEnqueueReadBuffer(command_queue, dense_w2_mem_obj, CL_TRUE, 0,
-							   sizeof(dense_w2), dense_w2, 0, NULL, NULL);
+							  sizeof(dense_w2), dense_w2, 0, NULL, NULL);
 	ret = clEnqueueReadBuffer(command_queue, dense_w_mem_obj, CL_TRUE, 0,
-							   sizeof(dense_w), dense_w, 0, NULL, NULL);
+							  sizeof(dense_w), dense_w, 0, NULL, NULL);
 	ret = clEnqueueReadBuffer(command_queue, conv_w_mem_obj, CL_TRUE, 0,
-							   sizeof(conv_w), conv_w, 0, NULL, NULL);
+							  sizeof(conv_w), conv_w, 0, NULL, NULL);
 	ret = clEnqueueReadBuffer(command_queue, conv_b_mem_obj, CL_TRUE, 0,
-							   sizeof(conv_b), conv_b, 0, NULL, NULL);
-
-
+							  sizeof(conv_b), conv_b, 0, NULL, NULL);
 }
 /* ************************************************************ */
 
@@ -693,15 +745,13 @@ int main()
 	db_conv_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(db_conv), NULL, &ret);
 	sig_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(sig_layer), NULL, &ret);
 	conv_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(conv_layer), NULL, &ret);
-	img_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(img), NULL, &ret);
 	max_pooling_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(max_pooling), NULL, &ret);
-
+	img_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 35 * 32 * sizeof(unsigned char), NULL, &ret);
 
 	cl_program program = clCreateProgramWithSource(context, 1,
 												   (const char **)&source_str, (const size_t *)&source_size, &ret);
 
 	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
-	
 
 	// Create kernels
 	kernel_update_weights_dense_b = clCreateKernel(program, "update_weights_1d", &ret);
@@ -713,14 +763,14 @@ int main()
 	ret = clSetKernelArg(kernel_update_weights_dense_b2, 0, sizeof(cl_mem), (void *)&eta_mem_obj);
 	ret = clSetKernelArg(kernel_update_weights_dense_b2, 1, sizeof(cl_mem), (void *)&db2_mem_obj);
 	ret = clSetKernelArg(kernel_update_weights_dense_b2, 2, sizeof(cl_mem), (void *)&dense_b2_mem_obj);
-	
+
 	kernel_update_weights_dense_w2 = clCreateKernel(program, "update_weights_2d", &ret);
 	ret = clSetKernelArg(kernel_update_weights_dense_w2, 0, sizeof(cl_mem), (void *)&eta_mem_obj);
 	ret = clSetKernelArg(kernel_update_weights_dense_w2, 1, sizeof(cl_mem), (void *)&dw2_mem_obj);
 	ret = clSetKernelArg(kernel_update_weights_dense_w2, 2, sizeof(cl_mem), (void *)&dense_w2_mem_obj);
 	int w1 = 10;
 	ret = clSetKernelArg(kernel_update_weights_dense_w2, 3, sizeof(int), &w1);
-	
+
 	kernel_update_weights_dense_w = clCreateKernel(program, "update_weights_2d", &ret);
 	ret = clSetKernelArg(kernel_update_weights_dense_w, 0, sizeof(cl_mem), (void *)&eta_mem_obj);
 	ret = clSetKernelArg(kernel_update_weights_dense_w, 1, sizeof(cl_mem), (void *)&dw1_mem_obj);
@@ -756,13 +806,12 @@ int main()
 	ret = clSetKernelArg(kernel_sig_layer, 1, sizeof(cl_mem), (void *)&conv_layer_mem_obj);
 	ret = clSetKernelArg(kernel_sig_layer, 2, sizeof(cl_mem), (void *)&conv_b_mem_obj);
 
-
 	// ! Load Dataset
 	read_test_data();
 	read_train_data();
 	initialise_weights();
-
-	int epoch = 500;
+	//! TEST
+	int epoch = 2;
 	int num = 0;
 	cout << "Start Training." << endl;
 	for (int i = 0; i < epoch; i++)
@@ -776,7 +825,7 @@ int main()
 			give_y(label_train[num], vector_y);
 			give_img(data_train[num], img);
 			ret = clEnqueueWriteBuffer(command_queue, img_mem_obj, CL_TRUE, 0,
-							sizeof(img), img, 0, NULL, NULL);
+									   sizeof(img), img, 0, NULL, NULL);
 			forward_pass(img);
 			backward_pass(dense_softmax, vector_y, img);
 			update_weights();
@@ -792,29 +841,31 @@ int main()
 			confusion_mat[i][j] = 0;
 	}
 
-	cout << "Start Testing." << endl;
-	for (int i = 0; i < val_len; i++)
-	{
-		give_img(data_test[i], img);
-		forward_pass(img);
-		int pre = give_prediction();
-		confusion_mat[label_test[i]][pre]++;
-		if (pre == label_test[i])
-			cor++;
-	}
-	float accu = float(cor) / val_len;
-	cout << "Accuracy: " << accu << endl;
+	//! TEST
+	// cout << "Start Testing." << endl;
+	// for (int i = 0; i < val_len; i++)
+	// {
+	// 	unsigned char img[35][32];
+	// 	give_img(data_test[i], img);
+	// 	forward_pass(img);
+	// 	int pre = give_prediction();
+	// 	confusion_mat[label_test[i]][pre]++;
+	// 	if (pre == label_test[i])
+	// 		cor++;
+	// }
+	// float accu = float(cor) / val_len;
+	// cout << "Accuracy: " << accu << endl;
 
-	cout << "   0 1 2 3 4 5 6 7 8 9" << endl;
-	for (int i = 0; i < 10; i++)
-	{
-		cout << i << ": ";
-		for (int j = 0; j < 10; j++)
-		{
-			cout << confusion_mat[i][j] << " ";
-		}
-		cout << endl;
-	}
+	// cout << "   0 1 2 3 4 5 6 7 8 9" << endl;
+	// for (int i = 0; i < 10; i++)
+	// {
+	// 	cout << i << ": ";
+	// 	for (int j = 0; j < 10; j++)
+	// 	{
+	// 		cout << confusion_mat[i][j] << " ";
+	// 	}
+	// 	cout << endl;
+	// }
 
 	// SECTION: OpenCL Clean up
 	ret = clFlush(command_queue);
