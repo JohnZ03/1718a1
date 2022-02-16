@@ -327,9 +327,9 @@ void forward_pass(unsigned char img[][32])
 								sizeof(sig_layer), sig_layer, 0, NULL, NULL);
 
 	// Execute the OpenCL kernel on the list
-	global_item_size[3] = {5, 14, 14}; // Process the entire lists
+	size_t global_item_size_zht[3] = {5, 14, 14}; // Process the entire lists
 	ret = clEnqueueNDRangeKernel(command_queue, max_pooling_kernel, 3, NULL,
-									global_item_size, NULL, 0, NULL, NULL);
+									global_item_size_zht, NULL, 0, NULL, NULL);
 
 	// Read the memory buffer C on the device to the local variable C
 	ret = clEnqueueReadBuffer(command_queue, max_pooling_mem_obj, CL_TRUE, 0,
