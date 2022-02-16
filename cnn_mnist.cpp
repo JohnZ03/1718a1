@@ -12,6 +12,9 @@ FILE *fp;
 char *source_str;
 size_t source_size;
 
+FILE *fp_yzj;
+char *source_str1_yzj;
+size_t source_size1_yzj;
 // SECTION: def for openCL
 #define CL_TARGET_OPENCL_VERSION 120
 
@@ -23,14 +26,17 @@ size_t source_size;
 #define MAX_SOURCE_SIZE (0x100000)
 
 float delta3[120];
+float delta4[10];
 cl_mem a_mem_obj;
 cl_mem b_mem_obj;
 cl_mem c_mem_obj;
-
+cl_mem dense_sigmoid_mem_obj;
+cl_mem delta4_mem_obj;
+cl_mem dw2_mem_obj;
 cl_command_queue command_queue;
 
 cl_kernel kernel;
-
+cl_kernel kernel_yzj1;
 // SECTION: global variables for openCL
 cl_platform_id platform_id = NULL;
 cl_device_id device_id = NULL;
@@ -296,6 +302,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	}
 
 	// Calculate Weight Changes for Dense Layer 2
+/*
 	for (int i = 0; i < 120; i++)
 	{
 		for (int j = 0; j < 10; j++)
@@ -303,7 +310,16 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 			dw2[i][j] = dense_sigmoid[i] * delta4[j];
 		}
 	}
+*/
 
+	ret = clEnqueueWriteBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0, 120 * sizeof(float), dense_sigmoid, 0, NULL, NULL);
+	ret = clEnqueueWriteBuffer(command_queue, delta4_mem_obj, CL_TRUE, 0, 10 * sizeof(float), delta4, 0, NULL, NULL);
+
+	size_t global_item_size_yzj2[2] = {10,120};
+	size_t local_item_size_yzj2[2] = {2,2};
+	ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL, global_item_size_yzj2, local_item_size_yzj2, 0, NULL, NULL);
+	ret = clEnqueueReadBuffer(command_queue, dw2_mem_obj, CL_TRUE, 0, 120 * 10 * sizeof(float), dw2, 0, NULL, NULL);
+	ret = clEnqueueReadBuffer(command_queue, dw2_mem_obj, CL_TRUE, 0, 120 * 10 * sizeof(float), dw2[0], 0, NULL, NULL);
 	// Delta 3
 	for (int i = 0; i < 120; i++)
 	{
@@ -578,6 +594,17 @@ int main()
 	source_size = fread(source_str, 1, MAX_SOURCE_SIZE, fp);
 	fclose(fp);
 
+	fp_yzj = fopen("vector_add_kernel_yzj.cl", "r");
+        if (!fp_yzj)
+        {
+                fprintf(stderr, "Failed to load kernel_yzj.\n");
+                exit(1);
+        }
+        source_str1_yzj = (char *)malloc(MAX_SOURCE_SIZE);
+        source_size1_yzj = fread(source_str1_yzj, 1, MAX_SOURCE_SIZE, fp_yzj);
+        fclose(fp_yzj);
+
+
 	// SECTION: openCL setup
 	// Get platform and device information
 	cl_int ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
@@ -598,24 +625,41 @@ int main()
 	c_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
 							   980 * 120 * sizeof(float), NULL, &ret);
 
+        dense_sigmoid_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
+                                                           sizeof(dense_sigmoid), NULL, &ret);
+        delta4_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
+                                                           sizeof(delta4), NULL, &ret);
+        dw2_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
+                                                           sizeof(dw2), NULL, &ret);
+
 	// Create a program from the kernel source
 	// ! Ret = 0, correct
 	cl_program program = clCreateProgramWithSource(context, 1,
 												   (const char **)&source_str, (const size_t *)&source_size, &ret);
+        cl_program program_yzj = clCreateProgramWithSource(context, 1,
+                                                                                                   (const char **)&source_str1_yzj, (const size_t *)&source_size1_yzj, &ret);
 
 	// Build the program
 	// ! Error = -11, CL_BUILD_PROGRAM _FAILURE
 	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+        printf("Build the program: %d\n", ret);
+        ret = clBuildProgram(program_yzj, 1, &device_id, NULL, NULL, NULL);
 	printf("Build the program: %d\n", ret);
 
 	// Create the OpenCL kernel
 	kernel = clCreateKernel(program, "vector_add", &ret);
+	kernel_yzj1 = clCreateKernel(program_yzj, "vector_add_yzj", &ret);
 	printf("Create the OpenCL kernel: %d\n", ret);
 
 	// Set the arguments of the kernel
 	ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&a_mem_obj);
 	ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&b_mem_obj);
 	ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&c_mem_obj);
+
+        ret = clSetKernelArg(kernel_yzj1, 0, sizeof(cl_mem), (void *)&dense_sigmoid_mem_obj);
+        ret = clSetKernelArg(kernel_yzj1, 1, sizeof(cl_mem), (void *)&delta4_mem_obj);
+        ret = clSetKernelArg(kernel_yzj1, 2, sizeof(cl_mem), (void *)&dw2_mem_obj);
+
 
 	// // Copy the lists A and B to their respective memory buffers
 	// ret = clEnqueueWriteBuffer(command_queue, a_mem_obj, CL_TRUE, 0,
@@ -699,6 +743,9 @@ int main()
 	ret = clReleaseMemObject(a_mem_obj);
 	ret = clReleaseMemObject(b_mem_obj);
 	ret = clReleaseMemObject(c_mem_obj);
+        ret = clReleaseMemObject(dense_sigmoid_mem_obj);
+        ret = clReleaseMemObject(delta4_mem_obj);
+        ret = clReleaseMemObject(dw2_mem_obj);
 	ret = clReleaseCommandQueue(command_queue);
 	ret = clReleaseContext(context);
 
