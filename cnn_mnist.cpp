@@ -13,8 +13,10 @@
 FILE *fp;
 char *source_str;
 size_t source_size;
+
 FILE *fp_wgx;
 char *source_str1_wgx;
+size_t source_size1_wgx;
 
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
@@ -1144,58 +1146,67 @@ int main()
 			int vector_y[10];
 			give_y(label_train[num], vector_y);
 			give_img(data_train[num], img);
-
-			int val_len = 600;
-			int cor = 0;
-			int confusion_mat[10][10];
-			for (int i = 0; i < 10; i++)
-			{
-				for (int j = 0; j < 10; j++)
-					confusion_mat[i][j] = 0;
-			}
-
-			cout << "Start Testing." << endl;
-			for (int i = 0; i < val_len; i++)
-			{
-				unsigned char img[35][32];
-				give_img(data_test[i], img);
-				forward_pass(img);
-			}
-			float accu = float(cor) / val_len;
-			cout << "Accuracy: " << accu << endl;
-
-			cout << "   0 1 2 3 4 5 6 7 8 9" << endl;
-			for (int i = 0; i < 10; i++)
-			{
-				cout << i << ": ";
-				for (int j = 0; j < 10; j++)
-				{
-					cout << confusion_mat[i][j] << " ";
-				}
-				cout << endl;
-			}
-
-			// SECTION: OpenCL Clean up
-			ret = clFlush(command_queue);
-			ret = clFinish(command_queue);
-			ret = clReleaseKernel(kernel);
-			ret = clReleaseProgram(program);
-			ret = clReleaseProgram(program_wgx);
-
-			ret = clReleaseMemObject(dense_input_mem_obj);
-			ret = clReleaseMemObject(delta3_mid_mem_obj);
-			ret = clReleaseMemObject(delta3_mem_obj);
-			ret = clReleaseMemObject(delta2_mid_mem_obj);
-			ret = clReleaseMemObject(delta2_mem_obj);
-			ret = clReleaseMemObject(dense_w_mem_obj);
-			ret = clReleaseMemObject(dw1_mem_obj);
-			ret = clReleaseMemObject(d_sigmoid_dense_input_mem_obj);
-			ret = clReleaseMemObject(dense_w2_mem_obj);
-			ret = clReleaseMemObject(delta4_mem_obj);
-			ret = clReleaseMemObject(d_sigmoid_dense_sum_mem_obj);
-
-			ret = clReleaseCommandQueue(command_queue);
-			ret = clReleaseContext(context);
-
-			return 0;
+			forward_pass(img);
+			backward_pass(dense_softmax, vector_y, img);
+			update_weights();
 		}
+	}
+
+	int val_len = 600;
+	int cor = 0;
+	int confusion_mat[10][10];
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 10; j++)
+			confusion_mat[i][j] = 0;
+	}
+
+	cout << "Start Testing." << endl;
+	for (int i = 0; i < val_len; i++)
+	{
+		unsigned char img[35][32];
+		give_img(data_test[i], img);
+		forward_pass(img);
+		int pre = give_prediction();
+		confusion_mat[label_test[i]][pre]++;
+		if (pre == label_test[i])
+			cor++;
+	}
+	float accu = float(cor) / val_len;
+	cout << "Accuracy: " << accu << endl;
+
+	cout << "   0 1 2 3 4 5 6 7 8 9" << endl;
+	for (int i = 0; i < 10; i++)
+	{
+		cout << i << ": ";
+		for (int j = 0; j < 10; j++)
+		{
+			cout << confusion_mat[i][j] << " ";
+		}
+		cout << endl;
+	}
+
+	// SECTION: OpenCL Clean up
+	ret = clFlush(command_queue);
+	ret = clFinish(command_queue);
+	ret = clReleaseKernel(kernel);
+	ret = clReleaseProgram(program);
+	ret = clReleaseProgram(program_wgx);
+
+	ret = clReleaseMemObject(dense_input_mem_obj);
+	ret = clReleaseMemObject(delta3_mid_mem_obj);
+	ret = clReleaseMemObject(delta3_mem_obj);
+	ret = clReleaseMemObject(delta2_mid_mem_obj);
+	ret = clReleaseMemObject(delta2_mem_obj);
+	ret = clReleaseMemObject(dense_w_mem_obj);
+	ret = clReleaseMemObject(dw1_mem_obj);
+	ret = clReleaseMemObject(d_sigmoid_dense_input_mem_obj);
+	ret = clReleaseMemObject(dense_w2_mem_obj);
+	ret = clReleaseMemObject(delta4_mem_obj);
+	ret = clReleaseMemObject(d_sigmoid_dense_sum_mem_obj);
+
+	ret = clReleaseCommandQueue(command_queue);
+	ret = clReleaseContext(context);
+
+	return 0;
+}
