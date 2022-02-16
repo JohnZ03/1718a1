@@ -49,6 +49,7 @@ cl_mem dense_b_mem_obj;
 cl_mem dense_sigmoid_mem_obj;
 cl_mem dense_sum2_mem_obj;
 cl_mem dense_b2_mem_obj;
+cl_mem dense_softmax_mem_obj;
 
 cl_command_queue command_queue;
 
@@ -63,6 +64,7 @@ cl_kernel kernel_wgx5;
 cl_kernel kernel_wgx6;
 cl_kernel kernel_wgx7;
 cl_kernel kernel_wgx8;
+cl_kernel kernel_wgx9;
 
 // SECTION: global variables for openCL
 cl_platform_id platform_id = NULL;
@@ -316,11 +318,27 @@ void forward_pass(unsigned char img[][32])
 	}
 */
 	// Softmax Output
+	//
+	
+	
+	size_t global_item_size_wgx9 = 10; // Process the entire lists
+	size_t local_item_size_wgx9 = 10;	// Process in groups of 20
+	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx9, 1, NULL,
+								 &global_item_size_wgx9, &local_item_size_wgx9, 0, NULL, NULL);
+	ret = clEnqueueReadBuffer(command_queue, dense_softmax_mem_obj, CL_TRUE, 0,
+							  sizeof(dense_softmax), dense_softmax, 0, NULL, NULL);
+
+	float dense_softmax_1[10];
+
 	float den = softmax_den(dense_sum2, 10);
+	/*
 	for (int i = 0; i < 10; i++)
 	{
-		dense_softmax[i] = exp(dense_sum2[i]) / den;
-	}
+		dense_softmax_1[i] = exp(dense_sum2[i]) / den;
+		if(dense_softmax_1[i]-dense_softmax[i]>0.00001 ||dense_softmax_1[i]-dense_softmax[i]<-0.00001)
+			printf("o=%f, n=%f`\n",dense_softmax_1[i],dense_softmax[i]);
+	}*/
+	
 }
 
 void update_weights()
@@ -758,6 +776,9 @@ int main()
 	dense_b2_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
 										sizeof(dense_b2), NULL, &ret);
 
+	dense_softmax_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE,
+										10*sizeof(float), NULL, &ret);
+
 	// Create a program from the kernel source
 	cl_program program = clCreateProgramWithSource(context, 1,
 												   (const char **)&source_str, (const size_t *)&source_size, &ret);
@@ -791,6 +812,8 @@ int main()
 	printf("Create the OpenCL kernel sigmoid: %d\n", ret);
 	kernel_wgx8 = clCreateKernel(program_wgx, "multi_add2", &ret);
 	printf("Create the OpenCL kernel d_sigmoid: %d\n", ret);
+	kernel_wgx9 = clCreateKernel(program_wgx, "softmax_den", &ret);
+	printf("Create the OpenCL kernel softmax_den: %d\n", ret);
 
 	// Set the arguments of the kernel
 	ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&dense_input_mem_obj);
@@ -846,6 +869,11 @@ int main()
 	ret = clSetKernelArg(kernel_wgx8, 4, sizeof(cl_int), (void *)&kernel_wgx_size8_1);
 	ret = clSetKernelArg(kernel_wgx8, 5, sizeof(cl_int), (void *)&kernel_wgx_size8_2);
 
+	cl_int kernel_wgx_size9 = 10;
+	ret = clSetKernelArg(kernel_wgx9, 0, sizeof(cl_mem), (void *)&dense_sum2_mem_obj);
+	ret = clSetKernelArg(kernel_wgx9, 1, sizeof(cl_mem), (void *)&dense_softmax_mem_obj);
+	ret = clSetKernelArg(kernel_wgx9, 2, sizeof(cl_int), (void *)&kernel_wgx_size9);
+	printf("Set kernel Arg: %d\n", ret);
 
 	// ! Max pooling setup (forward pass)
 	fp = fopen("max_pooling_kernel.cl", "r");
