@@ -214,6 +214,9 @@ void initialise_weights()
 							   sizeof(dense_w), dense_w, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, dense_b_mem_obj, CL_TRUE, 0,
 							   sizeof(dense_b), conv_w, 0, NULL, NULL);
+
+	ret = clEnqueueWriteBuffer(command_queue, eta_mem_obj, CL_TRUE, 0,
+							   sizeof(eta), &eta, 0, NULL, NULL);
 }
 /* ************************************************************ */
 
@@ -496,8 +499,6 @@ void update_weights()
 	// 	}
 	// }
 
-	ret = clEnqueueWriteBuffer(command_queue, eta_mem_obj, CL_TRUE, 0,
-							   sizeof(eta), &eta, 0, NULL, NULL);
 	//ret = clEnqueueWriteBuffer(command_queue, db1_mem_obj, CL_TRUE, 0,
 	//						   sizeof(db1), db1, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, db2_mem_obj, CL_TRUE, 0,
