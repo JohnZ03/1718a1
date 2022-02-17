@@ -504,8 +504,8 @@ void update_weights()
 							   sizeof(db2), db2, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, dw2_mem_obj, CL_TRUE, 0,
 							   sizeof(dw2), dw2, 0, NULL, NULL);
-	ret = clEnqueueWriteBuffer(command_queue, dw1_mem_obj, CL_TRUE, 0,
-							   sizeof(dw1), dw1, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, dw1_mem_obj, CL_TRUE, 0,
+	//						   sizeof(dw1), dw1, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, dw_conv_mem_obj, CL_TRUE, 0,
 							   sizeof(dw_conv), dw_conv, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, db_conv_mem_obj, CL_TRUE, 0,
@@ -636,8 +636,8 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// printf("Execute the OpenCL kernel on the list: %d\n", ret);
 
 	// Read the memory buffer C on the device to the local variable C
-	ret = clEnqueueReadBuffer(command_queue, dw1_mem_obj, CL_TRUE, 0,
-							  sizeof(dw1), dw1, 0, NULL, NULL);
+	//ret = clEnqueueReadBuffer(command_queue, dw1_mem_obj, CL_TRUE, 0,
+	//						  sizeof(dw1), dw1, 0, NULL, NULL);
 
 	// Delta2
 	// TODO: attempt on OPENCL      Guoxian
