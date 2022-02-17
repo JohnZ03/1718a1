@@ -54,6 +54,7 @@ cl_mem dense_softmax_mem_obj;
 cl_command_queue command_queue;
 
 cl_kernel kernel;
+cl_kernel kernel2;
 cl_kernel max_pooling_kernel;
 cl_kernel kernel_wgx;
 cl_kernel kernel_wgx1;
@@ -331,8 +332,8 @@ void forward_pass(unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx7, 1, NULL,
 								 &global_item_size_wgx7, &local_item_size_wgx7, 0, NULL, NULL);
 
-	ret = clEnqueueReadBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
-							  sizeof(dense_sigmoid), dense_sigmoid, 0, NULL, NULL);
+	//ret = clEnqueueReadBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
+	//						  sizeof(dense_sigmoid), dense_sigmoid, 0, NULL, NULL);
 
 	/*
 		float dense_sum_1[120];
@@ -446,8 +447,8 @@ void update_weights()
 	//						   sizeof(db1), db1, 0, NULL, NULL);
 	//ret = clEnqueueWriteBuffer(command_queue, db2_mem_obj, CL_TRUE, 0,
 	//						   sizeof(db2), db2, 0, NULL, NULL);
-	ret = clEnqueueWriteBuffer(command_queue, dw2_mem_obj, CL_TRUE, 0,
-							   sizeof(dw2), dw2, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, dw2_mem_obj, CL_TRUE, 0,
+	//						   sizeof(dw2), dw2, 0, NULL, NULL);
 	// ret = clEnqueueWriteBuffer(command_queue, dw1_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dw1), dw1, 0, NULL, NULL);
 	//ret = clEnqueueWriteBuffer(command_queue, dw_conv_mem_obj, CL_TRUE, 0,
@@ -517,13 +518,17 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 							  0, sizeof(db2), 0, NULL, NULL);
 
 	// Calculate Weight Changes for Dense Layer 2
-	for (int i = 0; i < 120; i++)
-	{
-		for (int j = 0; j < 10; j++)
-		{
-			dw2[i][j] = dense_sigmoid[i] * delta4[j];
-		}
-	}
+	//for (int i = 0; i < 120; i++)
+	//{
+	//	for (int j = 0; j < 10; j++)
+	//	{
+	//		dw2[i][j] = dense_sigmoid[i] * delta4[j];
+	//	}
+	//}
+
+	size_t global_item_size_2[2] = {120, 10}; // Process the entire lists
+	ret = clEnqueueNDRangeKernel(command_queue, kernel2, 2, NULL,
+								 global_item_size_2, NULL, 0, NULL, NULL);
 
 	// Delta 3
 
@@ -1025,6 +1030,8 @@ int main()
 	// Create the OpenCL kernel
 	kernel = clCreateKernel(program, "mul_2d", &ret);
 	printf("Create the OpenCL kernel: %d\n", ret);
+	kernel2 = clCreateKernel(program, "mul_2d_1", &ret);
+	printf("Create the OpenCL kernel: %d\n", ret);
 	kernel_wgx = clCreateKernel(program_wgx, "multi_add", &ret);
 	printf("Create the OpenCL kernel multi_add: %d\n", ret);
 	kernel_wgx1 = clCreateKernel(program_wgx, "vector_multi", &ret);
@@ -1051,6 +1058,9 @@ int main()
 	ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&delta3_mem_obj);
 	ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&dw1_mem_obj);
 
+	ret = clSetKernelArg(kernel2, 0, sizeof(cl_mem), (void *)&dense_sigmoid_mem_obj);
+	ret = clSetKernelArg(kernel2, 1, sizeof(cl_mem), (void *)&delta4_mem_obj);
+	ret = clSetKernelArg(kernel2, 2, sizeof(cl_mem), (void *)&dw2_mem_obj);
 	cl_int kernel_wgx_size = 120;
 	ret = clSetKernelArg(kernel_wgx, 0, sizeof(cl_mem), (void *)&dense_w_mem_obj);
 	ret = clSetKernelArg(kernel_wgx, 1, sizeof(cl_mem), (void *)&delta3_mem_obj);
