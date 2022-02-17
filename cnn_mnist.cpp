@@ -498,8 +498,8 @@ void update_weights()
 
 	ret = clEnqueueWriteBuffer(command_queue, eta_mem_obj, CL_TRUE, 0,
 							   sizeof(eta), &eta, 0, NULL, NULL);
-	ret = clEnqueueWriteBuffer(command_queue, db1_mem_obj, CL_TRUE, 0,
-							   sizeof(db1), db1, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, db1_mem_obj, CL_TRUE, 0,
+	//						   sizeof(db1), db1, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, db2_mem_obj, CL_TRUE, 0,
 							   sizeof(db2), db2, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, dw2_mem_obj, CL_TRUE, 0,
@@ -619,8 +619,10 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// ret = clEnqueueReadBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
 	//						  sizeof(delta3), delta3, 0, NULL, NULL);
 
-	ret = clEnqueueReadBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
-							  sizeof(db1), db1, 0, NULL, NULL);
+	ret = clEnqueueCopyBuffer(command_queue, delta3_mem_obj, db1_mem_obj, 0,
+							  0, sizeof(db1), 0, NULL, NULL);
+	//ret = clEnqueueReadBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
+	//						  sizeof(db1), db1, 0, NULL, NULL);
 
 	// Calculate Weight Changes for Dense Layer 1
 	// Copy the lists A and B to their respective memory buffers
