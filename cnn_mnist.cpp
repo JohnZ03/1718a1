@@ -258,15 +258,15 @@ void forward_pass(unsigned char img[][32])
 	ret = clEnqueueFillBuffer(command_queue, sig_layer_mem_obj, &zeros_float, sizeof(zeros_float), 0,
 							  sizeof(sig_layer), 0, NULL, NULL);
 
-	ret = clEnqueueWriteBuffer(command_queue, conv_w_mem_obj, CL_TRUE, 0,
-							   sizeof(conv_w), conv_w, 0, NULL, NULL);
+	// ret = clEnqueueWriteBuffer(command_queue, conv_w_mem_obj, CL_TRUE, 0,
+	// 						   sizeof(conv_w), conv_w, 0, NULL, NULL);
 	size_t global_item_size[3] = {5, 28, 28};
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_forward_conv, 3, NULL,
 								 global_item_size, NULL, 0, NULL, NULL);
 
 	// Sigmoid
-	ret = clEnqueueWriteBuffer(command_queue, conv_b_mem_obj, CL_TRUE, 0,
-							   sizeof(conv_b), conv_b, 0, NULL, NULL);
+	// ret = clEnqueueWriteBuffer(command_queue, conv_b_mem_obj, CL_TRUE, 0,
+	// 						   sizeof(conv_b), conv_b, 0, NULL, NULL);
 	// No change with global_item_size
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_sig_layer, 3, NULL,
 								 global_item_size, NULL, 0, NULL, NULL);
@@ -685,16 +685,19 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	}
 
 	// Set Conv Layer Weight changes to 0
-	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-	{
-		for (int i = 0; i < 5; i++)
-		{
-			for (int j = 0; j < 5; j++)
-			{
-				dw_conv[filter_dim][i][j] = 0;
-			}
-		}
-	}
+	// for (int filter_dim = 0; filter_dim < 5; filter_dim++)
+	// {
+	// 	for (int i = 0; i < 5; i++)
+	// 	{
+	// 		for (int j = 0; j < 5; j++)
+	// 		{
+	// 			dw_conv[filter_dim][i][j] = 0;
+	// 		}
+	// 	}
+	// }
+	cl_float zeros_float = 0;
+	ret = clEnqueueFillBuffer(command_queue, dw_conv_mem_obj, &zeros_float, sizeof(zeros_float), 0,
+							  sizeof(dw_conv), 0, NULL, NULL);
 
 	// TODO: Haotian
 	// Calculate Weight Changes for Conv Layer
@@ -719,8 +722,8 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// ret = clEnqueueWriteBuffer(command_queue, dw_max_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dw_max), dw_max, 0, NULL, NULL);
 
-	ret = clEnqueueWriteBuffer(command_queue, img_mem_obj, CL_TRUE, 0,
-							   35 * 32 * sizeof(unsigned char), img, 0, NULL, NULL);
+	// ret = clEnqueueWriteBuffer(command_queue, img_mem_obj, CL_TRUE, 0,
+	// 						   35 * 32 * sizeof(unsigned char), img, 0, NULL, NULL);
 
 	size_t global_item_size_zht2[3] = {5, 5, 5}; // Process the entire lists
 	ret = clEnqueueNDRangeKernel(command_queue, conv_weight_kernel, 3, NULL,
