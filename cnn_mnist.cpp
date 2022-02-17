@@ -264,8 +264,9 @@ void forward_pass(unsigned char img[][32])
 	// ret = clEnqueueWriteBuffer(command_queue, conv_w_mem_obj, CL_TRUE, 0,
 	// 						   sizeof(conv_w), conv_w, 0, NULL, NULL);
 	size_t global_item_size[3] = {5, 28, 28};
+	size_t local_item_size[3] = {5, 4, 4};
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_forward_conv, 3, NULL,
-								 global_item_size, NULL, 0, NULL, NULL);
+								 global_item_size, local_item_size, 0, NULL, NULL);
 
 	// Sigmoid
 	// ret = clEnqueueWriteBuffer(command_queue, conv_b_mem_obj, CL_TRUE, 0,
@@ -284,8 +285,9 @@ void forward_pass(unsigned char img[][32])
 
 	// Execute the OpenCL kernel on the list
 	size_t global_item_size_zht[3] = {5, 14, 14}; // Process the entire lists
+	size_t local_item_size_zht[3] = {1, 2, 2}; // Process the entire lists
 	ret = clEnqueueNDRangeKernel(command_queue, max_pooling_kernel, 3, NULL,
-								 global_item_size_zht, NULL, 0, NULL, NULL);
+								 global_item_size_zht, local_item_size_zht, 0, NULL, NULL);
 
 	// Read the memory buffer C on the device to the local variable C
 	// ret = clEnqueueReadBuffer(command_queue, max_pooling_mem_obj, CL_TRUE, 0,
@@ -457,8 +459,9 @@ void update_weights()
 	//						   sizeof(db_conv), db_conv, 0, NULL, NULL);
 
 	size_t global_item_size[3] = {120};
+	size_t local_item_size[3] = {10};
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_update_weights_dense_b, 1, NULL,
-								 global_item_size, NULL, 0, NULL, NULL);
+								 global_item_size, local_item_size, 0, NULL, NULL);
 
 	global_item_size[0] = 10;
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_update_weights_dense_b2, 1, NULL,
@@ -471,8 +474,10 @@ void update_weights()
 
 	global_item_size[0] = 980;
 	global_item_size[1] = 120;
+	local_item_size[0] = 20;
+	local_item_size[1] = 12;
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_update_weights_dense_w, 2, NULL,
-								 global_item_size, NULL, 0, NULL, NULL);
+								 global_item_size, local_item_size, 0, NULL, NULL);
 
 	global_item_size[0] = 5;
 	global_item_size[1] = 7;
