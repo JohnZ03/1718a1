@@ -304,8 +304,8 @@ void forward_pass(unsigned char img[][32])
 	// No change with global_item_size
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_sig_layer, 3, NULL,
 								 global_item_size, NULL, 0, NULL, NULL);
-	ret = clEnqueueReadBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
-							  sizeof(sig_layer), sig_layer, 0, NULL, NULL);
+	//ret = clEnqueueReadBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
+	//						  sizeof(sig_layer), sig_layer, 0, NULL, NULL);
 
 	// // Convolution Operation + Sigmoid Activation
 	// for (int filter_dim = 0; filter_dim < 5; filter_dim++)
@@ -332,8 +332,8 @@ void forward_pass(unsigned char img[][32])
 
 	// MAX Pooling (max_pooling, max_layer)
 	// Copy the lists A and B to their respective memory buffers
-	ret = clEnqueueWriteBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
-							   sizeof(sig_layer), sig_layer, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
+	//						   sizeof(sig_layer), sig_layer, 0, NULL, NULL);
 
 	// Execute the OpenCL kernel on the list
 	size_t global_item_size_zht[3] = {5, 14, 14}; // Process the entire lists
