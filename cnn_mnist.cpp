@@ -343,8 +343,8 @@ void forward_pass(unsigned char img[][32])
 	// Read the memory buffer C on the device to the local variable C
 	//ret = clEnqueueReadBuffer(command_queue, max_pooling_mem_obj, CL_TRUE, 0,
 	//						  sizeof(max_pooling), max_pooling, 0, NULL, NULL);
-	ret = clEnqueueReadBuffer(command_queue, max_layer_mem_obj, CL_TRUE, 0,
-							  sizeof(max_layer), max_layer, 0, NULL, NULL);
+	//ret = clEnqueueReadBuffer(command_queue, max_layer_mem_obj, CL_TRUE, 0,
+	//						  sizeof(max_layer), max_layer, 0, NULL, NULL);
 
 	// ret = clEnqueueReadBuffer(command_queue, max_layer_mem_obj, CL_TRUE, 0,
 	//							sizeof(dense_input), dense_input, 0, NULL, NULL);
