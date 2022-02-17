@@ -691,8 +691,8 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 								 &global_item_size_wgx1, &local_item_size_wgx1, 0, NULL, NULL);
 	// printf("NDRangeKernel: %d\n", ret);
 
-	ret = clEnqueueReadBuffer(command_queue, delta2_mem_obj, CL_TRUE, 0,
-							  sizeof(delta2), delta2, 0, NULL, NULL);
+	//ret = clEnqueueReadBuffer(command_queue, delta2_mem_obj, CL_TRUE, 0,
+	//						  sizeof(delta2), delta2, 0, NULL, NULL);
 
 	// TODO: Haotian
 	// Calc back-propagated max layer dw_max
@@ -717,8 +717,8 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// 		}
 	// 	}
 	// }
-	ret = clEnqueueWriteBuffer(command_queue, delta2_mem_obj, CL_TRUE, 0,
-							   sizeof(delta2), delta2, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, delta2_mem_obj, CL_TRUE, 0,
+	//						   sizeof(delta2), delta2, 0, NULL, NULL);
 
 	//ret = clEnqueueWriteBuffer(command_queue, max_pooling_mem_obj, CL_TRUE, 0,
 	//						   sizeof(max_pooling), max_pooling, 0, NULL, NULL);
