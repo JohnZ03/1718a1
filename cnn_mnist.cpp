@@ -426,8 +426,8 @@ void forward_pass(unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx8, 1, NULL,
 								 &global_item_size_wgx8, &local_item_size_wgx8, 0, NULL, NULL);
 
-	ret = clEnqueueReadBuffer(command_queue, dense_sum2_mem_obj, CL_TRUE, 0,
-							  sizeof(dense_sum2), dense_sum2, 0, NULL, NULL);
+	//ret = clEnqueueReadBuffer(command_queue, dense_sum2_mem_obj, CL_TRUE, 0,
+	//						  sizeof(dense_sum2), dense_sum2, 0, NULL, NULL);
 	/*
 	float dense_sum2_1[10];
 	for (int i = 0; i < 10; i++)
@@ -452,9 +452,9 @@ void forward_pass(unsigned char img[][32])
 	ret = clEnqueueReadBuffer(command_queue, dense_softmax_mem_obj, CL_TRUE, 0,
 							  sizeof(dense_softmax), dense_softmax, 0, NULL, NULL);
 
-	float dense_softmax_1[10];
+	//float dense_softmax_1[10];
 
-	float den = softmax_den(dense_sum2, 10);
+	//float den = softmax_den(dense_sum2, 10);
 	/*
 	for (int i = 0; i < 10; i++)
 	{
