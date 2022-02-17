@@ -26,20 +26,23 @@ __kernel void update_weights_3d(__global float *A, __global float *B,
 
 __kernel void forward_conv(__global unsigned char *img, __global float *conv_w,
                            __global float *conv_layer) {
-    int filter_dim = get_global_id(0);
-    int i = get_global_id(1);
-    int j = get_global_id(2);
-//   for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-//     for (int i = 0; i < 28; i++)
-//       for (int j = 0; j < 28; j++)
-        for (int k = 0; k < 7; k++)
-          for (int l = 0; l < 7; l++)
-            conv_layer[filter_dim * 784 + i * 28 + j] +=
-                img[(i + k + 1) * 32 + j + l - 2] *
-                conv_w[filter_dim * 49 + k * 7 + l];
+  int filter_dim = get_global_id(0);
+  int i = get_global_id(1);
+  int j = get_global_id(2);
+  //   for (int filter_dim = 0; filter_dim < 5; filter_dim++)
+  //     for (int i = 0; i < 28; i++)
+  //       for (int j = 0; j < 28; j++)
+  for (int k = 0; k < 7; k++) {
+    for (int l = 0; l < 7; l++) {
+      conv_layer[filter_dim * 784 + i * 28 + j] +=
+          img[(i + k + 1) * 32 + j + l - 2] *
+          conv_w[filter_dim * 49 + k * 7 + l];
+    }
+  }
 }
 
-// __kernel void forward_conv(__global unsigned char *img, __global float *conv_w,
+// __kernel void forward_conv(__global unsigned char *img, __global float
+// *conv_w,
 //                            __global float *conv_layer) {
 
 //   int k = get_global_id(0);
