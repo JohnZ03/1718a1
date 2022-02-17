@@ -442,8 +442,8 @@ void update_weights()
 
 	// ret = clEnqueueWriteBuffer(command_queue, db1_mem_obj, CL_TRUE, 0,
 	//						   sizeof(db1), db1, 0, NULL, NULL);
-	ret = clEnqueueWriteBuffer(command_queue, db2_mem_obj, CL_TRUE, 0,
-							   sizeof(db2), db2, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, db2_mem_obj, CL_TRUE, 0,
+	//						   sizeof(db2), db2, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, dw2_mem_obj, CL_TRUE, 0,
 							   sizeof(dw2), dw2, 0, NULL, NULL);
 	// ret = clEnqueueWriteBuffer(command_queue, dw1_mem_obj, CL_TRUE, 0,
@@ -506,8 +506,13 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	for (int i = 0; i < 10; i++)
 	{
 		delta4[i] = y_hat[i] - y[i]; // Derivative of Softmax + Cross entropy
-		db2[i] = delta4[i];			 // Bias Changes
+		//db2[i] = delta4[i];			 // Bias Changes
 	}
+	ret = clEnqueueWriteBuffer(command_queue, delta4_mem_obj, CL_TRUE, 0,
+							   sizeof(delta4), delta4, 0, NULL, NULL);
+
+	ret = clEnqueueCopyBuffer(command_queue, delta4_mem_obj, db2_mem_obj, 0,
+							  0, sizeof(db2), 0, NULL, NULL);
 
 	// Calculate Weight Changes for Dense Layer 2
 	for (int i = 0; i < 120; i++)
@@ -538,14 +543,13 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 			d_sigmoid_dense_sum[i] = d_sigmoid(dense_sum[i]);
 		}*/
 
-	memset(delta3, 0, sizeof(delta3));
-	float z2_wgx = 0;
-	ret = clEnqueueWriteBuffer(command_queue, delta4_mem_obj, CL_TRUE, 0,
-							   sizeof(delta4), delta4, 0, NULL, NULL);
+	cl_char zeros_char_wgx = 0;
+	ret = clEnqueueFillBuffer(command_queue, delta3_mid_mem_obj, &zeros_char_wgx, sizeof(zeros_char_wgx), 0,
+							   sizeof(delta3), 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, delta4_mem_obj, CL_TRUE, 0,
+	//						   sizeof(delta4), delta4, 0, NULL, NULL);
 	ret = clEnqueueWriteBuffer(command_queue, dense_w2_mem_obj, CL_TRUE, 0,
 							   sizeof(dense_w2), dense_w2, 0, NULL, NULL);
-	ret = clEnqueueWriteBuffer(command_queue, delta3_mid_mem_obj, CL_TRUE, 0,
-							   sizeof(delta3), delta3, 0, NULL, NULL);
 
 	size_t global_item_size_wgx3 = 120; // Process the entire lists
 	size_t local_item_size_wgx3 = 20;	// Process in groups of 10
@@ -600,13 +604,11 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// ret = clEnqueueReadBuffer(command_queue, d_sigmoid_dense_input_mem_obj, CL_TRUE, 0,
 	//						  sizeof(d_sigmoid_dense_input), d_sigmoid_dense_input, 0, NULL, NULL);
 
-	float delta2[980];
-	memset(delta2, 0, sizeof(delta2));
-	// float z1_wgx = 0;
-	//	ret = clEnqueueFillBuffer(command_queue, delta2_mid_mem_obj, &z1_wgx, sizeof(z1_wgx),
-	//			0, sizeof(delta2), 0, NULL, NULL);
-	ret = clEnqueueWriteBuffer(command_queue, delta2_mid_mem_obj, CL_TRUE, 0,
-							   sizeof(delta2), delta2, 0, NULL, NULL);
+	//float delta2[980];
+	
+	cl_char zeros_char = 0;
+	ret = clEnqueueFillBuffer(command_queue, delta2_mid_mem_obj, &zeros_char, sizeof(zeros_char), 0,
+							  980*sizeof(float), 0, NULL, NULL);
 	// ret = clEnqueueWriteBuffer(command_queue, dense_w_mem_obj, CL_TRUE, 0,
 	//    sizeof(dense_w), dense_w, 0, NULL, NULL);
 	// ret = clEnqueueWriteBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
