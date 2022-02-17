@@ -331,8 +331,8 @@ void forward_pass(unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx7, 1, NULL,
 								 &global_item_size_wgx7, &local_item_size_wgx7, 0, NULL, NULL);
 
-	// ret = clEnqueueReadBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
-	//						  sizeof(dense_sigmoid), dense_sigmoid, 0, NULL, NULL);
+	ret = clEnqueueReadBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
+							  sizeof(dense_sigmoid), dense_sigmoid, 0, NULL, NULL);
 
 	/*
 		float dense_sum_1[120];
