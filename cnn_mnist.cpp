@@ -731,6 +731,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	ret = clEnqueueReadBuffer(command_queue, dw_max_mem_obj, CL_TRUE, 0,
 							  sizeof(dw_max), dw_max, 0, NULL, NULL);
 
+
 	// Calc Conv Bias Changes
 	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
 	{
@@ -775,8 +776,8 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// 	}
 	// }
 
-	ret = clEnqueueWriteBuffer(command_queue, dw_max_mem_obj, CL_TRUE, 0,
-							   sizeof(dw_max), dw_max, 0, NULL, NULL);
+	//ret = clEnqueueWriteBuffer(command_queue, dw_max_mem_obj, CL_TRUE, 0,
+	//						   sizeof(dw_max), dw_max, 0, NULL, NULL);
 
 	ret = clEnqueueWriteBuffer(command_queue, img_mem_obj, CL_TRUE, 0,
 							   35 * 32 * sizeof(unsigned char), img, 0, NULL, NULL);
