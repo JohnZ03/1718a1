@@ -927,7 +927,7 @@ int main()
 	sig_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(sig_layer), NULL, &ret);
 	conv_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(conv_layer), NULL, &ret);
 	max_pooling_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(max_pooling), NULL, &ret);
-	img_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 35 * 32 * sizeof(unsigned char), NULL, &ret);
+	img_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, 35 * 32 * sizeof(unsigned char), NULL, &ret);
 
 	cl_program program = clCreateProgramWithSource(context, 1,
 												   (const char **)&source_str, (const size_t *)&source_size, &ret);
