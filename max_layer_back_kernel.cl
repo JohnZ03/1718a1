@@ -1,4 +1,4 @@
-__kernel void max_layer_back_kernel(__global float *max_pooling,
+__kernel void max_layer_back_kernel(__global char *max_pooling,
                                     __global float *delta2,
                                     __global float *dw_max) {
   // Get the index of the current element

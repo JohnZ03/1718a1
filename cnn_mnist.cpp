@@ -555,8 +555,9 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 			d_sigmoid_dense_sum[i] = d_sigmoid(dense_sum[i]);
 		}*/
 
-	cl_char zeros_char_wgx = 0;
-	ret = clEnqueueFillBuffer(command_queue, delta3_mid_mem_obj, &zeros_char_wgx, sizeof(zeros_char_wgx), 0,
+	// cl_char zeros_char_wgx = 0;
+	cl_float zeros_float_wgx = 0;
+	ret = clEnqueueFillBuffer(command_queue, delta3_mid_mem_obj, &zeros_float_wgx, sizeof(zeros_float_wgx), 0,
 							   sizeof(delta3), 0, NULL, NULL);
 	//ret = clEnqueueWriteBuffer(command_queue, delta4_mem_obj, CL_TRUE, 0,
 	//						   sizeof(delta4), delta4, 0, NULL, NULL);
@@ -618,8 +619,9 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 
 	//float delta2[980];
 	
-	cl_char zeros_char = 0;
-	ret = clEnqueueFillBuffer(command_queue, delta2_mid_mem_obj, &zeros_char, sizeof(zeros_char), 0,
+	// cl_char zeros_char = 0;
+	cl_float zeros_float = 0;
+	ret = clEnqueueFillBuffer(command_queue, delta2_mid_mem_obj, &zeros_float, sizeof(zeros_float), 0,
 							  980*sizeof(float), 0, NULL, NULL);
 	// ret = clEnqueueWriteBuffer(command_queue, dense_w_mem_obj, CL_TRUE, 0,
 	//    sizeof(dense_w), dense_w, 0, NULL, NULL);
@@ -712,7 +714,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// 		}
 	// 	}
 	// }
-	cl_float zeros_float = 0;
+	// cl_float zeros_float = 0;
 	ret = clEnqueueFillBuffer(command_queue, dw_conv_mem_obj, &zeros_float, sizeof(zeros_float), 0,
 							  sizeof(dw_conv), 0, NULL, NULL);
 
@@ -906,7 +908,7 @@ int main()
 	db_conv_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(db_conv), NULL, &ret);
 	sig_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(sig_layer), NULL, &ret);
 	conv_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(conv_layer), NULL, &ret);
-	max_pooling_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(max_pooling), NULL, &ret);
+	max_pooling_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 5 * 28 * 28 * sizeof(char), NULL, &ret);
 	img_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 35 * 32 * sizeof(unsigned char), NULL, &ret);
 
 	cl_program program = clCreateProgramWithSource(context, 1,
