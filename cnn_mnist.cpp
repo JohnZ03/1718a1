@@ -911,7 +911,7 @@ int main()
 	source_size = fread(source_str, 1, MAX_SOURCE_SIZE, fp);
 	fclose(fp);
 	// Create Buffers
-	eta_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float), NULL, &ret);
+	eta_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float), NULL, &ret);
 	dense_b_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(dense_b), NULL, &ret);
 	db1_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(db1), NULL, &ret);
 	dense_b2_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(dense_b2), NULL, &ret);
