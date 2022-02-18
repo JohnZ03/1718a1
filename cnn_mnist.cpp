@@ -667,6 +667,9 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// TODO: Haotian
 	// Calc back-propagated max layer dw_max
 	float delta2[980];
+	size_t global_item_size_zht1[3] = {5, 14, 14}; // Process the entire lists
+	ret = clEnqueueNDRangeKernel(command_queue, max_layer_back_kernel, 3, NULL,
+								 global_item_size_zht1, NULL, 0, NULL, NULL);
 	ret = clEnqueueReadBuffer(command_queue, delta2_mem_obj, CL_TRUE, 0,
 							  sizeof(delta2), delta2, 0, NULL, NULL);
 	ret = clEnqueueReadBuffer(command_queue, max_pooling_mem_obj, CL_TRUE, 0,
@@ -700,9 +703,6 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// ret = clEnqueueWriteBuffer(command_queue, max_pooling_mem_obj, CL_TRUE, 0,
 	//						   sizeof(max_pooling), max_pooling, 0, NULL, NULL);
 
-	size_t global_item_size_zht1[3] = {5, 14, 14}; // Process the entire lists
-	//ret = clEnqueueNDRangeKernel(command_queue, max_layer_back_kernel, 3, NULL,
-	//							 global_item_size_zht1, NULL, 0, NULL, NULL);
 
 	//ret = clEnqueueReadBuffer(command_queue, dw_max_mem_obj, CL_TRUE, 0,
 	//						  sizeof(dw_max), dw_max, 0, NULL, NULL);
