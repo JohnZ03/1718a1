@@ -277,7 +277,6 @@ void forward_pass(unsigned char img[][32])
 	// ret = clEnqueueReadBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
 	// 						  sizeof(sig_layer), sig_layer, 0, NULL, NULL);
 
-
 	// MAX Pooling (max_pooling, max_layer)
 	// Copy the lists A and B to their respective memory buffers
 	// ret = clEnqueueWriteBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
@@ -285,7 +284,7 @@ void forward_pass(unsigned char img[][32])
 
 	// Execute the OpenCL kernel on the list
 	size_t global_item_size_zht[3] = {5, 14, 14}; // Process the entire lists
-	size_t local_item_size_zht[3] = {1, 2, 2}; // Process the entire lists
+	size_t local_item_size_zht[3] = {1, 2, 2};	  // Process the entire lists
 	ret = clEnqueueNDRangeKernel(command_queue, max_pooling_kernel, 3, NULL,
 								 global_item_size_zht, local_item_size_zht, 0, NULL, NULL);
 
@@ -334,7 +333,7 @@ void forward_pass(unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx7, 1, NULL,
 								 &global_item_size_wgx7, &local_item_size_wgx7, 0, NULL, NULL);
 
-	//ret = clEnqueueReadBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueReadBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
 	//						  sizeof(dense_sigmoid), dense_sigmoid, 0, NULL, NULL);
 
 	/*
@@ -360,11 +359,11 @@ void forward_pass(unsigned char img[][32])
 	// Dense Layer 2
 	// TODO: attempt on OPENCL      Zhuojun
 
-	//ret = clEnqueueWriteBuffer(command_queue, dense_w2_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueWriteBuffer(command_queue, dense_w2_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_w2), dense_w2, 0, NULL, NULL);
-	// ret = clEnqueueWriteBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
+	//  ret = clEnqueueWriteBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_sigmoid), dense_sigmoid, 0, NULL, NULL);
-	// ret = clEnqueueWriteBuffer(command_queue, dense_b2_mem_obj, CL_TRUE, 0,
+	//  ret = clEnqueueWriteBuffer(command_queue, dense_b2_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_b2), dense_b2, 0, NULL, NULL);
 
 	size_t global_item_size_wgx8 = 10; // Process the entire lists
@@ -447,15 +446,15 @@ void update_weights()
 
 	// ret = clEnqueueWriteBuffer(command_queue, db1_mem_obj, CL_TRUE, 0,
 	//						   sizeof(db1), db1, 0, NULL, NULL);
-	//ret = clEnqueueWriteBuffer(command_queue, db2_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueWriteBuffer(command_queue, db2_mem_obj, CL_TRUE, 0,
 	//						   sizeof(db2), db2, 0, NULL, NULL);
-	//ret = clEnqueueWriteBuffer(command_queue, dw2_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueWriteBuffer(command_queue, dw2_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dw2), dw2, 0, NULL, NULL);
 	// ret = clEnqueueWriteBuffer(command_queue, dw1_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dw1), dw1, 0, NULL, NULL);
-	//ret = clEnqueueWriteBuffer(command_queue, dw_conv_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueWriteBuffer(command_queue, dw_conv_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dw_conv), dw_conv, 0, NULL, NULL);
-	//ret = clEnqueueWriteBuffer(command_queue, db_conv_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueWriteBuffer(command_queue, db_conv_mem_obj, CL_TRUE, 0,
 	//						   sizeof(db_conv), db_conv, 0, NULL, NULL);
 
 	size_t global_item_size[3] = {120};
@@ -495,7 +494,7 @@ void update_weights()
 	// 						  sizeof(dense_b), dense_b, 0, NULL, NULL);
 	// ret = clEnqueueReadBuffer(command_queue, dense_b2_mem_obj, CL_TRUE, 0,
 	//						  sizeof(dense_b2), dense_b2, 0, NULL, NULL);
-	//ret = clEnqueueReadBuffer(command_queue, dense_w2_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueReadBuffer(command_queue, dense_w2_mem_obj, CL_TRUE, 0,
 	//						  sizeof(dense_w2), dense_w2, 0, NULL, NULL);
 	// ret = clEnqueueReadBuffer(command_queue, dense_w_mem_obj, CL_TRUE, 0,
 	//   sizeof(dense_w), dense_w, 0, NULL, NULL);
@@ -514,7 +513,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	for (int i = 0; i < 10; i++)
 	{
 		delta4[i] = y_hat[i] - y[i]; // Derivative of Softmax + Cross entropy
-		//db2[i] = delta4[i];			 // Bias Changes
+									 // db2[i] = delta4[i];			 // Bias Changes
 	}
 	ret = clEnqueueWriteBuffer(command_queue, delta4_mem_obj, CL_TRUE, 0,
 							   sizeof(delta4), delta4, 0, NULL, NULL);
@@ -523,7 +522,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 							  0, sizeof(db2), 0, NULL, NULL);
 
 	// Calculate Weight Changes for Dense Layer 2
-	//for (int i = 0; i < 120; i++)
+	// for (int i = 0; i < 120; i++)
 	//{
 	//	for (int j = 0; j < 10; j++)
 	//	{
@@ -558,10 +557,10 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// cl_char zeros_char_wgx = 0;
 	cl_float zeros_float_wgx = 0;
 	ret = clEnqueueFillBuffer(command_queue, delta3_mid_mem_obj, &zeros_float_wgx, sizeof(zeros_float_wgx), 0,
-							   sizeof(delta3), 0, NULL, NULL);
-	//ret = clEnqueueWriteBuffer(command_queue, delta4_mem_obj, CL_TRUE, 0,
+							  sizeof(delta3), 0, NULL, NULL);
+	// ret = clEnqueueWriteBuffer(command_queue, delta4_mem_obj, CL_TRUE, 0,
 	//						   sizeof(delta4), delta4, 0, NULL, NULL);
-	//ret = clEnqueueWriteBuffer(command_queue, dense_w2_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueWriteBuffer(command_queue, dense_w2_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_w2), dense_w2, 0, NULL, NULL);
 
 	size_t global_item_size_wgx3 = 120; // Process the entire lists
@@ -617,12 +616,12 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// ret = clEnqueueReadBuffer(command_queue, d_sigmoid_dense_input_mem_obj, CL_TRUE, 0,
 	//						  sizeof(d_sigmoid_dense_input), d_sigmoid_dense_input, 0, NULL, NULL);
 
-	//float delta2[980];
-	
+	// float delta2[980];
+
 	// cl_char zeros_char = 0;
 	cl_float zeros_float = 0;
 	ret = clEnqueueFillBuffer(command_queue, delta2_mid_mem_obj, &zeros_float, sizeof(zeros_float), 0,
-							  980*sizeof(float), 0, NULL, NULL);
+							  980 * sizeof(float), 0, NULL, NULL);
 	// ret = clEnqueueWriteBuffer(command_queue, dense_w_mem_obj, CL_TRUE, 0,
 	//    sizeof(dense_w), dense_w, 0, NULL, NULL);
 	// ret = clEnqueueWriteBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
@@ -685,12 +684,12 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, max_layer_back_kernel, 3, NULL,
 								 global_item_size_zht1, NULL, 0, NULL, NULL);
 
-	//ret = clEnqueueReadBuffer(command_queue, dw_max_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueReadBuffer(command_queue, dw_max_mem_obj, CL_TRUE, 0,
 	//						  sizeof(dw_max), dw_max, 0, NULL, NULL);
 
 	// Calc Conv Bias Changes
-	
-	//for (int filter_dim = 0; filter_dim < 5; filter_dim++)
+
+	// for (int filter_dim = 0; filter_dim < 5; filter_dim++)
 	//{
 	//	for (int i = 0; i < 28; i++)
 	//	{
@@ -699,7 +698,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	//			db_conv[filter_dim][i][j] = dw_max[filter_dim][i][j];
 	//		}
 	//	}
-	//}
+	// }
 	ret = clEnqueueCopyBuffer(command_queue, dw_max_mem_obj, db_conv_mem_obj, 0,
 							  0, sizeof(db_conv), 0, NULL, NULL);
 
@@ -748,7 +747,7 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, conv_weight_kernel, 3, NULL,
 								 global_item_size_zht2, NULL, 0, NULL, NULL);
 
-	//ret = clEnqueueReadBuffer(command_queue, dw_conv_mem_obj, CL_TRUE, 0,
+	// ret = clEnqueueReadBuffer(command_queue, dw_conv_mem_obj, CL_TRUE, 0,
 	//						  sizeof(dw_conv), dw_conv, 0, NULL, NULL);
 }
 /* ************************************************************ */
