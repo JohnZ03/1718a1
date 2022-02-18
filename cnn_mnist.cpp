@@ -738,18 +738,36 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// 	}
 	// }
 
-	// ret = clEnqueueWriteBuffer(command_queue, dw_max_mem_obj, CL_TRUE, 0,
-	//						   sizeof(dw_max), dw_max, 0, NULL, NULL);
+	ret = clEnqueueReadBuffer(command_queue, dw_max_mem_obj, CL_TRUE, 0,
+							   sizeof(dw_max), dw_max, 0, NULL, NULL);
 
-	// ret = clEnqueueWriteBuffer(command_queue, img_mem_obj, CL_TRUE, 0,
-	// 						   35 * 32 * sizeof(unsigned char), img, 0, NULL, NULL);
+	ret = clEnqueueReadBuffer(command_queue, img_mem_obj, CL_TRUE, 0,
+							   35 * 32 * sizeof(unsigned char), img, 0, NULL, NULL);
 
-	size_t global_item_size_zht2[3] = {5, 5, 5}; // Process the entire lists
-	ret = clEnqueueNDRangeKernel(command_queue, conv_weight_kernel, 3, NULL,
-								 global_item_size_zht2, NULL, 0, NULL, NULL);
+	// size_t global_item_size_zht2[3] = {5, 5, 5}; // Process the entire lists
+	// ret = clEnqueueNDRangeKernel(command_queue, conv_weight_kernel, 3, NULL,
+	// 							 global_item_size_zht2, NULL, 0, NULL, NULL);
 
-	//ret = clEnqueueReadBuffer(command_queue, dw_conv_mem_obj, CL_TRUE, 0,
-	//						  sizeof(dw_conv), dw_conv, 0, NULL, NULL);
+	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
+	{
+		for (int i = 0; i < 26; i++)
+		{
+			for (int j = 0; j < 26; j++)
+			{
+				float cur_val = dw_max[filter_dim][i][j];
+				for (int k = 0; k < 5; k++)
+				{
+					for (int l = 0; l < 5; l++)
+					{
+						dw_conv[filter_dim][k][l] += img[i + k + 1][j + l - 2] * cur_val;
+					}
+				}
+			}
+		}
+	}
+
+	ret = clEnqueueWriteBuffer(command_queue, dw_conv_mem_obj, CL_TRUE, 0,
+							  sizeof(dw_conv), dw_conv, 0, NULL, NULL);
 }
 /* ************************************************************ */
 
