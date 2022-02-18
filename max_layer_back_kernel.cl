@@ -1,5 +1,5 @@
 __kernel void max_layer_back_kernel(__global float *max_pooling,
-                                    __global char *delta2,
+                                    __global float *delta2,
                                     __global float *dw_max) {
   // Get the index of the current element
   int filter_dim = get_global_id(0);
