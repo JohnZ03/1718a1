@@ -908,7 +908,7 @@ int main()
 	db_conv_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(db_conv), NULL, &ret);
 	sig_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(sig_layer), NULL, &ret);
 	conv_layer_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(conv_layer), NULL, &ret);
-	max_pooling_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 5 * 28 * 28 * sizeof(char), NULL, &ret);
+	max_pooling_mem_obj = clCreateBuffer(context, CL_MEM_READ_WRITE, 5 * 28 * 28 * sizeof(char), NULL, &ret);
 	img_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, 35 * 32 * sizeof(unsigned char), NULL, &ret);
 
 	cl_program program = clCreateProgramWithSource(context, 1,
