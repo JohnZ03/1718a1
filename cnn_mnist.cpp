@@ -145,6 +145,7 @@ float db_conv[5][28][28];
 
 /* ************************************************************ */
 /* Helper functions */
+/*
 float sigmoid(float x)
 {
 	if (x > 500)
@@ -167,7 +168,7 @@ float softmax_den(float *x, int len)
 	}
 	return val;
 }
-
+*/
 void initialise_weights()
 {
 	for (int i = 0; i < 5; i++)
@@ -279,6 +280,31 @@ void forward_pass(unsigned char img[][32])
 
 
 	// MAX Pooling (max_pooling, max_layer)
+	/*
+	    float cur_max =0;
+        int max_i=0, max_j=0;
+        for (int filter_dim=0; filter_dim<5; filter_dim++) {
+                for (int i=0; i<28; i+=2) {
+                        for (int j=0; j<28; j+=2) {
+                                max_i=i;
+                                max_j=j;
+                                cur_max=sig_layer[filter_dim][i][j];
+                                for (int k=0; k<2; k++) {
+                                        for (int l=0; l<2; l++) {
+                                                if (sig_layer[filter_dim][i+k][j+l] > cur_max) {
+                                                        max_i = i+k;
+                                                        max_j = j+l;
+                                                        cur_max = sig_layer[filter_dim][max_i][max_j];
+                                                }
+                                        }
+                                }
+                                max_pooling[filter_dim][max_i][max_j] = 1;
+                                max_layer[filter_dim][i/2][j/2] = cur_max;
+                        }
+                }
+        }
+		*/
+
 	// Copy the lists A and B to their respective memory buffers
 	// ret = clEnqueueWriteBuffer(command_queue, sig_layer_mem_obj, CL_TRUE, 0,
 	//						   sizeof(sig_layer), sig_layer, 0, NULL, NULL);
@@ -297,8 +323,7 @@ void forward_pass(unsigned char img[][32])
 
 	// ret = clEnqueueReadBuffer(command_queue, max_layer_mem_obj, CL_TRUE, 0,
 	//							sizeof(dense_input), dense_input, 0, NULL, NULL);
-	ret = clEnqueueCopyBuffer(command_queue, max_layer_mem_obj, dense_input_mem_obj, 0,
-							  0, sizeof(dense_input), 0, NULL, NULL);
+
 	/*
 	int k = 0;
 	for (int filter_dim = 0; filter_dim < 5; filter_dim++)
@@ -312,8 +337,22 @@ void forward_pass(unsigned char img[][32])
 			}
 		}
 	}*/
+	ret = clEnqueueCopyBuffer(command_queue, max_layer_mem_obj, dense_input_mem_obj, 0,
+							  0, sizeof(dense_input), 0, NULL, NULL);
 
 	// Dense Layer
+    /*    
+	for (int i=0; i<120; i++) {
+                dense_sum[i] = 0;
+                dense_sigmoid[i] = 0;
+                for (int j=0; j<980; j++) {
+                        dense_sum[i] += dense_w[j][i] * dense_input[j];
+                }
+                dense_sum[i] += dense_b[i];
+                dense_sigmoid[i] = sigmoid(dense_sum[i]);
+        }
+	*/
+
 	// ret = clEnqueueWriteBuffer(command_queue, dense_w_mem_obj, CL_TRUE, 0,
 	// 						   sizeof(dense_w), dense_w, 0, NULL, NULL);
 	// ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
@@ -337,28 +376,17 @@ void forward_pass(unsigned char img[][32])
 	//ret = clEnqueueReadBuffer(command_queue, dense_sigmoid_mem_obj, CL_TRUE, 0,
 	//						  sizeof(dense_sigmoid), dense_sigmoid, 0, NULL, NULL);
 
-	/*
-		float dense_sum_1[120];
-		float dense_sigmoid_1[120];
-		for (int i = 0; i < 120; i++)
-		{
-			dense_sum_1[i] = 0;
-			dense_sigmoid_1[i] = 0;
-			for (int j = 0; j < 980; j++)
-			{
-				dense_sum_1[i] += dense_w[j][i] * dense_input[j];
-			}
-			dense_sum_1[i] += dense_b[i];
-			if(dense_sum_1[i]-dense_sum[i]>0.00001 ||dense_sum_1[i]-dense_sum[i]<-0.00001)
-				printf("o=%f, n=%f, dense_b=%f, dense_w=%f\n",dense_sum_1[i],dense_sum[i],dense_b[i],dense_w[0][i]);
-			dense_sigmoid_1[i] = sigmoid(dense_sum_1[i]);
-			if(dense_sigmoid[i]-dense_sigmoid_1[i]>0.00001 ||dense_sigmoid[i]-dense_sigmoid_1[i]<-0.00001)
-				printf("o_s=%f, n_s=%f, dense_b=%f, dense_w=%f\n",dense_sigmoid_1[i],dense_sigmoid[i],dense_b[i],dense_w[0][i]);
-		}
-	*/
 
 	// Dense Layer 2
-	// TODO: attempt on OPENCL      Zhuojun
+	/*
+        for (int i=0; i<10; i++) {
+                dense_sum2[i]=0;
+                for (int j=0; j<120; j++) {
+                        dense_sum2[i] += dense_w2[j][i] * dense_sigmoid[j];
+                }
+                dense_sum2[i] += dense_b2[i];
+        }
+	*/
 
 	//ret = clEnqueueWriteBuffer(command_queue, dense_w2_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_w2), dense_w2, 0, NULL, NULL);
@@ -374,23 +402,15 @@ void forward_pass(unsigned char img[][32])
 
 	// ret = clEnqueueReadBuffer(command_queue, dense_sum2_mem_obj, CL_TRUE, 0,
 	//						  sizeof(dense_sum2), dense_sum2, 0, NULL, NULL);
-	/*
-	float dense_sum2_1[10];
-	for (int i = 0; i < 10; i++)
-	{
-		dense_sum2_1[i] = 0;
-		for (int j = 0; j < 120; j++)
-		{
-			dense_sum2_1[i] += dense_w2[j][i] * dense_sigmoid[j];
-		}
-		dense_sum2_1[i] += dense_b2[i];
-		if(dense_sum2_1[i]-dense_sum2[i]>0.00001 ||dense_sum2_1[i]-dense_sum2[i]<-0.00001)
-			printf("o=%f, n=%f, dense_b=%f, dense_w=%f\n",dense_sum2_1[i],dense_sum2[i],dense_b[i],dense_w[0][i]);
-	}
-*/
-	// Softmax Output
-	//
+	
 
+	// Softmax Output
+	/*
+	    float den = softmax_den(dense_sum2, 10);
+        for (int i=0; i<10; i++) {
+                dense_softmax[i] = exp(dense_sum2[i])/den;
+        }
+	*/
 	size_t global_item_size_wgx9 = 10; // Process the entire lists
 	size_t local_item_size_wgx9 = 10;  // Process in groups of 20
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx9, 1, NULL,
@@ -398,16 +418,6 @@ void forward_pass(unsigned char img[][32])
 	ret = clEnqueueReadBuffer(command_queue, dense_softmax_mem_obj, CL_TRUE, 0,
 							  sizeof(dense_softmax), dense_softmax, 0, NULL, NULL);
 
-	// float dense_softmax_1[10];
-
-	// float den = softmax_den(dense_sum2, 10);
-	/*
-	for (int i = 0; i < 10; i++)
-	{
-		dense_softmax_1[i] = exp(dense_sum2[i]) / den;
-		if(dense_softmax_1[i]-dense_softmax[i]>0.00001 ||dense_softmax_1[i]-dense_softmax[i]<-0.00001)
-			printf("o=%f, n=%f`\n",dense_softmax_1[i],dense_softmax[i]);
-	}*/
 }
 
 void update_weights()
@@ -547,13 +557,20 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	ret = clEnqueueNDRangeKernel(command_queue, kernel_wgx4, 1, NULL,
 								 &global_item_size_wgx4, &local_item_size_wgx4, 0, NULL, NULL);
 
+
+        // Delta 3
+		/*
+        float delta3[120];
+        for (int i=0; i<120; i++) {
+                delta3[i] = 0;
+                for (int j=0; j<10; j++) {
+                        delta3[i] += dense_w2[i][j]*delta4[j];
+                }
+                delta3[i] *= d_sigmoid(dense_sum[i]);
+        }
+		*/
 	// ret = clEnqueueReadBuffer(command_queue, d_sigmoid_dense_sum_mem_obj, CL_TRUE, 0,
 	//						  sizeof(d_sigmoid_dense_sum), d_sigmoid_dense_sum, 0, NULL, NULL);
-	/*
-		for (int i = 0; i < 120; i++)
-		{
-			d_sigmoid_dense_sum[i] = d_sigmoid(dense_sum[i]);
-		}*/
 
 	// cl_char zeros_char_wgx = 0;
 	cl_float zeros_float_wgx = 0;
@@ -578,13 +595,21 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// ret = clEnqueueReadBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
 	//						  sizeof(delta3), delta3, 0, NULL, NULL);
 
+
+    //for (int i=0; i<120; i++) db1[i] = delta3[i]; // Bias Weight change
 	ret = clEnqueueCopyBuffer(command_queue, delta3_mem_obj, db1_mem_obj, 0,
 							  0, sizeof(db1), 0, NULL, NULL);
 	// ret = clEnqueueReadBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
 	//						  sizeof(db1), db1, 0, NULL, NULL);
 
 	// Calculate Weight Changes for Dense Layer 1
-	// Copy the lists A and B to their respective memory buffers
+	/*
+        for (int i=0; i<980; i++) {
+                for (int j=0; j<120; j++) {
+                        dw1[i][j] = dense_input[i]*delta3[j];
+                }
+        }
+	*/
 	// ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_input), dense_input, 0, NULL, NULL);
 	// ret = clEnqueueWriteBuffer(command_queue, delta3_mem_obj, CL_TRUE, 0,
@@ -594,16 +619,22 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	size_t global_item_size[2] = {980, 120}; // Process the entire lists
 	ret = clEnqueueNDRangeKernel(command_queue, kernel, 2, NULL,
 								 global_item_size, NULL, 0, NULL, NULL);
-	// printf("Execute the OpenCL kernel on the list: %d\n", ret);
 
-	// Read the memory buffer C on the device to the local variable C
 	// ret = clEnqueueReadBuffer(command_queue, dw1_mem_obj, CL_TRUE, 0,
 	//						  sizeof(dw1), dw1, 0, NULL, NULL);
 
 	// Delta2
-	// TODO: attempt on OPENCL      Guoxian
+	/*
+        float delta2[980];
+        for (int i=0; i<980; i++) {
+                delta2[i] = 0;
+                for (int j=0; j<120; j++) {
+                        delta2[i] += dense_w[i][j]*delta3[j];
+                }
+                delta2[i] *= d_sigmoid(dense_input[i]);
+        }
+		*/
 
-	float d_sigmoid_dense_input[980];
 
 	// ret = clEnqueueWriteBuffer(command_queue, dense_input_mem_obj, CL_TRUE, 0,
 	//						   sizeof(dense_input), dense_input, 0, NULL, NULL);
@@ -634,12 +665,6 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 								 &global_item_size_wgx1, &local_item_size_wgx1, 0, NULL, NULL);
 	// ret = clEnqueueReadBuffer(command_queue, delta2_mid_mem_obj, CL_TRUE, 0,
 	//						  sizeof(delta2), delta2, 0, NULL, NULL);
-	// printf("ReadBuffer: %d\n", ret);
-	/*
-		for(int i=0; i<980; i++){
-			delta2[i] *= d_sigmoid(dense_input[i]);
-		}
-	*/
 
 	// ret = clEnqueueWriteBuffer(command_queue, d_sigmoid_dense_input_mem_obj, CL_TRUE, 0,
 	//						   sizeof(d_sigmoid_dense_input), d_sigmoid_dense_input, 0, NULL, NULL);
@@ -652,7 +677,6 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	// ret = clEnqueueReadBuffer(command_queue, delta2_mem_obj, CL_TRUE, 0,
 	//						  sizeof(delta2), delta2, 0, NULL, NULL);
 
-	// TODO: Haotian
 	// Calc back-propagated max layer dw_max
 	// int k = 0;
 	// for (int filter_dim = 0; filter_dim < 5; filter_dim++)
@@ -718,7 +742,6 @@ void backward_pass(float *y_hat, int *y, unsigned char img[][32])
 	ret = clEnqueueFillBuffer(command_queue, dw_conv_mem_obj, &zeros_float, sizeof(zeros_float), 0,
 							  sizeof(dw_conv), 0, NULL, NULL);
 
-	// TODO: Haotian
 	// Calculate Weight Changes for Conv Layer
 	// for (int filter_dim = 0; filter_dim < 5; filter_dim++)
 	// {
