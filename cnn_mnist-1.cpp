@@ -4,6 +4,8 @@
 #include <sstream>
 #include <fstream>
 
+#define FIXED_POINT (1<<10)
+
 using namespace std;
 const int filter_size=7;
 const double eta=0.01;
@@ -14,68 +16,75 @@ unsigned char data_test[10000][784];
 unsigned char label_train[60000];
 unsigned char label_test[10000];
 
-double conv_w[5][7][7];
-double conv_b[5][28][28];
-double conv_layer[5][28][28];
-double sig_layer[5][28][28];
+long conv_w[5][7][7];
+long conv_b[5][28][28];
+long conv_layer[5][28][28];
+long sig_layer[5][28][28];
 char max_pooling[5][28][28];
-double max_layer[5][14][14];
+long max_layer[5][14][14];
 
-double dense_input[980];
-double dense_w[980][120];
-double dense_b[120];
-double dense_sum[120];
-double dense_sigmoid[120];
-double dense_w2[120][10];
-double dense_b2[10];
-double dense_sum2[10];
-double dense_softmax[10];
+long dense_input[980];
+long dense_w[980][120];
+long dense_b[120];
+long dense_sum[120];
+long dense_sigmoid[120];
+long dense_w2[120][10];
+long dense_b2[10];
+long dense_sum2[10];
+long dense_softmax[10];
 
-double dw2[120][10];
-double db2[10];
-double dw1[980][120];
-double db1[120];
+long dw2[120][10];
+long db2[10];
+long dw1[980][120];
+long db1[120];
 
-double dw_max[5][28][28];
-double dw_conv[5][7][7];
-double db_conv[5][28][28];
+long dw_max[5][28][28];
+long dw_conv[5][7][7];
+long db_conv[5][28][28];
 
 
 /* ************************************************************ */
 /* Helper functions */
-double sigmoid(double x) {
-    double y;
-    if(x>1&&x<=1)           y = 0.2383*x   + 0.5000
-    if(x>-2&&x<=-1]         y = 0.0467*x*x + 0.2896*x + 0.5118
-    if(x>-3&&x<=-2)         y = 0.0298*x*x + 0.2202*x + 0.4400
-    if(x>-4&&x<=-3)         y = 0.0135*x*x + 0.1239*x + 0.2969
-    if(x>-5&&x<=-4)         y = 0.0054*x*x + 0.0597*x + 0.1703
-    if(x>-5.03&&x<=-5)      y = 0.0066
-    if(x>-5.2&&x<=-5.03)    y = 0.0060
-    if(x>-5.41&&x<=-5.2)    y = 0.0050
-    if(x>-5.66&&x<=-5.41)   y = 0.0400
-    if(x>-6&&x<=-5.66)      y = 0.0030
-    if(x>-6.53&&x<=-6)      y = 0.0020
-    if(x>-7.6&&x<=-6.53)    y = 0.0010
-    if(x<=-7.6)             y = 0
-    if(x>1&&x<=2)           y = 0.0467*x*x + 0.2896x + 0.4882
-    if(x>2&&x<=3)           y = 0.0298*x*x + 0.2202x + 0.5600
-    if(x>3&&x<=4)           y = 0.0135*x*x + 0.1239x + 0.7030
-    if(x>4&&x<=5)           y = 0.0054*x*x + 0.0597x + 0.8297
-    if(x>5&&x<=5.0218)      y = 0.9930
-    if(x>5.0218&&x<=5.1890) y = 0.9940
-    if(x>5.1890&&x<=5.3890) y = 0.9950
-    if(x>5.3890&&x<=5.6380) y = 0.9960
-    if(x>5.6380&&x<=5.9700) y = 0.9970
-    if(x>5.9700&&x<=6.4700) y = 0.9980
-    if(x>6.4700&&x<=7.5500) y = 0.9990
-    if(x>7.5500)            y = 1
+long sigmoid(long x) {
+    
+    long y;
+    if(x>1&&x<=1)           y = 0.2383*x   + 0.5000;
+    if(x>-2&&x<=-1]         y = 0.0467*x*x + 0.2896*x + 0.5118;
+    if(x>-3&&x<=-2)         y = 0.0298*x*x + 0.2202*x + 0.4400;
+    if(x>-4&&x<=-3)         y = 0.0135*x*x + 0.1239*x + 0.2969;
+    if(x>-5&&x<=-4)         y = 0.0054*x*x + 0.0597*x + 0.1703;
+    if(x>-5.03&&x<=-5)      y = 0.0066;
+    if(x>-5.2&&x<=-5.03)    y = 0.0060;
+    if(x>-5.41&&x<=-5.2)    y = 0.0050;
+    if(x>-5.66&&x<=-5.41)   y = 0.0400;
+    if(x>-6&&x<=-5.66)      y = 0.0030;
+    if(x>-6.53&&x<=-6)      y = 0.0020;
+    if(x>-7.6&&x<=-6.53)    y = 0.0010;
+    if(x<=-7.6)             y = 0;
+    if(x>1&&x<=2)           y = 0.0467*x*x + 0.2896x + 0.4882;
+    if(x>2&&x<=3)           y = 0.0298*x*x + 0.2202x + 0.5600;
+    if(x>3&&x<=4)           y = 0.0135*x*x + 0.1239x + 0.7030;
+    if(x>4&&x<=5)           y = 0.0054*x*x + 0.0597x + 0.8297;
+    if(x>5&&x<=5.0218)      y = 0.9930;
+    if(x>5.0218&&x<=5.1890) y = 0.9940;
+    if(x>5.1890&&x<=5.3890) y = 0.9950;
+    if(x>5.3890&&x<=5.6380) y = 0.9960;
+    if(x>5.6380&&x<=5.9700) y = 0.9970;
+    if(x>5.9700&&x<=6.4700) y = 0.9980;
+    if(x>6.4700&&x<=7.5500) y = 0.9990;
+    if(x>7.5500)            y = 1;
     return y;
 }
 
 double d_sigmoid(double x) {
-        double sig = sigmoid(x);
-        return sig*(1-sig);
+    if(x<=-8)               y = 0;
+    if(x>-8&&x<=-1.6)       y = 8 + abs(x)/64;
+    if(x>-1.6&&x<=1.6)      y = x/4 + 0.5;
+    if(x>1.6&&x<=8)         y = 1-(8-x)/64;
+    if(x>8)                 y = 1;
+
+    return y;
+
 }
 
 double softmax_den(double *x, int len) {
