@@ -9,6 +9,7 @@ double max_layer_test[5][14][14];
 double dense_sum2_test[10];
 double dense_sum_test[120];
 double dense_sigmoid_test[120];
+double dense_softmax_test[10];
 
 // weights
 double conv_w_test[5][7][7];
@@ -86,6 +87,16 @@ double sigmoid_test(double x)
     if (x > 7.5500)
         y = 1;
     return y;
+}
+
+double softmax_den(double *x, int len)
+{
+        double val = 0;
+        for (int i = 0; i < len; i++)
+        {
+                val += exp(x[i]);
+        }
+        return val;
 }
 
 void conv_sig()
@@ -206,12 +217,12 @@ void forward_pass_test(unsigned char img[][32])
         dense_sum2_test[i] = dense_sum2_test[i] + dense_b2_test[i];
     }
 
-    // // Softmax Output
-    // double den = softmax_den(dense_sum2, 10);
-    // for (int i = 0; i < 10; i++)
-    // {
-    //         dense_softmax[i] = exp(dense_sum2[i]) / den;
-    // }
+    // Softmax Output
+    double den = softmax_den(dense_sum2_test, 10);
+    for (int i = 0; i < 10; i++)
+    {
+            dense_softmax_test[i] = exp(dense_sum2_test[i]) / den;
+    }
 }
 
 int *forward(int Mode_select, int host_valid, int host_ready, double &bus)
@@ -298,7 +309,7 @@ int *forward(int Mode_select, int host_valid, int host_ready, double &bus)
                     // std::cout << "sending results 9; sending finished" << std::endl;
                     result_last = 0;
                     finished_computing = 0; //! temporary
-                    bus = dense_sum2_test[res_idx];
+                    bus = dense_softmax_test[res_idx];
                     device_state[0] = 1;
                     device_state[1] = 0;
                     return device_state;
@@ -308,7 +319,7 @@ int *forward(int Mode_select, int host_valid, int host_ready, double &bus)
                 {
                     // std::cout << "sending results " << res_idx << std::endl;
 
-                    bus = dense_sum2_test[res_idx];
+                    bus = dense_softmax_test[res_idx];
                     res_idx++;
                     if (res_idx == 9)
                     {
