@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
+#include <cmath>
 #include "device.cpp"
 
 // test related
