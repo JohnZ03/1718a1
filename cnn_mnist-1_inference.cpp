@@ -6,7 +6,8 @@
 
 #include "fixed.h"
 
-using fixed = numeric::fixed<32, 32>;
+using fixed = numeric::fixed<52, 12>;
+using weights = numeric::fixed<20, 12>;
 
 #if __cplusplus >= 201402L
 #define STATIC_ASSERT14(expr) static_assert((expr), "")
@@ -21,6 +22,13 @@ fixed max_layer_test[5][14][14];
 fixed dense_sum2_test[10];
 fixed dense_sum_test[120];
 fixed dense_sigmoid_test[120];
+
+weights conv_w_test[5][7][7];
+weights conv_b_test[5][28][28];
+weights dense_w_test[980][120];
+weights dense_b_test[120];
+weights dense_w2_test[120][10];
+weights dense_b2_test[10];
 
 const int filter_size = 7;
 const double eta = 0.01;
@@ -143,107 +151,6 @@ double softmax_den(double *x, int len)
 
 /* ************************************************************ */
 /* Forward Pass */
-void forward_pass(unsigned char img[][32])
-{
-
-        // Convolution Operation + Sigmoid Activation
-        for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-        {
-                for (int i = 0; i < 28; i++)
-                {
-                        for (int j = 0; j < 28; j++)
-                        {
-                                max_pooling[filter_dim][i][j] = 0;
-
-                                conv_layer[filter_dim][i][j] = 0;
-                                sig_layer[filter_dim][i][j] = 0;
-                                for (int k = 0; k < filter_size; k++)
-                                {
-                                        for (int l = 0; l < filter_size; l++)
-                                        {
-                                                conv_layer[filter_dim][i][j] += img[i + k + 1][j + l - 2] * conv_w[filter_dim][k][l];
-                                        }
-                                }
-                                sig_layer[filter_dim][i][j] = sigmoid(conv_layer[filter_dim][i][j] + conv_b[filter_dim][i][j]);
-                        }
-                }
-        }
-
-        // MAX Pooling (max_pooling, max_layer)
-        double cur_max = 0;
-        int max_i = 0, max_j = 0;
-        for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-        {
-                for (int i = 0; i < 28; i += 2)
-                {
-                        for (int j = 0; j < 28; j += 2)
-                        {
-                                max_i = i;
-                                max_j = j;
-                                cur_max = sig_layer[filter_dim][i][j];
-                                for (int k = 0; k < 2; k++)
-                                {
-                                        for (int l = 0; l < 2; l++)
-                                        {
-                                                if (sig_layer[filter_dim][i + k][j + l] > cur_max)
-                                                {
-                                                        max_i = i + k;
-                                                        max_j = j + l;
-                                                        cur_max = sig_layer[filter_dim][max_i][max_j];
-                                                }
-                                        }
-                                }
-                                max_pooling[filter_dim][max_i][max_j] = 1;
-                                max_layer[filter_dim][i / 2][j / 2] = cur_max;
-                        }
-                }
-        }
-
-        int k = 0;
-        for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-        {
-                for (int i = 0; i < 14; i++)
-                {
-                        for (int j = 0; j < 14; j++)
-                        {
-                                dense_input[k] = max_layer[filter_dim][i][j];
-                                k++;
-                        }
-                }
-        }
-
-        // Dense Layer
-        for (int i = 0; i < 120; i++)
-        {
-                dense_sum[i] = 0;
-                dense_sigmoid[i] = 0;
-                for (int j = 0; j < 980; j++)
-                {
-                        dense_sum[i] += dense_w[j][i] * dense_input[j];
-                }
-                dense_sum[i] += dense_b[i];
-                dense_sigmoid[i] = sigmoid(dense_sum[i]);
-        }
-
-        // Dense Layer 2
-        for (int i = 0; i < 10; i++)
-        {
-                dense_sum2[i] = 0;
-                for (int j = 0; j < 120; j++)
-                {
-                        dense_sum2[i] += dense_w2[j][i] * dense_sigmoid[j];
-                }
-                dense_sum2[i] += dense_b2[i];
-        }
-
-        // Softmax Output
-        double den = softmax_den(dense_sum2, 10);
-        for (int i = 0; i < 10; i++)
-        {
-                dense_softmax[i] = exp(dense_sum2[i]) / den;
-        }
-}
-/* Forward Pass */
 void forward_pass_test(unsigned char img[][32])
 {
         fixed imgfix[35][32];
@@ -266,10 +173,10 @@ void forward_pass_test(unsigned char img[][32])
                                 {
                                         for (int l = 0; l < filter_size; l++)
                                         {
-                                                conv_layer_test[filter_dim][i][j] += imgfix[i + k + 1][j + l - 2] * conv_w[filter_dim][k][l];
+                                                conv_layer_test[filter_dim][i][j] += imgfix[i + k + 1][j + l - 2] * conv_w_test[filter_dim][k][l];
                                         }
                                 }
-                                sig_layer_test[filter_dim][i][j] = sigmoid_test(conv_layer_test[filter_dim][i][j] + conv_b[filter_dim][i][j]);
+                                sig_layer_test[filter_dim][i][j] = sigmoid_test(conv_layer_test[filter_dim][i][j] + conv_b_test[filter_dim][i][j]);
                         }
                 }
         }
@@ -324,9 +231,9 @@ void forward_pass_test(unsigned char img[][32])
                 dense_sigmoid_test[i] = 0;
                 for (int j = 0; j < 980; j++)
                 {
-                        dense_sum_test[i] += dense_w[j][i] * dense_input_test[j];
+                        dense_sum_test[i] += dense_w_test[j][i] * dense_input_test[j];
                 }
-                dense_sum_test[i] += dense_b[i];
+                dense_sum_test[i] = dense_sum_test[i] + dense_b_test[i];
                 dense_sigmoid_test[i] = sigmoid_test(dense_sum_test[i]);
         }
 
@@ -336,17 +243,17 @@ void forward_pass_test(unsigned char img[][32])
                 dense_sum2_test[i] = 0;
                 for (int j = 0; j < 120; j++)
                 {
-                        dense_sum2_test[i] += dense_w2[j][i] * dense_sigmoid_test[j];
+                        dense_sum2_test[i] += dense_w2_test[j][i] * dense_sigmoid_test[j];
                 }
-                dense_sum2_test[i] += dense_b2[i];
+                dense_sum2_test[i] = dense_sum2_test[i] + dense_b2_test[i];
         }
 
-        // Softmax Output
-        double den = softmax_den(dense_sum2, 10);
-        for (int i = 0; i < 10; i++)
-        {
-                dense_softmax[i] = exp(dense_sum2[i]) / den;
-        }
+        // // Softmax Output
+        // double den = softmax_den(dense_sum2, 10);
+        // for (int i = 0; i < 10; i++)
+        // {
+        //         dense_softmax[i] = exp(dense_sum2[i]) / den;
+        // }
 }
 
 void read_weights()
@@ -355,28 +262,46 @@ void read_weights()
         if (!fin)
                 std::cerr << "Unable to open file!";
         for (int i = 0; i < 120; i++)
+        {
                 fin >> dense_b[i];
+                dense_b_test[i] = dense_b[i];
+        }
 
         for (int j = 0; j < 10; j++)
+        {
                 fin >> dense_b2[j];
+                dense_b2_test[j] = dense_b2[j];
+        }
 
         for (int i = 0; i < 120; i++)
                 for (int j = 0; j < 10; j++)
+                {
                         fin >> dense_w2[i][j];
+                        dense_w2_test[i][j] = dense_w2[i][j];
+                }
 
         for (int i = 0; i < 120; i++)
                 for (int k = 0; k < 980; k++)
+                {
                         fin >> dense_w[k][i];
+                        dense_w_test[k][i] = dense_w[k][i];
+                }
 
         for (int i = 0; i < 5; i++)
                 for (int k = 0; k < 7; k++)
                         for (int j = 0; j < 7; j++)
+                        {
                                 fin >> conv_w[i][k][j];
+                                conv_w_test[i][k][j] = conv_w[i][k][j];
+                        }
 
         for (int i = 0; i < 5; i++)
                 for (int l = 0; l < 28; l++)
                         for (int m = 0; m < 28; m++)
+                        {
                                 fin >> conv_b[i][l][m];
+                                conv_b_test[i][l][m] = conv_b[i][l][m];
+                        }
 }
 
 void read_test_data()
