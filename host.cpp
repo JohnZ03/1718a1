@@ -7,7 +7,7 @@
 // test related
 unsigned char data_test[10000][784];
 unsigned char label_test[10000];
-int val_len = 600;
+const int val_len = 600;
 int result_counter = 0;
 double vector[600][10] = {};
 unsigned char imgs_to_give[600][35][32];
@@ -53,14 +53,15 @@ int main()
 
     // send weights
     std::cout << "sending weights..." << std::endl;
-    while (ptr_weights != &weights[123095])
+    while (ptr_weights != &weights[123094])
     {
         bus = *ptr_weights; // load weights into bus
         ptr_weights++;
         // forward(Mode_select, host_valid, host_ready);
         int *res = forward(1, 1, 0, bus);
 
-        //------not necessary; explicitly show interfaces only; applicable to all below
+        //------not necessary; explicitly show interfaces only;
+        // applicable to all similar statments below
         device_state[0] = *res;
         res++;
         device_state[1] = *res;
@@ -68,7 +69,7 @@ int main()
     }
     // image transfer
     bool imgs_finished = 0;
-    unsigned char *img_ptr;
+    unsigned char *img_ptr = (unsigned char *)imgs_to_give;
     int digit = 0;
     std::cout << "start sending imgs..." << std::endl;
     while (!imgs_finished)
@@ -78,15 +79,14 @@ int main()
         {
             int *res = forward(2, 0, 1, bus);
             vector[result_counter][digit] = bus; // read result
+            std::cout << "image " << result_counter + 1 << " vector digit " << digit << " finished... " << std::endl;
             digit++;
             if (digit == 10)
             {
                 result_counter++;
                 std::cout << "image " << result_counter << " finished" << std::endl;
-
                 digit = 0;
             }
-            std::cout << "image " << result_counter << " vector digit " << digit << " finished... " << std::endl;
 
             device_state[0] = *res;
             res++;
@@ -95,12 +95,14 @@ int main()
         // device_valid == 0, device_ready == 1
         else if (device_state[0] == 1)
         {
-            std::cout << "segment sent!" << std::endl;
             double imgs_in_bus = (double)*img_ptr;
+            // std::cout << "segment sent:" << imgs_in_bus << std::endl;
             bus = imgs_in_bus; //! load 64 bits into bus; temporary
-            img_ptr++;
-            if (img_ptr == &imgs_to_give[600][35][32])
+
+            if (img_ptr == &imgs_to_give[599][34][31])
                 imgs_finished = 1; // finish sending everything
+            else
+                img_ptr++;
 
             int *res = forward(2, 1, 0, bus);
 
@@ -119,22 +121,26 @@ int main()
         }
     }
     // nothing to send, waits remaining results
-    std::cout << "waiting remaining results..." << std::endl;
+    std::cout << std::endl
+              << "waiting remaining results..." << std::endl;
     while (result_counter < val_len)
     {
         int *res = forward(2, 0, 1, bus);
-        device_state[0] = *res;
-        res++;
-        device_state[1] = *res;
         if (device_state[1] == 1)
         {
             vector[result_counter][digit] = int(bus); // read result
+            std::cout << "image " << result_counter + 1 << " vector digit " << digit << " finished... " << std::endl;
+            digit++;
             if (digit == 10)
             {
                 result_counter++;
+                std::cout << "image " << result_counter << " finished" << std::endl;
                 digit = 0;
             }
         }
+        device_state[0] = *res;
+        res++;
+        device_state[1] = *res;
     }
 
     //--------------------------------------

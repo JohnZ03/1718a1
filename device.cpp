@@ -292,9 +292,10 @@ int *forward(int Mode_select, int host_valid, int host_ready, double &bus)
             {
                 // std::cout << "preparing sending results" << std::endl;
 
+                // sending dense_sum2_test[9]
                 if (host_valid == 0 && host_ready == 1 && result_last)
                 {
-                    std::cout << "sending results 9; sending finished" << std::endl;
+                    // std::cout << "sending results 9; sending finished" << std::endl;
                     result_last = 0;
                     finished_computing = 0; //! temporary
                     bus = dense_sum2_test[res_idx];
@@ -302,9 +303,10 @@ int *forward(int Mode_select, int host_valid, int host_ready, double &bus)
                     device_state[1] = 0;
                     return device_state;
                 }
+                // sending dense_sum2_test[0~8]
                 else if (host_valid == 0 && host_ready == 1 && !result_last)
                 {
-                    std::cout << "sending results " << res_idx << std::endl;
+                    // std::cout << "sending results " << res_idx << std::endl;
 
                     bus = dense_sum2_test[res_idx];
                     res_idx++;
@@ -318,11 +320,16 @@ int *forward(int Mode_select, int host_valid, int host_ready, double &bus)
                     return device_state;
                 }
             }
-            else
+            else // computation not finished
             {
                 //! continue computing
-                device_state[0] = 1;
-                device_state[1] = 0;
+                forward_pass_test(img_buffer); //! computation shouldn't be finished in 1 cycle
+                finished_computing = 1;
+
+                img_buffer_full = 0;
+
+                device_state[0] = 0;
+                device_state[1] = 1;
                 return device_state;
             }
         }
@@ -333,10 +340,12 @@ int *forward(int Mode_select, int host_valid, int host_ready, double &bus)
 
                 if (!img_buffer_full)
                 {
-                    *img_ptr = (unsigned char)bus; //! temporary
-                    // std::cout << "segment received!" << std::endl;
+                    unsigned char imgs_in_bus = bus;
+                    *img_ptr = imgs_in_bus; //! temporary
 
-                    if (img_ptr == &img_buffer[35][32])
+                    // std::cout << "segment received! " << (int)*img_ptr << std::endl;
+
+                    if (img_ptr == &img_buffer[34][31])
                     {
                         img_ptr = (unsigned char *)img_buffer;
                         img_buffer_full = 1;
