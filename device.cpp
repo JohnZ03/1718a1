@@ -309,7 +309,7 @@ int *forward(int Mode_select, int host_valid, int host_ready, double &bus)
                     // std::cout << "sending results 9; sending finished" << std::endl;
                     result_last = 0;
                     finished_computing = 0; //! temporary
-                    bus = dense_softmax_test[res_idx];
+                    bus = dense_softmax_test[9];
                     device_state[0] = 1;
                     device_state[1] = 0;
                     return device_state;
