@@ -1,7 +1,7 @@
 .PHONY:vcs verdi clean 
 
 FSDB_NAME = fix_ari_mul.fsdb
-RUN_VERDI = verdi -f filelist.f  -ssf $(FSDB_NAME)
+RUN_VERDI = verdi -f filelist.f  -ssf $(FSDB_NAME) -nologo
 
 vcs:
 	vcs -full64 -cpp g++-4.4 -cc gcc-4.4 -sverilog  -timescale=1ns/1ps -f filelist.f -fsdb
