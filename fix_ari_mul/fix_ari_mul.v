@@ -22,11 +22,12 @@ always@(posedge clk or negedge rst_n)begin
    end
    else begin
      data_in1_r <= {{EX_SI{data_in1[DATA-1]}},data_in1[DATA-2:0]};
-     data_in2_r <= {{EX_SI{data_in1[DATA-1]}},data_in1[DATA-2:0]};
+     data_in2_r <= {{EX_SI{data_in2[DATA-1]}},data_in2[DATA-2:0]};
    end
  end
 
 reg [EX_SI*2-1:0] shift_r [EX_SI*2-1:0];
+
 integer i,j,k;
 always@(posedge clk or negedge rst_n)
   if(!rst_n)
@@ -43,10 +44,12 @@ reg [EX_SI*2-1:0] sum;
 always@(posedge clk or negedge rst_n)
   if(!rst_n)
     sum <= 'b0;
-  else begin
+/*  else begin
     for(i = 0; i < EX_SI*2; i=i+1)
-      sum <= sum[i];
-  end
+      sum <= sum + shift_r[i];
+  end */
+ else
+   sum <= shift_r[0]+shift_r[1]+shift_r[2]+shift_r[3]+shift_r[4]+shift_r[5]+shift_r[6]+shift_r[7]+shift_r[8]+shift_r[9]+shift_r[10]+shift_r[11]+shift_r[12]+shift_r[13]+shift_r[14]+shift_r[15]+shift_r[16]+shift_r[17]+shift_r[18]+shift_r[19]+shift_r[20]+shift_r[21]+shift_r[22]+shift_r[23]+shift_r[24]+shift_r[25]+shift_r[26]+shift_r[27]+shift_r[28]+shift_r[29];
     
 assign data_out[EX_SI*2-1:0] = sum;
 assign data_out[EX_SI*2] = (data_in1[DATA-1] ^ data_in2[DATA-1]) ? 1 : 0;
