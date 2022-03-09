@@ -79,8 +79,6 @@ module fix_ari_mul_tb;
 		   end
 		   begin
 		      @(posedge clk)
-		      @(posedge clk)
-		      @(posedge clk)
 		      for(j=0;j<100;j=j+1) begin
 		         @(posedge clk)
 		         data_out_ref = $signed(data_in1_dly3) * $signed(data_in2_dly3);
@@ -94,75 +92,7 @@ module fix_ari_mul_tb;
 		   end
 		join
 
-		//corner case 1
-		@(posedge clk)
-	    data_in1 = 1024;
-		data_in2 = 8192;
-	
-	    @(posedge clk)
-	    @(posedge clk)
-	    @(posedge clk)
-
-		data_out_ref = $signed(data_in1) * $signed(data_in2);
-		data_out_ref_round =  (data_out_ref<  -8388608 ) ? -32768 :
-		                      (data_out_ref>   8388607 ) ?  32767 : {data_out_ref[2*WIDTH-2],data_out_ref[22:16],data_out_ref[15:8]};
-		if(data_out_ref == data_out)
-		      $display("Correct: in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d, rounded output:%d", data_in1_dly3, data_in2_dly3, data_out_ref,data_out_ref_round,data_out,data_out_round);
-		else
-		         $error  ("Error:   in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d, rounded output:%d", data_in1_dly3, data_in2_dly3, data_out_ref,data_out_ref_round,data_out,data_out_round);
-
-		//corner case 2
-		@(posedge clk)
-	    data_in1 = -1024;
-		data_in2 = 8192;
-	
-	    @(posedge clk)
-	    @(posedge clk)
-	    @(posedge clk)
-
-		data_out_ref = $signed(data_in1) * $signed(data_in2);
-		data_out_ref_round =  (data_out_ref<  -8388608 ) ? -32768 :
-		                      (data_out_ref>   8388607 ) ?  32767 : {data_out_ref[2*WIDTH-2],data_out_ref[22:16],data_out_ref[15:8]};
-		if(data_out_ref == data_out)
-		      $display("Correct: in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d, rounded output:%d", data_in1_dly3, data_in2_dly3, data_out_ref,data_out_ref_round,data_out,data_out_round);
-		else
-		      $error  ("Error:   in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d, rounded output:%d", data_in1_dly3, data_in2_dly3, data_out_ref,data_out_ref_round,data_out,data_out_round);
-
-		//corner case 3
-		@(posedge clk)
-	    data_in1 = 1023;
-		data_in2 = 8195;
-	
-	    @(posedge clk)
-	    @(posedge clk)
-	    @(posedge clk)
-
-		data_out_ref = $signed(data_in1) * $signed(data_in2);
-		data_out_ref_round =  (data_out_ref<  -8388608 ) ? -32768 :
-		                      (data_out_ref>   8388607 ) ?  32767 : {data_out_ref[2*WIDTH-2],data_out_ref[22:16],data_out_ref[15:8]};
-		if(data_out_ref == data_out)
-		      $display("Correct: in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d, rounded output:%d", data_in1_dly3, data_in2_dly3, data_out_ref,data_out_ref_round,data_out,data_out_round);
-		else
-		         $error  ("Error:   in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d, rounded output:%d", data_in1_dly3, data_in2_dly3, data_out_ref,data_out_ref_round,data_out,data_out_round);
-
-		//corner case 4
-		@(posedge clk)
-	    data_in1 = -1023;
-		data_in2 = 8195;
-	
-	    @(posedge clk)
-	    @(posedge clk)
-	    @(posedge clk)
-
-		data_out_ref = $signed(data_in1) * $signed(data_in2);
-		data_out_ref_round =  (data_out_ref<  -8388608 ) ? -32768 :
-		                      (data_out_ref>   8388607 ) ?  32767 : {data_out_ref[2*WIDTH-2],data_out_ref[22:16],data_out_ref[15:8]};
-		if(data_out_ref == data_out)
-		      $display("Correct: in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d, rounded output:%d", data_in1_dly3, data_in2_dly3, data_out_ref,data_out_ref_round,data_out,data_out_round);
-		else
-		      $error  ("Error:   in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d, rounded output:%d", data_in1_dly3, data_in2_dly3, data_out_ref,data_out_ref_round,data_out,data_out_round);
-
-	end
+    end
 
     initial begin
        $fsdbDumpfile("fix_ari_mul.fsdb");
