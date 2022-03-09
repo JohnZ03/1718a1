@@ -167,7 +167,9 @@ module fix_ari_mul_tb;
     initial begin
        $fsdbDumpfile("fix_ari_mul.fsdb");
        $fsdbDumpvars;
+       $fsdbDumpMDA();
     end		
+
 
     initial begin
     	#5000;
