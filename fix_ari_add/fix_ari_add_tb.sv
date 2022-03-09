@@ -1,6 +1,6 @@
 module fix_ari_add_tb;
 
-    parameter WIDTH = 15;
+    parameter WIDTH = 16;
     
     logic   signed [WIDTH-1:0] data_in1;
     logic   signed [WIDTH-1:0] data_in2;
@@ -19,15 +19,15 @@ module fix_ari_add_tb;
 		);
 
     initial begin
-	    data_in1 = -16383;
-		data_in2 = -8191;
+	    data_in1 = -32768;
+		data_in2 = -12384;
 	    for(i=0;i<100;i=i+1) begin
 		    #9
-		    data_in1 = data_in1 + 240;
-		    data_in2 = data_in2 + 240;
+		    data_in1 = data_in1 + 480;
+		    data_in2 = data_in2 + 480;
 			data_out_ref = data_in1 + data_in2;
-			data_out_ref_round = (data_out_ref< -16384) ? -16384 :
-			                     (data_out_ref>  16383) ?  16383 : data_out_ref;
+			data_out_ref_round = (data_out_ref< -32768) ? -32768 :
+			                     (data_out_ref>  32767) ?  32767 : data_out_ref;
 			#1
 		    if(data_out_ref_round == data_out)
 			    $display("Correct: in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d", data_in1, data_in2, data_out_ref,data_out_ref_round,data_out);
@@ -38,11 +38,11 @@ module fix_ari_add_tb;
 
 		//corner cases 0
         #9
-		data_in1 = 8192;
-		data_in2 = 8191;
+		data_in1 = 16384;
+		data_in2 = 16383;
 		data_out_ref = data_in1 + data_in2;
-		data_out_ref_round = (data_out_ref< -16384) ? -16384 :
-		                     (data_out_ref>  16383) ?  16383 : data_out_ref;
+		data_out_ref_round = (data_out_ref< -32768) ? -32768 :
+		                     (data_out_ref>  32767) ?  32767 : data_out_ref;
 		#1
 	    if(data_out_ref_round == data_out)
 		    $display("Correct: in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d", data_in1, data_in2, data_out_ref,data_out_ref_round,data_out);
@@ -51,11 +51,11 @@ module fix_ari_add_tb;
 
 		//corner cases 1
         #9
-		data_in1 = 8192;
-		data_in2 = 8192;
+		data_in1 = 16394;
+		data_in2 = 16384;
 		data_out_ref = data_in1 + data_in2;
-		data_out_ref_round = (data_out_ref< -16384) ? -16384 :
-		                     (data_out_ref>  16383) ?  16383 : data_out_ref;
+		data_out_ref_round = (data_out_ref< -32768) ? -32768 :
+		                     (data_out_ref>  32767) ?  32767 : data_out_ref;
 		#1
 	    if(data_out_ref_round == data_out)
 		    $display("Correct: in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d", data_in1, data_in2, data_out_ref,data_out_ref_round,data_out);
@@ -64,11 +64,11 @@ module fix_ari_add_tb;
 
 		//corner cases 2
         #9
-		data_in1 = -8192;
-		data_in2 = -8192;
+		data_in1 = -16384;
+		data_in2 = -16384;
 		data_out_ref = data_in1 + data_in2;
-		data_out_ref_round = (data_out_ref< -16384) ? -16384 :
-		                     (data_out_ref>  16383) ?  16383 : data_out_ref;
+		data_out_ref_round = (data_out_ref< -32768) ? -32768 :
+		                     (data_out_ref>  32767) ?  32767 : data_out_ref;
 		#1
 	    if(data_out_ref_round == data_out)
 		    $display("Correct: in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d", data_in1, data_in2, data_out_ref,data_out_ref_round,data_out);
@@ -77,11 +77,11 @@ module fix_ari_add_tb;
 
 		//corner cases 3
         #9
-		data_in1 = -8192;
-		data_in2 = -8193;
+		data_in1 = -16384;
+		data_in2 = -16385;
 		data_out_ref = data_in1 + data_in2;
-		data_out_ref_round = (data_out_ref< -16384) ? -16384 :
-		                     (data_out_ref>  16383) ?  16383 : data_out_ref;
+		data_out_ref_round = (data_out_ref< -32768) ? -32768 :
+		                     (data_out_ref>  32767) ?  32767 : data_out_ref;
 		#1
 	    if(data_out_ref_round == data_out)
 		    $display("Correct: in1:%d, in2:%d, ref:%d, rounded ref:%d, output:%d", data_in1, data_in2, data_out_ref,data_out_ref_round,data_out);

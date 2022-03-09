@@ -1,10 +1,10 @@
 module fix_ari_add
-#(parameter DATA = 15)
+#(parameter DATA = 16)
 (data_in1,data_in2,data_out);
 
 
-parameter MIN=15'sb100_0000_0000_0000;
-parameter MAX=15'sb011111111111111;
+parameter MIN=16'sb1000_0000_0000_0000;
+parameter MAX=16'sb0111_1111_1111_1111;
 
 input  signed [DATA-1:0] data_in1;
 input  signed [DATA-1:0] data_in2;
