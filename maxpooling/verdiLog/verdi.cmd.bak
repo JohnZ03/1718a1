@@ -1,0 +1,76 @@
+debImport "-f" "filelist.f"
+debLoadSimResult \
+           /home/wugxfly/Documents/cnn_mnist_1718/1718a1/maxpooling/maxpooling.fsdb
+wvCreateWindow
+verdiWindowResize -win $_Verdi_1 "470" "122" "900" "744"
+verdiWindowResize -win $_Verdi_1 "55" -14 "1855" "1056"
+srcHBSelect "maxpooling_tb.dut" -win $_nTrace1
+srcSetScope -win $_nTrace1 "maxpooling_tb.dut" -delim "."
+srcSelect -signal "clk" -win $_nTrace1
+srcSelect -signal "rst_n" -win $_nTrace1
+srcSelect -signal "ena" -win $_nTrace1
+srcSelect -signal "frame_start_in" -win $_nTrace1
+srcSelect -signal "line_start_in" -win $_nTrace1
+srcSelect -signal "frame_end_in" -win $_nTrace1
+srcSelect -signal "sig_layer" -win $_nTrace1
+srcSelect -signal "max_layer" -win $_nTrace1
+srcSelect -signal "frame_start_out" -win $_nTrace1
+srcSelect -signal "line_start_out" -win $_nTrace1
+srcSelect -signal "frame_end_out" -win $_nTrace1
+srcSelect -signal "valid" -win $_nTrace1
+srcAddSelectedToWave -win $_nTrace1
+wvSetCursor -win $_nWave2 42194.960212 -snap {("G1" 3)}
+wvZoomIn -win $_nWave2
+wvZoomIn -win $_nWave2
+wvZoomIn -win $_nWave2
+wvZoomIn -win $_nWave2
+wvZoomIn -win $_nWave2
+wvSetCursor -win $_nWave2 15830.921139 -snap {("G1" 5)}
+srcDeselectAll -win $_nTrace1
+srcSelect -signal "sram0_wen" -win $_nTrace1
+srcSelect -signal "sram0_en" -win $_nTrace1
+srcSelect -signal "sram0_wen" -win $_nTrace1
+srcSelect -signal "sram0_wdata" -win $_nTrace1
+srcSelect -signal "sram0_rdata" -win $_nTrace1
+srcSelect -signal "sram0_addr" -win $_nTrace1
+srcAddSelectedToWave -win $_nTrace1
+wvSetCursor -win $_nWave2 39137.555037 -snap {("G1" 16)}
+wvSetCursor -win $_nWave2 33420.833515 -snap {("G1" 17)}
+wvZoomOut -win $_nWave2
+wvZoomIn -win $_nWave2
+srcDeselectAll -win $_nTrace1
+srcSelect -signal "state" -win $_nTrace1
+srcAddSelectedToWave -win $_nTrace1
+wvScrollDown -win $_nWave2 1
+wvScrollDown -win $_nWave2 0
+wvScrollDown -win $_nWave2 0
+wvScrollDown -win $_nWave2 0
+wvScrollDown -win $_nWave2 0
+wvScrollDown -win $_nWave2 0
+wvZoomOut -win $_nWave2
+wvZoomOut -win $_nWave2
+wvZoomOut -win $_nWave2
+wvZoomOut -win $_nWave2
+wvZoomIn -win $_nWave2
+wvZoomIn -win $_nWave2
+srcDeselectAll -win $_nTrace1
+srcSelect -signal "frame_start_in" -win $_nTrace1
+wvScrollUp -win $_nWave2 1
+wvScrollUp -win $_nWave2 1
+wvScrollUp -win $_nWave2 1
+wvScrollUp -win $_nWave2 1
+wvScrollUp -win $_nWave2 1
+wvScrollUp -win $_nWave2 1
+wvScrollUp -win $_nWave2 1
+wvScrollUp -win $_nWave2 1
+wvScrollUp -win $_nWave2 1
+wvScrollDown -win $_nWave2 0
+wvScrollDown -win $_nWave2 0
+srcDeselectAll -win $_nTrace1
+srcSelect -signal "next_state" -win $_nTrace1
+srcAddSelectedToWave -win $_nTrace1
+wvSelectSignal -win $_nWave2 {( "G1" 19 )} 
+wvSelectSignal -win $_nWave2 {( "G1" 19 )} 
+wvSelectSignal -win $_nWave2 {( "G1" 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 \
+           )} 
+debExit

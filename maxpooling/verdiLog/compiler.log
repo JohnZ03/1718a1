@@ -1,0 +1,214 @@
+*design* DebussyLib (btIdent Verdi3_L-2016.06-1)
+Command arguments:
+    +define+verilog
+    -f filelist.f
+        max4.v
+        maxpooling.v
+        sram0.v
+        maxpooling_tb.sv
+
+
+*Error* illegal LHS in continuous assignment
+"maxpooling.v", 76: 
+
+*Error* Syntax error at ;
+"maxpooling_tb.sv", 2: 
+
+*Error* Syntax error at ;
+"maxpooling_tb.sv", 3: 
+
+*Error* Syntax error at ;
+"maxpooling_tb.sv", 4: 
+
+*Error* Syntax error at ;
+"maxpooling_tb.sv", 5: 
+
+*Error* Syntax error at ;
+"maxpooling_tb.sv", 6: 
+
+*Error* Syntax error at ;
+"maxpooling_tb.sv", 7: 
+
+*Error* Syntax error at [
+"maxpooling_tb.sv", 8: 
+
+*Error* Syntax error at [
+"maxpooling_tb.sv", 9: 
+
+*Error* Syntax error at ;
+"maxpooling_tb.sv", 10: 
+
+*Error* Syntax error at ;
+"maxpooling_tb.sv", 11: 
+
+*Error* Syntax error at ;
+"maxpooling_tb.sv", 12: 
+
+*Error* Syntax error at ;
+"maxpooling_tb.sv", 13: 
+
+*Error* Syntax error at i
+"maxpooling_tb.sv", 63: 
+
+*Error* Syntax error at <
+"maxpooling_tb.sv", 63: 
+
+*Error* Syntax error at )
+"maxpooling_tb.sv", 63: 
+
+*Error* Syntax error at j
+"maxpooling_tb.sv", 68: 
+
+*Error* Syntax error at <
+"maxpooling_tb.sv", 68: 
+
+*Error* Syntax error at )
+"maxpooling_tb.sv", 68: 
+
+*Error* Syntax error at end
+"maxpooling_tb.sv", 77: 
+
+*Error* Syntax error at while
+"maxpooling_tb.sv", 82: 
+
+*Error* Syntax error at @
+"maxpooling_tb.sv", 83: 
+
+*Error* Syntax error at end
+"maxpooling_tb.sv", 85: 
+
+*Error* Syntax error at join
+"maxpooling_tb.sv", 86: 
+
+*Error* Syntax error at end
+"maxpooling_tb.sv", 87: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 34: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 36: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 40: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 42: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 48: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 49: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 50: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 51: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 57: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 58: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 59: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 60: 
+
+*Error* missing end in for statement
+"maxpooling_tb.sv", 63: 
+
+*Error* missing initial in for statement
+"maxpooling_tb.sv", 63: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 64: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 65: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 66: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 67: 
+
+*Error* missing end in for statement
+"maxpooling_tb.sv", 68: 
+
+*Error* missing initial in for statement
+"maxpooling_tb.sv", 68: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 69: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 71: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 73: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 75: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 78: 
+
+*Error* illegal LHS in procedural assignment
+"maxpooling_tb.sv", 79: 
+Highest level modules:
+maxpooling_tb
+
+
+*Error* failed to find identifier int
+"maxpooling_tb.sv", 63: 
+
+*Error* failed to find identifier i
+"maxpooling_tb.sv", 63: 
+
+*Error* failed to find identifier i
+"maxpooling_tb.sv", 63: 
+
+*Error* failed to find identifier i
+"maxpooling_tb.sv", 63: 
+
+*Error* failed to find identifier int
+"maxpooling_tb.sv", 68: 
+
+*Error* failed to find identifier j
+"maxpooling_tb.sv", 68: 
+
+*Error* failed to find identifier j
+"maxpooling_tb.sv", 68: 
+
+*Error* failed to find identifier j
+"maxpooling_tb.sv", 68: 
+
+*Error* failed to find identifier i
+"maxpooling_tb.sv", 69: 
+
+*Error* failed to find identifier j
+"maxpooling_tb.sv", 69: 
+
+*Error* failed to find identifier j
+"maxpooling_tb.sv", 70: 
+
+*Error* failed to find identifier i
+"maxpooling_tb.sv", 70: 
+
+*Error* failed to find identifier j
+"maxpooling_tb.sv", 72: 
+
+*Error* failed to find identifier i
+"maxpooling_tb.sv", 72: 
+
+*Warning* port sizes differ (16 vs 1) in port connection (port sig_layer)
+"maxpooling_tb.sv", 25: 
+
+*Warning* port sizes differ (16 vs 1) in port connection (port max_layer)
+"maxpooling_tb.sv", 26: 
+Total	65 error(s),   2 warning(s)

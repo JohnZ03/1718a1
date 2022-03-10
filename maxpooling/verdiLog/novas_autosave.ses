@@ -1,0 +1,70 @@
+@verdi rc file Version 1.0
+[General]
+VerdiVersion = Verdi3_L-2016.06-1
+[KeyNote]
+Line1 = Automatic Backup 0
+[TestBench]
+ConstrViewShow = 0
+InherViewShow = 0
+FSDBMsgShow = 0
+AnnotationShow = 0
+powerDumped = 0
+[hb]
+postSimFile = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/maxpooling/maxpooling.fsdb
+syncTime = 335000
+viewport = 65 24 1855 1056 608 181 685 1853
+activeNode = "maxpooling_tb.dut"
+activeScope = "maxpooling_tb.dut"
+activeFile = "maxpooling.v"
+interactiveMode = False
+viewType = Source
+simulatorMode = False
+sourceBeginLine = 0
+baMode = False
+srcLineNum = True
+syncSignal = False
+traceMode = Hierarchical
+showTraceInSchema = True
+paMode = False
+funcMode = False
+traceCrossHier = True
+DnDtraceCrossHierOnly = True
+traceIncTopPort = False
+leadingZero = False
+signalPane = False
+Scope1 = "maxpooling_tb.dut"
+Scope2 = "maxpooling_tb.dut.u_max4"
+multipleSelection = 13 124 10 0 0 1 5 0 0 2 5 0 0 3 5 0 0 4 5 0 0 5 5 0 0 6 5 0 0 7 11 0 0 8 11 0 0 9 5 0 0 10 5 0 0 11 5 0 0 12 5 0 0
+sdfCheckUndef = FALSE
+simFlow = FALSE
+[hb.sourceTab.1]
+scope = maxpooling_tb.dut
+File = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/maxpooling/maxpooling.v
+Line = 1
+[imp.design1]
+dbEnum =  oh
+invokeDir = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/maxpooling
+design = DebussyLib
+hostCommand = hostCommand -f filelist.f
+[nMemoryManager]
+FsdbFile = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/maxpooling/maxpooling.fsdb
+UserActionNum = 0
+nMemWindowNum = 0
+[wave.0]
+viewPort = 0 28 1855 566 182 63
+SessionFile = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/maxpooling/verdiLog/novas_autosave.ses.wave.0
+displayGrid = FALSE
+hierarchicalName = FALSE
+snap = TRUE
+displayLeadingZeros = FALSE
+fixDelta = FALSE
+displayCursorMarker = FALSE
+autoUpdate = FALSE
+highlightGlitchs = FALSE
+waveformSync = FALSE
+displayErrors = TRUE
+displayMsgSymbols = TRUE
+showMsgDescriptions = TRUE
+autoFit = FALSE
+displayDeltaY = FALSE
+centerCursor = FALSE
