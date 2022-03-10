@@ -126,9 +126,10 @@ always @ ( posedge clk or negedge rst_n)
 	    valid <= 1'b1;
 		max_layer <= max_value; 
     end
-    else
+    else begin
         valid <= 1'b0;
 		max_layer <= max_value; 
+    end
 
 //line_start_out
 always @ ( posedge clk or negedge rst_n)
