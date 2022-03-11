@@ -63,8 +63,8 @@ module fix_ari_mul_tb;
     end
 
     initial begin
-	    data_in1 = -100;
-		data_in2 = 10;
+	    data_in1 = -200;
+		data_in2 = -10;
 
 		while(!rst_n)
 		    @(posedge clk);
