@@ -1,8 +1,8 @@
-module maxpooling_tb;
-
 import "DPI-C" function void maxpooling_model(input int signed sig_layer[5][28][28], output int signed max_layer[5][14][14]);
-`include "maxpooling_input_tr.sv"
-`include "maxpooling_output_tr.sv"
+`include "tb/maxpooling_input_tr.sv"
+`include "tb/maxpooling_output_tr.sv"
+
+module maxpooling_tb;
 
 logic         clk;
 logic         rst_n;
