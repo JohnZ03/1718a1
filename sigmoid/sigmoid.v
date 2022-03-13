@@ -50,9 +50,7 @@ always @ (posedge clk or negedge rst_n)
     end
     else begin
         sigmoid_in_dly1 <= sigmoid_in;
-      always @ (posedge clk or negedge rst_n)
-    if (!rst_n) begin
-  sigmoid_in_dly2 <= sigmoid_in_dly1;
+        sigmoid_in_dly2 <= sigmoid_in_dly1;
         sigmoid_in_dly3 <= sigmoid_in_dly2;
         sigmoid_in_dly4 <= sigmoid_in_dly3;
         sigmoid_in_dly5 <= sigmoid_in_dly4;
@@ -76,14 +74,14 @@ always @ (posedge clk or negedge rst_n)
 always @ (posedge clk or negedge rst_n)
     if (!rst_n)
         range1 <= 3'h0;
-    else begin
-        if(sigmoid_in > 16'sb0000010100000000) // >5
+    else if (ena) begin
+        if(sigmoid_in > 16'sb0000_0101_0000_0000) // >5
             range1 <= 3'h1;
-        else if(sigmoid_in > 16'sd0000000100000000) // 1 to 5
+        else if(sigmoid_in > 16'sb0000_0001_0000_0000) // 1 to 5
             range1 <= 3'h2;
-        else if(sigmoid_in > 16'sd1111111100000000) // -1 to 1
+        else if(sigmoid_in > 16'sb1111111100000000) // -1 to 1
             range1 <= 3'h3;
-        else if(sigmoid_in > 16'sd1111101100000000) // -5 to -1
+        else if(sigmoid_in > 16'sb1111101100000000) // -5 to -1
             range1 <= 3'h4;
         else                                        // <-5
             range1 <= 3'h5;
@@ -97,92 +95,102 @@ always @ (posedge clk or negedge rst_n)
         constant_term  <= 16'sd0;
     end
     else begin
-        case(range1)
-            3'h1: 
-                //5      to 5.3890  1280 to 1380 -> 16'd254  
-                //5.3890 to 6       1380 to 1536 -> 16'h255
-                //6      to inf     >1536        -> 16'h256
-                quadratic_term <= 16'sd0;
-                linear_term    <= 16'sd0;
-                if(sigmoid_in_dly1 < 16'sd1380) 
-                    constant_term  <= 16'sd254;
-                else if(sigmoid_in_dly1 < 16'sd1380)
-                    constant_term  <= 16'sd255;
-                else
-                    constant_term  <= 16'sd256;
-            3'h2:
-                if(sigmoid_in_dly1 < 16'sd512) begin
-                    quadratic_term <= 16'sb1111101000000110;
-                    linear_term    <= 16'sd9490; 
-                    constant_term  <= 16'sd125; 
+        if(ena_dly[0]) begin 
+            case(range1)
+                3'h1: 
+                begin
+                    //5      to 5.3890  1280 to 1380 -> 16'd254  
+                    //5.3890 to 6       1380 to 1536 -> 16'h255
+                    //6      to inf     >1536        -> 16'h256
+                    quadratic_term <= 16'sd0;
+                    linear_term    <= 16'sd0;
+                    if(sigmoid_in_dly1 < 16'sd1380) 
+                        constant_term  <= 16'sd254;
+                    else if(sigmoid_in_dly1 < 16'sd1536)
+                        constant_term  <= 16'sd255;
+                    else
+                        constant_term  <= 16'sd256;
                 end
+                3'h2:
+                begin
+                    if(sigmoid_in_dly1 < 16'sd512) begin              // 1 to 2
+                        quadratic_term <= 16'sb1111101000000110;
+                        linear_term    <= 16'sd9490; 
+                        constant_term  <= 16'sd125; 
+                    end
 
-                else if(sigmoid_in_dly1 < 16'sd768) begin
-                    quadratic_term <= 16'sb1111110000110000;
-                    linear_term    <= 16'sd7216; 
-                    constant_term  <= 16'sd143; 
+                    else if(sigmoid_in_dly1 < 16'sd768) begin         // 2 to 3
+                        quadratic_term <= 16'sb1111110000110000;
+                        linear_term    <= 16'sd7216; 
+                        constant_term  <= 16'sd143; 
+                    end
+
+                    else if(sigmoid_in_dly1 < 16'sd1024) begin        // 3 to 4
+                        quadratic_term <= 16'sb1111111001000110; 
+                        linear_term    <= 16'sd4060; 
+                        constant_term  <= 16'sd180; 
+                    end
+
+                    else begin
+                        quadratic_term <= 16'sb1111111101001111;      // 4 to 5
+                        linear_term    <= 16'sd1956; 
+                        constant_term  <= 16'sd212; 
+                    end
                 end
-
-                else if(sigmoid_in_dly1 < 16'sd1024) begin
-                    quadratic_term <= 16'sb1111111111111000; 
-                    linear_term    <= 16'sd4060; 
-                    constant_term  <= 16'sd180; 
+                3'h3:
+                begin
+                        quadratic_term <= 16'sb0;
+                        linear_term    <= 16'sd7809; 
+                        constant_term  <= 16'sd128; 
                 end
+                3'h4:
+                begin
+                    if(sigmoid_in_dly1 > 16'sb1111111000000000) begin //-512
+                        quadratic_term <= 16'sd1530;
+                        linear_term    <= 16'sd9490; 
+                        constant_term  <= 16'sd131; 
+                    end
 
-                else begin
-                    quadratic_term <= 16'sb1111111101001111;
-                    linear_term    <= 16'sd1956; 
-                    constant_term  <= 16'sd212; 
+                    else if(sigmoid_in_dly1 > 16'sb1111110100000000) begin  //-768
+                        quadratic_term <= 16'sd976;
+                        linear_term    <= 16'sd7216; 
+                        constant_term  <= 16'sd113; 
+                    end
+
+                    else if(sigmoid_in_dly1 > 16'sb1111110000000000) begin  //-1024
+                        quadratic_term <= 16'sd442; 
+                        linear_term    <= 16'sd4060; 
+                        constant_term  <= 16'sd76; 
+                    end
+
+                    else begin
+                        quadratic_term <= 16'sd177;
+                        linear_term    <= 16'sd1956; 
+                        constant_term  <= 16'sd44; 
+                    end
                 end
-
-            3'h3:
-                    quadratic_term <= 16'sb0;
-                    linear_term    <= 16'sd7809; 
-                    constant_term  <= 16'sd128; 
-
-            3'h4:
-                if(sigmoid_in_dly1 < 16'sd512) begin
-                    quadratic_term <= 16'sd1530;
-                    linear_term    <= 16'sd9490; 
-                    constant_term  <= 16'sd131; 
+                3'h5: 
+                    //5      to 5.3890 -1280  -> 16'sd(-254)  
+                    //-5.41  to 6      -1385  -> 16'sd(-255)
+                    //6      to -inf   -1536  -> 16'sd(-256)
+                begin
+                    quadratic_term <= 16'sd0;
+                    linear_term    <= 16'sd0;
+                    if(sigmoid_in_dly1 > 16'sb1111101010010111) // -5.41
+                        constant_term  <= 16'sd2;
+                    else if(sigmoid_in_dly1 > 16'sb1111101000000000)  //-6
+                        constant_term  <= 16'sd1;
+                    else
+                        constant_term  <= 16'sd0;
                 end
-
-                else if(sigmoid_in_dly1 < 16'sd768) begin
-                    quadratic_term <= 16'sd976;
-                    linear_term    <= 16'sd7216; 
-                    constant_term  <= 16'sd113; 
+                default:
+                begin
+                    quadratic_term <= 16'sd0;
+                    linear_term    <= 16'sd0;
+                    constant_term  <= 16'sd0;
                 end
-
-                else if(sigmoid_in_dly1 < 16'sd1024) begin
-                    quadratic_term <= 16'sd442; 
-                    linear_term    <= 16'sd4060; 
-                    constant_term  <= 16'sd76; 
-                end
-
-                else begin
-                    quadratic_term <= 16'sd117;
-                    linear_term    <= 16'sd1956; 
-                    constant_term  <= 16'sd44; 
-                end
- 
-            3'h5: 
-                //5      to 5.3890  1280 to 1380 -> 16'd254  
-                //5.3890 to 6       1380 to 1536 -> 16'h255
-                //6      to inf     >1536        -> 16'h256
-                quadratic_term <= 16'sd0;
-                linear_term    <= 16'sd0;
-                if(sigmoid_in_dly1 < 16'sd1380) 
-                    constant_term  <= 16'sd254;
-                else if(sigmoid_in_dly1 < 16'sd1380)
-                    constant_term  <= 16'sd255;
-                else
-                    constant_term  <= 16'sd256;
-            default:
-                quadratic_term <= 16'sd0;
-                linear_term    <= 16'sd0;
-                constant_term  <= 16'sd0;
-
-        endcase
+            endcase
+        end
     end
 
 always @ (posedge clk or negedge rst_n)
@@ -235,17 +243,17 @@ fix_ari_mul mul1_1(
 
 //round multply results
 
-assign mul_out0_1_round = {mul_out0_1[30],mul_out0_1[21:8]};
+assign mul_out0_1_round = {mul_out0_1[30],mul_out0_1[22:8]};
 assign mul_out1_1_round = mul_out1_1[30:15];
 assign mul_out0_2_round = mul_out0_2[30:15];
 
 always @ (posedge clk or negedge rst_n)
-    if (!rst_n) begin
+    if (!rst_n) 
         sigmoid_out <= 16'sd0;
     else
-        sigmoid_out <= mul_out_1_1_round + mul_out_0_2_round_dly3 + constant_term_dly6;
+        sigmoid_out <= mul_out1_1_round + mul_out0_2_round_dly3 + constant_term_dly6;
 
-//It takes 9 cycles for data to go through sigmoid
+//It takes 8 cycles for data to go through sigmoid
 //ena delay 
 always @ (posedge clk or negedge rst_n)
     if (!rst_n) 
@@ -253,5 +261,5 @@ always @ (posedge clk or negedge rst_n)
     else
         ena_dly <= {ena_dly[7:0],ena};
 assign valid = ena_dly[8];
-
+endmodule
 
