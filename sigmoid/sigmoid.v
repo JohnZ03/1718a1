@@ -50,8 +50,6 @@ always @ (posedge clk or negedge rst_n)
     end
     else begin
         sigmoid_in_dly1 <= sigmoid_in;
-always @ (posedge clk or negedge rst_n)
-    if (!rst_n) begin
         sigmoid_in_dly2 <= sigmoid_in_dly1;
         sigmoid_in_dly3 <= sigmoid_in_dly2;
         sigmoid_in_dly4 <= sigmoid_in_dly3;
