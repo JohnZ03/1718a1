@@ -1,7 +1,5 @@
-long int* dense_sum2[10];
-
 // Take pointers input, return pointer to tb
-long int* dense_1(long int* dense_w2, long int* dense2_input, long int* dense_b2)
+void dense_1(const long int* dense_w2, const long int* dense2_input, const long int* dense_b2, long int* dense_sum2)
 {   
     // Dense Layer 2
     for (int i = 0; i < 10; i++)
@@ -13,6 +11,4 @@ long int* dense_1(long int* dense_w2, long int* dense2_input, long int* dense_b2
         }
         dense_sum2[i] += dense_b2[i];
     }
-
-    return dense_sum2;
 }
