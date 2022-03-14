@@ -78,7 +78,7 @@ int main()
             {
                 if (k % 8 == 0 && !(k == 0 && j == 0 && i == 0))
                     fout << endl;
-                fout << std::hex << setw(2) << setfill('0') << int(img[j][k]);
+                fout << std::hex << setw(2) << setfill('0') << int(img[j][7 - k + k / 8 * 16]);
             }
     }
 
