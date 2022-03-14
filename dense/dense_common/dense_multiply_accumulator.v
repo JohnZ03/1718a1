@@ -7,19 +7,17 @@ module dense_multiply_accumulator(
     input  signed [15:0] dense_input,
     output reg              valid,
     output reg signed [15:0] dense_sum_out,
-    output [9:0]         rom0_addr,
-    output signed [15:0] rom0_data,
+    output reg [9:0]         rom0_addr,
+    input signed [15:0] rom0_data
 );
 
-//wire signed [15:0] rom0_data;
-//reg  [9:0]  rom0_addr;
 
-wire signed [15:0] mul_data_out;
+wire signed [30:0] mul_data_out;
 wire signed [15:0] mul_data_in1;
 wire signed [15:0] mul_data_in2;
 
 reg  signed [15:0] dense_input_dly;
-reg  signed [15:0] dense_sum;
+reg  signed [30:0] dense_sum;
 
 reg  [3:0]  ena_dly;
 reg  [4:0]  frame_end_dly;
@@ -57,9 +55,9 @@ always @ (posedge clk or negedge rst_n)
 //dense_sum
 always @ (posedge clk or negedge rst_n)
     if (!rst_n)
-        dense_sum <= 16'sh0;
+        dense_sum <= 31'sh0;
     else if(frame_start_in)
-        dense_sum <= 16'sh0;
+        dense_sum <= 31'sh0;
     else if(ena_dly[3])
         dense_sum <= dense_sum + mul_data_out;
 
@@ -71,7 +69,7 @@ always @ (posedge clk or negedge rst_n)
     end
     else begin
         valid <= frame_end_dly[4];
-        dense_sum_out <= dense_sum;
+        dense_sum_out <= {dense_sum[30],dense_sum[22:8]};
     end
     
 
@@ -93,7 +91,7 @@ fix_ari_mul mul0(
     .rst_n(rst_n),
     .data_in1(dense_input_dly),
     .data_in2(rom0_data),
-    .data_out_round(mul_data_out)
+    .data_out(mul_data_out)
     );
 endmodule
 
