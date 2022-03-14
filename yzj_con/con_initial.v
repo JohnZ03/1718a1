@@ -143,6 +143,6 @@ always@(posedge clk or negedge rst_n)
               if(!rst_n)
                 out_reg <= 0;
               else 
-                out_reg <= $signed(out_r6[75:38]) + $signed(out_r6[37:0]);
+                out_reg <= $signed(out_r6[75:38]) + $signed(out_r6[37:0]) + $signed(bias);
 
 endmodule
