@@ -114,7 +114,14 @@ always@(posedge clk or negedge rst_n)
       enable <= 1'b1;
   end
 
-
+con  con_inst(
+    .clk      (clk),
+    .rst_n    (rst_n),
+    .wei      (), 
+    .bias     (), 
+    .ima      (ima_ton_con),
+    .out_reg  ()
+    );
 
 
 
