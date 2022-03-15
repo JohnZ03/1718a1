@@ -6,10 +6,10 @@ class conv_core_input_tr;
     //special case
     constraint c{
         foreach(ima[u]){
-            ima[u] == u;
+            ima[u] == 1;
         }
         foreach(wei[j]){
-            wei[j] == 2;
+            wei[j] == 1;
         }
         bias == 1;
     }

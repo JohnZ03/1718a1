@@ -50,7 +50,7 @@ always@(posedge clk or negedge rst_n)
   //image extend
   genvar i;
   generate
-  for(i = 1;i < 49;i = i + 1)
+  for(i = 1;i < 50;i = i + 1)
   begin: ima_extenstion
     assign ima_0[i*17-1:(i-1)*17] = {1'b0,ima[i*8-1:(i-1)*8],{8{1'b0}}};
   end
@@ -59,7 +59,7 @@ always@(posedge clk or negedge rst_n)
   //wei extend
   genvar k;
   generate
-  for(k = 1;k < 49;k = k + 1)
+  for(k = 1;k < 50;k = k + 1)
   begin: wei_extenstion
     assign wei_0[k*17-1:(k-1)*17] = {wei[DATA-1],wei};  //change i to k by Guoxian
   end
@@ -72,7 +72,7 @@ always@(posedge clk or negedge rst_n)
 
   genvar j;
   generate
-  for(j = 1;j < 49;j = j + 1)
+  for(j = 1;j < 50;j = j + 1)
   begin:mul
     fix_ari_mul #(  //change fix_air_mul to fix_ari_mul by Guoxian
       .DATA(17),
@@ -115,7 +115,7 @@ always@(posedge clk or negedge rst_n)
         endgenerate
 
         always@(posedge clk or negedge rst_n)begin
-          out_r2[34*25-1:34*24] <= $signed(out_r1[33*NUM-1:33*(NUM-1)]) + $signed(bias,{8{1'b0}});//6'b0
+          out_r2[34*25-1:34*24] <= $signed(out_r1[33*NUM-1:33*(NUM-1)]) + $signed({bias,{8'h0}});//6'h0
         end
 
         //second 13 add

@@ -1,6 +1,6 @@
 .PHONY:vcs verdi clean 
 
-FSDB_NAME = dense_1.fsdb
+FSDB_NAME = conv_core_tb.fsdb
 RUN_VERDI = verdi -f filelist.f  -ssf $(FSDB_NAME) -nologo
 
 vcs:
