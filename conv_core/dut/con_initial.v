@@ -24,6 +24,9 @@ reg en_r4;
 reg en_r5;
 reg en_r6;
 reg en_r7;
+reg en_r8;
+reg en_r9;
+reg en_r10;
 
 always@(posedge clk or negedge rst_n)
   if(!rst_n)begin
@@ -34,6 +37,9 @@ always@(posedge clk or negedge rst_n)
     en_r5 <= 0;
     en_r6 <= 0;
     en_r7 <= 0;
+    en_r8 <= 0;
+    en_r9 <= 0;
+    en_r10 <= 0;
   end
   else begin
     en_r1 <= enable;
@@ -43,9 +49,12 @@ always@(posedge clk or negedge rst_n)
     en_r5 <= en_r4;
     en_r6 <= en_r5;
     en_r7 <= en_r6;
+    en_r8 <= en_r7;
+    en_r9 <= en_r8;
+    en_r10 <= en_r9;
   end
 
-  assign valid = en_r7;  //changed to blocking assignment by Guoxian
+  assign valid = en_r10;  //changed by Guoxian delay 9 cycle
 
   //image extend
   genvar i;
@@ -61,7 +70,7 @@ always@(posedge clk or negedge rst_n)
   generate
   for(k = 1;k < 50;k = k + 1)
   begin: wei_extenstion
-    assign wei_0[k*17-1:(k-1)*17] = {wei[DATA-1],wei};  //change i to k by Guoxian
+    assign wei_0[k*17-1:(k-1)*17] = {wei[k*16-1],wei[k*16-1:(k-1)*16]};  //change by Guoxian [k*16-1]
   end
   endgenerate
 
