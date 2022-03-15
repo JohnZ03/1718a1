@@ -1,19 +1,51 @@
-module con(wei, bias, ima, out_reg, clk, rst_n);
+module con(wei, bias, ima, out_reg, clk, rst_n,enable,valid);
 
 parameter DATA = 16;//original wei width
 parameter EXT = 17;//extension width
 parameter NUM = 49;//how many multi
 parameter IMA = 8;//image width
 
+input enable;
 input [DATA*NUM-1:0] wei;
 input [IMA*NUM-1:0] ima;
 input [DATA-1:0] bias;
 input clk;
 input rst_n;
 output [38:0] out_reg;
+output valid;
 
 wire [EXT*NUM-1:0] ima_0;//image after extension
 wire [EXT*NUM-1:0] wei_0;//weight after extension
+
+reg en_r1;
+reg en_r2;
+reg en_r3;
+reg en_r4;
+reg en_r5;
+reg en_r6;
+reg en_r7;
+
+always@(posedge clk or negedge rst_n)
+  if(!rst_n)begin
+    en_r1 <= 0;
+    en_r2 <= 0;
+    en_r3 <= 0;
+    en_r4 <= 0;
+    en_r5 <= 0;
+    en_r6 <= 0;
+    en_r7 <= 0;
+  end
+    else begin
+    en_r1 <= enable;
+    en_r2 <= en_r1;
+    en_r3 <= en_r2;
+    en_r4 <= en_r3;
+    en_r5 <= en_r4;
+    en_r6 <= en_r5;
+    en_r7 <= en_r6;
+  end
+
+assign valid <= en_r7;
 
 //image extend
 genvar i;
@@ -80,7 +112,7 @@ always@(posedge clk or negedge rst_n)
       for(a=1;a<25;a=a+1)begin
         out_r2[34*a-1:34*(a-1)] <= $signed(out_r1[33*a*2-1:33*(a*2-1)]) + $signed(out_r1[33*(a*2-1)-1:33*(a*2-2)]);
       end
-      out_r2[34*25-1:34*24] <= $signed(out_r1[33*NUM-1:33*(NUM-1)]);
+      out_r2[34*25-1:34*24] <= $signed(out_r1[33*NUM-1:33*(NUM-1)]) + $signed(bias);
     end
 
     //second 13 add
@@ -143,6 +175,6 @@ always@(posedge clk or negedge rst_n)
               if(!rst_n)
                 out_reg <= 0;
               else 
-                out_reg <= $signed(out_r6[75:38]) + $signed(out_r6[37:0]) + $signed(bias);
+                out_reg <= $signed(out_r6[75:38]) + $signed(out_r6[37:0]);
 
 endmodule
