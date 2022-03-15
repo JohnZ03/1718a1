@@ -115,7 +115,7 @@ always@(posedge clk or negedge rst_n)
         endgenerate
 
         always@(posedge clk or negedge rst_n)begin
-          out_r2[34*25-1:34*24] <= $signed(out_r1[33*NUM-1:33*(NUM-1)]) + $signed(bias);
+          out_r2[34*25-1:34*24] <= $signed(out_r1[33*NUM-1:33*(NUM-1)]) + $signed(bias,{8{1'b0}});//6'b0
         end
 
         //second 13 add
