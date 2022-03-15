@@ -1,4 +1,4 @@
-module fix_ari_mul(data_in1,data_in2,data_out,data_out_round,clk,rst_n);
+module fix_ari_mul(data_in1,data_in2,data_out,clk,rst_n);
 
 parameter DATA=16;
 parameter EX_SI=DATA-1;
@@ -9,7 +9,6 @@ parameter POIN=8;
 input [DATA-1:0] data_in1;
 input [DATA-1:0] data_in2;
 output [EX_SI*2:0] data_out;
-output [DATA-1:0] data_out_round;
 input clk;
 input rst_n;
 
@@ -69,5 +68,4 @@ always@(posedge clk or negedge rst_n)
   end
     
 assign data_out = {sign_r3,sum};
-assign data_out_round = {sign_r3,data_out[2*POIN+INTE-1:2*POIN],data_out[2*POIN-1:POIN]};
 endmodule
