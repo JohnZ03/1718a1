@@ -123,7 +123,7 @@ always @ ( posedge clk or negedge rst_n)
 	    valid <= 1'b0;
 		max_layer <= 'h0; 
 	end
-    else if (sram0_addr_dly && state_read_dly)begin
+    else if (sram0_addr_dly && !sram0_addr[0] && state_read_dly)begin //sram_ddr[0] rising edge
 	    valid <= 1'b1;
 		max_layer <= max_value; 
     end
@@ -136,7 +136,7 @@ always @ ( posedge clk or negedge rst_n)
 always @ ( posedge clk or negedge rst_n)
     if (!rst_n) 
 	    line_start_out <= 1'b0;
-    else if (sram0_addr == 5'h1 && state_read_dly)
+    else if (sram0_addr == 5'h1 && !sram0_addr_dly   && state_read_dly)
 	    line_start_out <= 1'b1;
     else
         line_start_out <= 1'b0;
