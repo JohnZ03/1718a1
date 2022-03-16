@@ -1,7 +1,7 @@
 `include "tb/conv_core_input_tr.sv"
 `include "tb/conv_core_output_tr.sv"
 
-import "DPI-C" function int conv_core_model(input int signed img[49], input int signed conv_w[49]);
+import "DPI-C" function int conv_core_model(input int signed img[49], input int signed conv_w[49], input int signed conv_b);
 module conv_core_tb;
 
 logic clk;
@@ -50,7 +50,6 @@ con dut(
     end
 
 
-
     task driver_one_pkt(conv_core_input_tr tr_i);
         cif.enable <= 1'b0;
         @(cif.cb);
@@ -67,7 +66,7 @@ con dut(
     task monitor_one_pkt();
 		while(!cif.valid) 
             @(cif.cb);
-		tr_o.out_reg = cif.out_reg;
+		tr_o.out_reg = $signed(cif.out_reg);
         @(cif.cb);
     endtask
     
@@ -88,10 +87,13 @@ con dut(
             end
         join
         //reference model
-        out_reg_ref=conv_core_model(.img(tr_i.ima), .conv_w(tr_i.wei));
+        out_reg_ref=conv_core_model(.img(tr_i.ima), .conv_w(tr_i.wei),.conv_b(tr_i.bias));
+        //$display("img: %d, wei: %d, bias: %d",tr_i.ima[0], tr_i.wei[0], tr_i.bias);
         //scoreboard
         if(out_reg_ref != tr_o.out_reg)
-            $error("out_reg_ref: %d, out_reg: %d", out_reg_ref, tr_o.out_reg);
+            $error("Error: out_reg_ref: %d, out_reg: %d", out_reg_ref, tr_o.out_reg);
+        else
+            $display("Correct: out_reg_ref: %d, out_reg: %d", out_reg_ref, tr_o.out_reg);
     end
 
 
