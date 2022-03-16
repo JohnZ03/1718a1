@@ -31,7 +31,7 @@ reg       frame_end_mid2;
 reg       valid2;
 
 //dense_w stored in rom
-wire [9:0]    rom0_addr;
+wire [9:0]    rom0_addr[119:0];
 wire [1919:0] rom0_data;
 
 
@@ -60,7 +60,7 @@ generate
             .dense_input      (dense_input ),   
             .valid            (valid_120[i]),
             .dense_sum_out    (dense_sum_out[i*16+15:i*16]),
-            .rom0_addr        (rom0_addr),
+            .rom0_addr        (rom0_addr[i]),
             .rom0_data        (rom0_data[i*16+15:i*16])
         );
     end
@@ -75,7 +75,7 @@ rom_dense_w_inst
 (
     .clk  (clk),
     .ena  (ena),
-    .addr (rom0_addr),
+    .addr (rom0_addr[0]),
     .q    (rom0_data)
     );
 
