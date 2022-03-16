@@ -107,6 +107,20 @@ always@(posedge clk or negedge rst_n)
       else
         out_r1 <= out_r;
 
+reg bias_r1;
+reg bias_r2;
+reg bias_r3;
+
+      always@(posedge clk or negedge rst_n)
+        if(!rst_n)begin
+          bias_r1 <= 0;
+          bias_r2 <= 0;
+          bias_r3 <= 0;
+          else begin
+          bias_r1 <= bias;
+          bias_r2 <= bias_r1;
+          bias_r3 <= bias_r2;
+        end
 
       //fisrt 25 add
       reg signed [34*25-1:0] out_r2;
@@ -124,7 +138,7 @@ always@(posedge clk or negedge rst_n)
         endgenerate
 
         always@(posedge clk or negedge rst_n)begin
-          out_r2[34*25-1:34*24] <= $signed(out_r1[33*NUM-1:33*(NUM-1)]) + $signed({bias,{8'h0}});//6'h0
+          out_r2[34*25-1:34*24] <= $signed(out_r1[33*NUM-1:33*(NUM-1)]) + $signed({bias_r3,{8'h0}});//6'h0
         end
 
         //second 13 add
