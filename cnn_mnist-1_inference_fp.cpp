@@ -7,6 +7,7 @@
 #include <fstream>
 
 const int FRACBITS = 8;
+const int FRACBITS_CONV_W = 6;
 
 const int filter_size = 7;
 // const double eta = 0.01;
@@ -26,7 +27,7 @@ double dense_w2[120][10];
 double dense_b2[10];
 
 // 16-bit fixed-point weights
-int conv_w_fp[5][7][7];
+short conv_w_fp[5][7][7];
 short conv_b_fp[5][28][28];
 short dense_w_fp[980][120];
 short dense_b_fp[120];
@@ -330,7 +331,7 @@ void read_weights()
                         for (int j = 0; j < 7; j++)
                         {
                                 fin >> conv_w[i][k][j];
-                                conv_w_fp[i][k][j] = conv_w[i][k][j] * pow(2, FRACBITS);
+                                conv_w_fp[i][k][j] = conv_w[i][k][j] * pow(2, FRACBITS_CONV_W);
                         }
 
         for (int i = 0; i < 5; i++)
@@ -418,9 +419,7 @@ int main()
 {
         read_test_data();
         read_weights();
-        // TODO:
         int val_len = 600;
-        // int val_len = 600;
         int cor = 0;
         int confusion_mat[10][10];
         for (int i = 0; i < 10; i++)
