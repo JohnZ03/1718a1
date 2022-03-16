@@ -1,0 +1,3 @@
+Command Line: /opt/synopsys/verdi/platform/LINUXAMD64/bin/Novas -f filelist.f -ssf conv_top_tb.fsdb -nologo
+uname(Linux wugxfly 4.15.0-142-generic #146~16.04.1-Ubuntu SMP Tue Apr 13 09:27:15 UTC 2021 x86_64)
+au time 111.789794 8.456186 4.569911 delta 274751488 274751488 total 658497536 658497536

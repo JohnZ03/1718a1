@@ -1,0 +1,123 @@
+0 
+27
+-Mamsrun=
+-Masflags=
+-Mcc=gcc-4.4
+-Mcfl= -pipe -fPIC -O -I/opt/synopsys/L-2016.06/include
+-Mcplusplus=g++-4.4
+-Mcrt0=
+-Mcrtn=
+-Mcsrc=
+-Mexternalobj=
+-Mldflags= -rdynamic
+-Mobjects= /opt/synopsys/L-2016.06/linux64/lib/libvirsim.so /opt/synopsys/L-2016.06/linux64/lib/liberrorinf.so /opt/synopsys/L-2016.06/linux64/lib/libsnpsmalloc.so
+-Mout=simv
+-Msaverestoreobj=/opt/synopsys/L-2016.06/linux64/lib/vcs_save_restore_new.o
+-Msyslibs=/opt/synopsys/verdi/share/PLI/VCS/LINUX64/pli.a -ldl
+-Mvcsaceobjs=
+-Mxcflags= -pipe -fPIC -I/opt/synopsys/L-2016.06/include
+-P
+-f filelist.f
+-fsdb
+-fsdb
+-full64
+-gen_obj
+-picarchive
+-sverilog
+-timescale=1ns/1ps
+/opt/synopsys/L-2016.06/linux64/bin/vcs1
+/opt/synopsys/verdi/share/PLI/VCS/LINUX64/verdi.tab
+77
+sysc_uni_pwd=/home/wugxfly/Documents/cnn_mnist_1718/1718a1/conv
+novas_home=/opt/synopsys/verdi
+XMODIFIERS=@im=fcitx
+XILINX_VIVADO=/opt/Xilinx/Vivado/2017.4
+XDG_VTNR=7
+XDG_SESSION_TYPE=x11
+XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0
+XDG_SESSION_ID=c2
+XDG_SESSION_DESKTOP=ubuntu
+XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
+XDG_SEAT=seat0
+XDG_RUNTIME_DIR=/run/user/1000
+XDG_MENU_PREFIX=gnome-
+XDG_GREETER_DATA_DIR=/var/lib/lightdm-data/wugxfly
+XDG_DATA_DIRS=/usr/share/ubuntu:/usr/share/gnome:/usr/local/share:/usr/share:/var/lib/snapd/desktop:/var/lib/snapd/desktop
+XDG_CURRENT_DESKTOP=Unity
+XDG_CONFIG_DIRS=/etc/xdg/xdg-ubuntu:/usr/share/upstart/xdg:/etc/xdg
+XAUTHORITY=/home/wugxfly/.Xauthority
+WORK_HOME=/home/wugxfly/Documents/uvm
+VTE_VERSION=4205
+VMR_MODE_FLAG=64
+VERDI_HOME=/opt/synopsys/verdi
+VCS_MX_HOME_INTERNAL=1
+VCS_MODE_FLAG=64
+VCS_HOME=/opt/synopsys/L-2016.06
+VCS_DEPTH=0
+VCS_ARG_ADDED_FOR_TMP=1
+VCS_ARCH_OVERRIDE=linux
+VCS_ARCH=linux64
+UVM_HOME=/home/wugxfly/Documents/example_and_uvm_source_code/uvm-1.1d
+UPSTART_SESSION=unix:abstract=/com/ubuntu/upstart-session/1000/1382
+UNAME=/bin/uname
+TOOL_HOME=/opt/synopsys/L-2016.06/linux64
+SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
+SIM_TOOL=VCS
+SESSION_MANAGER=local/wugxfly:@/tmp/.ICE-unix/1612,unix/wugxfly:/tmp/.ICE-unix/1612
+SESSIONTYPE=gnome-session
+SESSION=ubuntu
+SCRNAME=vcs
+SCRIPT_NAME=vcs
+QT_QPA_PLATFORMTHEME=appmenu-qt5
+QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1
+QT_IM_MODULE=fcitx
+QT_ACCESSIBILITY=1
+QT4_IM_MODULE=fcitx
+PKG_CONFIG_PATH=:/usr/local/opencv4/lib/pkgconfig
+OVA_UUM=0
+MANDATORY_PATH=/usr/share/gconf/ubuntu.mandatory.path
+LESSOPEN=| /usr/bin/lesspipe %s
+LESSCLOSE=/usr/bin/lesspipe %s %s
+LC_TIME=zh_CN.UTF-8
+LC_TELEPHONE=zh_CN.UTF-8
+LC_PAPER=zh_CN.UTF-8
+LC_NUMERIC=zh_CN.UTF-8
+LC_NAME=zh_CN.UTF-8
+LC_MONETARY=zh_CN.UTF-8
+LC_MEASUREMENT=zh_CN.UTF-8
+LC_IDENTIFICATION=zh_CN.UTF-8
+LC_ALL=C
+LC_ADDRESS=zh_CN.UTF-8
+JOB=dbus
+INSTANCE=
+IM_CONFIG_PHASE=1
+GTK_MODULES=gail:atk-bridge:unity-gtk-module
+GTK_IM_MODULE=fcitx
+GTK2_MODULES=overlay-scrollbar
+GPG_AGENT_INFO=/home/wugxfly/.gnupg/S.gpg-agent:0:1
+GNOME_KEYRING_PID=
+GNOME_KEYRING_CONTROL=
+GNOME_DESKTOP_SESSION_ID=this-is-deprecated
+GDM_LANG=en_US
+GDMSESSION=ubuntu
+DESKTOP_SESSION=ubuntu
+DEFAULTS_PATH=/usr/share/gconf/ubuntu.default.path
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-iZKG73I051
+COMPIZ_CONFIG_PROFILE=ubuntu
+CLUTTER_IM_MODULE=xim
+0
+8
+1647404274 tb/conv_if.sv
+1647405176 tb/conv_top_tb.sv
+1646968160 ../fix_ari_mul/fix_ari_mul.v
+1647401787 ../conv_core/dut/con_initial.v
+1647232047 ../sigmoid/dut/sigmoid.v
+1647440970 dut/con_top.v
+1647403634 filelist.f
+1468145700 /opt/synopsys/verdi/share/PLI/VCS/LINUX64/verdi.tab
+4
+0 
+1464147802 /opt/synopsys/L-2016.06/linux64/lib/libvirsim.so
+1464147272 /opt/synopsys/L-2016.06/linux64/lib/liberrorinf.so
+1464147248 /opt/synopsys/L-2016.06/linux64/lib/libsnpsmalloc.so
+1647440977 simv.daidir

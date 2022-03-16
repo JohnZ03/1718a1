@@ -4,7 +4,7 @@ logic clk;
 logic rst_n;
 conv_if cif(.clk(clk),.rst_n(rst_n));
 
-con_top dut(
+forward_pass_top dut(
     .clk (clk), 
     .rst_n(rst_n), 
     .ima(cif.ima),
@@ -14,10 +14,8 @@ con_top dut(
     .line_start_in(cif.line_start_in),
     .frame_end_in(cif.frame_end_in),
     .frame_end_dim_in(cif.frame_end_dim_in),
-    .frame_start_out(cif.frame_start_out),
-    .frame_end_out(cif.frame_end_out),
-    .line_start_out(cif.line_start_out),
-    .out_valid(cif.valid)
+    .valid(cif.valid),
+    .forward_pass_out(cif.forward_pass_out)
 );
 
 	initial begin 

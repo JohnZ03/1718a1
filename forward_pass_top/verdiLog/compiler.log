@@ -1,0 +1,341 @@
+*design* DebussyLib (btIdent Verdi3_L-2016.06-1)
+Command arguments:
+    +define+verilog
+    -f filelist.f
+        forward_pass.v
+        ../conv/dut/con_top.v
+        ../conv_core/dut/con_initial.v
+        ../sigmoid/dut/sigmoid.v
+        ../dense/dense1/dut/dense1_serial.v
+        ../dense/dense1/dut/dense1_top.v
+        ../dense/dense1/dut/rom_dense_b.v
+        ../dense/dense1/dut/rom_dense_w.v
+        ../dense/dense2/dut/dense2_top.v
+        ../dense/dense_common/dense_multiply_accumulator.v
+        ../dense/dense2/dut/rom_dense_w2.v
+        ../maxpooling/dut/max4.v
+        ../maxpooling/dut/maxpooling.v
+        ../maxpooling/dut/sram0.v
+        ../fix_ari_mul/fix_ari_mul.v
+        conv_top_tb.sv
+        conv_if.sv
+
+
+*Error* illegal LHS in continuous assignment
+"../conv/dut/con_top.v", 270: 
+
+*Error* illegal LHS in continuous assignment
+"../maxpooling/dut/maxpooling.v", 77: 
+
+*Error* Syntax error at ;
+"conv_top_tb.sv", 3: 
+
+*Error* Syntax error at ;
+"conv_top_tb.sv", 4: 
+
+*Warning* Task/Function Null portlist using parentheses.
+"conv_top_tb.sv", 47: 
+
+*Error* Syntax error at u
+"conv_top_tb.sv", 55: 
+
+*Error* Syntax error at <
+"conv_top_tb.sv", 55: 
+
+*Error* Syntax error at )
+"conv_top_tb.sv", 55: 
+
+*Error* Syntax error at i
+"conv_top_tb.sv", 64: 
+
+*Error* Syntax error at <
+"conv_top_tb.sv", 64: 
+
+*Error* Syntax error at )
+"conv_top_tb.sv", 64: 
+
+*Error* Syntax error at j
+"conv_top_tb.sv", 65: 
+
+*Error* Syntax error at <
+"conv_top_tb.sv", 65: 
+
+*Error* Syntax error at )
+"conv_top_tb.sv", 65: 
+
+*Error* Syntax error at end
+"conv_top_tb.sv", 77: 
+
+*Error* Syntax error at end
+"conv_top_tb.sv", 78: 
+
+*Error* Syntax error at .
+"conv_top_tb.sv", 79: 
+
+*Error* Syntax error at .
+"conv_top_tb.sv", 80: 
+
+*Error* Syntax error at .
+"conv_top_tb.sv", 81: 
+
+*Error* Syntax error at end
+"conv_top_tb.sv", 82: 
+
+*Error* Syntax error at endtask
+"conv_top_tb.sv", 83: 
+
+*Error* illegal LHS in procedural assignment
+"conv_top_tb.sv", 22: 
+
+*Error* illegal LHS in procedural assignment
+"conv_top_tb.sv", 24: 
+
+*Error* illegal LHS in procedural assignment
+"conv_top_tb.sv", 28: 
+
+*Error* illegal LHS in procedural assignment
+"conv_top_tb.sv", 30: 
+
+*Error* Syntax error at interface
+"conv_if.sv", 1: 
+
+*Error* Syntax error at input
+"conv_if.sv", 2: 
+
+*Error* Syntax error at input
+"conv_if.sv", 3: 
+
+*Error* Syntax error at )
+"conv_if.sv", 4: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 5: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 6: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 7: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 8: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 9: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 10: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 11: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 12: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 13: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 14: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 15: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 16: 
+
+*Error* Syntax error at logic
+"conv_if.sv", 18: 
+
+*Error* Syntax error at clocking
+"conv_if.sv", 20: 
+
+*Error* Syntax error at input
+"conv_if.sv", 21: 
+
+*Error* Syntax error at input
+"conv_if.sv", 22: 
+
+*Error* Syntax error at output
+"conv_if.sv", 23: 
+
+*Error* Syntax error at endclocking
+"conv_if.sv", 24: 
+
+*Error* Syntax error at endinterface
+"conv_if.sv", 25: 
+Highest level modules:
+conv_top_tb
+
+
+*Error* illegal output port on instance 'rom_dense_b_inst' port 'q'
+"../dense/dense1/dut/dense1_serial.v", 107: 
+
+*Error* illegal output port on instance 'u_dense_serial' port 'frame_start'
+"../dense/dense1/dut/dense1_top.v", 88: 
+
+*Error* illegal output port on instance 'u_dense_serial' port 'frame_end'
+"../dense/dense1/dut/dense1_top.v", 89: 
+
+*Error* illegal output port on instance 'u_dense_serial' port 'valid'
+"../dense/dense1/dut/dense1_top.v", 90: 
+
+*Error* illegal output port on instance 'u_dense_serial' port 'dense_sum_serial'
+"../dense/dense1/dut/dense1_top.v", 91: 
+
+*Error* illegal output port on instance 'u_dense_serial' port 'dense_b'
+"../dense/dense1/dut/dense1_top.v", 92: 
+
+*Error* failed to find identifier cif.ima
+"conv_top_tb.sv", 10: 
+
+*Error* failed to find identifier cif.ena_in
+"conv_top_tb.sv", 11: 
+
+*Error* failed to find identifier cif.frame_start_in
+"conv_top_tb.sv", 12: 
+
+*Error* failed to find identifier cif.frame_start_dim_in
+"conv_top_tb.sv", 13: 
+
+*Error* failed to find identifier cif.line_start_in
+"conv_top_tb.sv", 14: 
+
+*Error* failed to find identifier cif.frame_end_in
+"conv_top_tb.sv", 15: 
+
+*Error* failed to find identifier cif.frame_end_dim_in
+"conv_top_tb.sv", 16: 
+
+*Error* failed to find identifier cif.valid
+"conv_top_tb.sv", 17: 
+
+*Error* failed to find identifier cif.forward_pass_out
+"conv_top_tb.sv", 18: 
+
+*Error* failed to find identifier cif.line_start_in
+"conv_top_tb.sv", 48: 
+
+*Error* failed to find identifier cif.frame_start_in
+"conv_top_tb.sv", 49: 
+
+*Error* failed to find identifier cif.frame_start_dim_in
+"conv_top_tb.sv", 50: 
+
+*Error* failed to find identifier cif.frame_end_in
+"conv_top_tb.sv", 51: 
+
+*Error* failed to find identifier cif.frame_end_dim_in
+"conv_top_tb.sv", 52: 
+
+*Error* failed to find identifier cif.cb
+"conv_top_tb.sv", 53: 
+
+*Error* failed to find identifier int
+"conv_top_tb.sv", 55: 
+
+*Error* failed to find identifier u
+"conv_top_tb.sv", 55: 
+
+*Error* failed to find identifier u
+"conv_top_tb.sv", 55: 
+
+*Error* failed to find identifier u
+"conv_top_tb.sv", 55: 
+
+*Error* failed to find identifier cif.line_start_in
+"conv_top_tb.sv", 56: 
+
+*Error* failed to find identifier cif.frame_start_in
+"conv_top_tb.sv", 57: 
+
+*Error* failed to find identifier u
+"conv_top_tb.sv", 58: 
+
+*Error* failed to find identifier cif.frame_start_dim_in
+"conv_top_tb.sv", 59: 
+
+*Error* failed to find identifier cif.cb
+"conv_top_tb.sv", 60: 
+
+*Error* failed to find identifier cif.ena_in
+"conv_top_tb.sv", 61: 
+
+*Error* failed to find identifier cif.frame_start_in
+"conv_top_tb.sv", 62: 
+
+*Error* failed to find identifier cif.frame_start_dim_in
+"conv_top_tb.sv", 63: 
+
+*Error* failed to find identifier int
+"conv_top_tb.sv", 64: 
+
+*Error* failed to find identifier i
+"conv_top_tb.sv", 64: 
+
+*Error* failed to find identifier i
+"conv_top_tb.sv", 64: 
+
+*Error* failed to find identifier i
+"conv_top_tb.sv", 64: 
+
+*Error* failed to find identifier int
+"conv_top_tb.sv", 65: 
+
+*Error* failed to find identifier j
+"conv_top_tb.sv", 65: 
+
+*Error* failed to find identifier j
+"conv_top_tb.sv", 65: 
+
+*Error* failed to find identifier j
+"conv_top_tb.sv", 65: 
+
+*Error* failed to find identifier cif.line_start_in
+"conv_top_tb.sv", 66: 
+
+*Error* failed to find identifier cif.ima
+"conv_top_tb.sv", 67: 
+
+*Error* failed to find identifier i
+"conv_top_tb.sv", 67: 
+
+*Error* failed to find identifier j
+"conv_top_tb.sv", 67: 
+
+*Error* failed to find identifier i
+"conv_top_tb.sv", 68: 
+
+*Error* failed to find identifier j
+"conv_top_tb.sv", 68: 
+
+*Error* failed to find identifier cif.line_start_in
+"conv_top_tb.sv", 69: 
+
+*Error* failed to find identifier i
+"conv_top_tb.sv", 70: 
+
+*Error* failed to find identifier j
+"conv_top_tb.sv", 70: 
+
+*Error* failed to find identifier cif.frame_end_in
+"conv_top_tb.sv", 71: 
+
+*Error* failed to find identifier u
+"conv_top_tb.sv", 72: 
+
+*Error* failed to find identifier cif.frame_end_dim_in
+"conv_top_tb.sv", 73: 
+
+*Error* failed to find identifier cif.cb
+"conv_top_tb.sv", 76: 
+
+*Error* failed to find identifier cif.cb
+"conv_top_tb.sv", 89: 
+
+*Error* failed to find identifier cif.cb
+"conv_top_tb.sv", 93: 
+
+*Error* view conv_if is not defined for instance cif
+"conv_top_tb.sv", 5: 
+Total	104 error(s),   1 warning(s)

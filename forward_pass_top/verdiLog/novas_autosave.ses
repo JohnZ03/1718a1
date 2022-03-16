@@ -1,0 +1,70 @@
+@verdi rc file Version 1.0
+[General]
+VerdiVersion = Verdi3_L-2016.06-1
+[KeyNote]
+Line1 = Automatic Backup 0
+[TestBench]
+ConstrViewShow = 0
+InherViewShow = 0
+FSDBMsgShow = 0
+AnnotationShow = 0
+powerDumped = 0
+[hb]
+postSimFile = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/forward_pass_top/conv_top_tb.fsdb
+syncTime = 5607500
+viewport = 55 0 1855 1056 608 436 232 898
+activeNode = "conv_top_tb.dut"
+activeScope = "conv_top_tb.dut"
+activeFile = "forward_pass.v"
+interactiveMode = False
+viewType = Source
+simulatorMode = False
+sourceBeginLine = 0
+baMode = False
+srcLineNum = True
+syncSignal = False
+traceMode = Hierarchical
+showTraceInSchema = True
+paMode = False
+funcMode = False
+traceCrossHier = True
+DnDtraceCrossHierOnly = True
+traceIncTopPort = False
+leadingZero = False
+signalPane = False
+Scope1 = "conv_top_tb.dut"
+Scope2 = "conv_top_tb"
+multipleSelection = 11 3 8 0 0 2 2 0 0 1 2 0 0 4 2 0 0 5 2 0 0 6 2 0 0 7 2 0 0 8 2 0 0 9 2 0 0 10 2 0 0 11 8 0 0
+sdfCheckUndef = FALSE
+simFlow = FALSE
+[hb.sourceTab.1]
+scope = conv_top_tb.dut
+File = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/forward_pass_top/forward_pass.v
+Line = 1
+[imp.design1]
+dbEnum =  oh
+invokeDir = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/forward_pass_top
+design = DebussyLib
+hostCommand = hostCommand -f filelist.f
+[nMemoryManager]
+FsdbFile = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/forward_pass_top/conv_top_tb.fsdb
+UserActionNum = 0
+nMemWindowNum = 0
+[wave.0]
+viewPort = 0 28 1855 432 100 65
+SessionFile = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/forward_pass_top/verdiLog/novas_autosave.ses.wave.0
+displayGrid = FALSE
+hierarchicalName = FALSE
+snap = TRUE
+displayLeadingZeros = FALSE
+fixDelta = FALSE
+displayCursorMarker = FALSE
+autoUpdate = FALSE
+highlightGlitchs = FALSE
+waveformSync = FALSE
+displayErrors = TRUE
+displayMsgSymbols = TRUE
+showMsgDescriptions = TRUE
+autoFit = FALSE
+displayDeltaY = FALSE
+centerCursor = FALSE
