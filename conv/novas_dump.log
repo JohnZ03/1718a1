@@ -1,0 +1,287 @@
+ANF: vcsd_register_1st_RTL_rfn('./simv: undefined symbol: vcsd_register_1st_RTL_rfn')
+ANF: vcsd_register_1st_sequential_rfn('./simv: undefined symbol: vcsd_register_1st_sequential_rfn')
+ANF: vcsd_register_2nd_RTL_rfn('./simv: undefined symbol: vcsd_register_2nd_RTL_rfn')
+ANF: vcsd_register_2nd_sequential_rfn('./simv: undefined symbol: vcsd_register_2nd_sequential_rfn')
+ANF: scsd_xprop_is_enabled('./simv: undefined symbol: scsd_xprop_is_enabled')
+ANF: scsd_xprop_sig_is_promoted('./simv: undefined symbol: scsd_xprop_sig_is_promoted')
+ANF: scsd_xprop_int_xvalue('./simv: undefined symbol: scsd_xprop_int_xvalue')
+ANF: scsd_xprop_bool_xvalue('./simv: undefined symbol: scsd_xprop_bool_xvalue')
+ANF: scsd_xprop_enum_xvalue('./simv: undefined symbol: scsd_xprop_enum_xvalue')
+ANF: scsd_xprop_register_merge_mode_cb('./simv: undefined symbol: scsd_xprop_register_merge_mode_cb')
+ANF: scsd_xprop_delete_merge_mode_cb('./simv: undefined symbol: scsd_xprop_delete_merge_mode_cb')
+ANF: scsd_xprop_get_merge_mode('./simv: undefined symbol: scsd_xprop_get_merge_mode')
+ANF: msvEnableDumpingMode('./simv: undefined symbol: msvEnableDumpingMode')
+ANF: msvGetVersion('./simv: undefined symbol: msvGetVersion')
+ANF: msvGetInstProp('./simv: undefined symbol: msvGetInstProp')
+ANF: msvIsSpiceEngineReady('./simv: undefined symbol: msvIsSpiceEngineReady')
+ANF: msvSetAddProbeCallback('./simv: undefined symbol: msvSetAddProbeCallback')
+ANF: msvGetInstHandle('./simv: undefined symbol: msvGetInstHandle')
+ANF: msvGetProbeByInst('./simv: undefined symbol: msvGetProbeByInst')
+ANF: msvGetSigHandle('./simv: undefined symbol: msvGetSigHandle')
+ANF: msvGetProbeBySig('./simv: undefined symbol: msvGetProbeBySig')
+ANF: msvGetProbeInfo('./simv: undefined symbol: msvGetProbeInfo')
+ANF: msvRelease('./simv: undefined symbol: msvRelease')
+ANF: msvSetVcCallbackFunc('./simv: undefined symbol: msvSetVcCallbackFunc')
+ANF: msvCheckVcCallback('./simv: undefined symbol: msvCheckVcCallback')
+ANF: msvAddVcCallback('./simv: undefined symbol: msvAddVcCallback')
+ANF: msvRemoveVcCallback('./simv: undefined symbol: msvRemoveVcCallback')
+ANF: msvGetLatestValue('./simv: undefined symbol: msvGetLatestValue')
+ANF: msvSetEndofSimCallback('./simv: undefined symbol: msvSetEndofSimCallback')
+ANF: msvIgnoredProbe('./simv: undefined symbol: msvIgnoredProbe')
+ANF: msvGetThruNetInfo('./simv: undefined symbol: msvGetThruNetInfo')
+ANF: msvFreeThruNetInfo('./simv: undefined symbol: msvFreeThruNetInfo')
+ANF: PI_ace_get_output_time_unit('./simv: undefined symbol: PI_ace_get_output_time_unit')
+ANF: PI_ace_sim_sync('./simv: undefined symbol: PI_ace_sim_sync')
+ANF: msvGetRereadInitFile('./simv: undefined symbol: msvGetRereadInitFile')
+ANF: msvSetBeforeRereadCallback('./simv: undefined symbol: msvSetBeforeRereadCallback')
+ANF: msvSetAfterRereadCallback('./simv: undefined symbol: msvSetAfterRereadCallback')
+ANF: msvSetForceCallback('./simv: undefined symbol: msvSetForceCallback')
+ANF: msvSetReleaseCallback('./simv: undefined symbol: msvSetReleaseCallback')
+ANF: msvGetForceStatus('./simv: undefined symbol: msvGetForceStatus')
+ANF: vhdi_dt_get_type('./simv: undefined symbol: vhdi_dt_get_type')
+ANF: vhdi_dt_get_key('./simv: undefined symbol: vhdi_dt_get_key')
+ANF: vhdi_dt_get_vhdl_enum_info('./simv: undefined symbol: vhdi_dt_get_vhdl_enum_info')
+ANF: vhdi_dt_get_vhdl_physical_info('./simv: undefined symbol: vhdi_dt_get_vhdl_physical_info')
+ANF: vhdi_dt_get_vhdl_array_info('./simv: undefined symbol: vhdi_dt_get_vhdl_array_info')
+ANF: vhdi_dt_get_vhdl_record_info('./simv: undefined symbol: vhdi_dt_get_vhdl_record_info')
+ANF: vhdi_def_traverse_module('./simv: undefined symbol: vhdi_def_traverse_module')
+ANF: vhdi_def_traverse_scope('./simv: undefined symbol: vhdi_def_traverse_scope')
+ANF: vhdi_def_traverse_variable('./simv: undefined symbol: vhdi_def_traverse_variable')
+ANF: vhdi_def_get_module_id_by_vhpi('./simv: undefined symbol: vhdi_def_get_module_id_by_vhpi')
+ANF: vhdi_def_get_handle_by_module_id('./simv: undefined symbol: vhdi_def_get_handle_by_module_id')
+ANF: vhdi_def_free('./simv: undefined symbol: vhdi_def_free')
+ANF: vhdi_ist_traverse_scope('./simv: undefined symbol: vhdi_ist_traverse_scope')
+ANF: vhdi_ist_traverse_variable('./simv: undefined symbol: vhdi_ist_traverse_variable')
+ANF: vhdi_ist_convert_by_vhpi('./simv: undefined symbol: vhdi_ist_convert_by_vhpi')
+ANF: vhdi_ist_clone('./simv: undefined symbol: vhdi_ist_clone')
+ANF: vhdi_ist_free('./simv: undefined symbol: vhdi_ist_free')
+ANF: vhdi_ist_hash_key('./simv: undefined symbol: vhdi_ist_hash_key')
+ANF: vhdi_ist_compare('./simv: undefined symbol: vhdi_ist_compare')
+ANF: vhdi_ist_get_value_addr('./simv: undefined symbol: vhdi_ist_get_value_addr')
+ANF: vhdi_set_scsd_callback('./simv: undefined symbol: vhdi_set_scsd_callback')
+ANF: vhdi_ist_check_scsd_callback('./simv: undefined symbol: vhdi_ist_check_scsd_callback')
+ANF: vhdi_ist_add_scsd_callback('./simv: undefined symbol: vhdi_ist_add_scsd_callback')
+ANF: vhdi_ist_remove_scsd_callback('./simv: undefined symbol: vhdi_ist_remove_scsd_callback')
+ANF: vhdi_ist_get_scsd_user_data('./simv: undefined symbol: vhdi_ist_get_scsd_user_data')
+ANF: vhdi_add_time_change_callback('./simv: undefined symbol: vhdi_add_time_change_callback')
+ANF: vhdi_get_real_value_by_value_addr('./simv: undefined symbol: vhdi_get_real_value_by_value_addr')
+ANF: vhdi_get_64_value_by_value_addr('./simv: undefined symbol: vhdi_get_64_value_by_value_addr')
+ANF: vhdi_xprop_inst_is_promoted('./simv: undefined symbol: vhdi_xprop_inst_is_promoted')
+VCS compile option:
+ option[0]: ./simv
+ option[1]: /opt/synopsys/L-2016.06/linux64/bin/vcs1
+ option[2]: -Mcc=gcc-4.4
+ option[3]: -Mcplusplus=g++-4.4
+ option[4]: -Masflags=
+ option[5]: -Mcfl= -pipe -fPIC -O -I/opt/synopsys/L-2016.06/include 
+ option[6]: -Mxcflags= -pipe -fPIC -I/opt/synopsys/L-2016.06/include
+ option[7]: -Mldflags= -rdynamic 
+ option[8]: -Mout=simv
+ option[9]: -Mamsrun=
+ option[10]: -Mvcsaceobjs=
+ option[11]: -Mobjects= /opt/synopsys/L-2016.06/linux64/lib/libvirsim.so /opt/synopsys/L-2016.06/linux64/lib/liberrorinf.so /opt/synopsys/L-2016.06/linux64/lib/libsnpsmalloc.so 
+ option[12]: -Mexternalobj=
+ option[13]: -Msaverestoreobj=/opt/synopsys/L-2016.06/linux64/lib/vcs_save_restore_new.o
+ option[14]: -Mcrt0=
+ option[15]: -Mcrtn=
+ option[16]: -Mcsrc=
+ option[17]: -Msyslibs=/opt/synopsys/verdi/share/PLI/VCS/LINUX64/pli.a -ldl 
+ option[18]: -full64
+ option[19]: -timescale=1ns/1ps
+ option[20]: -fsdb
+ option[21]: -P
+ option[22]: /opt/synopsys/verdi/share/PLI/VCS/LINUX64/verdi.tab
+ option[23]: -fsdb
+ option[24]: -picarchive
+ option[25]: -sverilog
+ option[26]: -gen_obj
+ option[27]: -f
+ option[28]: filelist.f
+ option[29]: -load
+ option[30]: /opt/synopsys/verdi/share/PLI/VCS/LINUX64/libnovas.so:FSDBDumpCmd
+ option[31]: -load
+ option[32]: /opt/synopsys/verdi/share/PLI/VCS/LINUX64/libnovas.so:FSDBDumpCmd
+ option[33]: timescale=1ns/1ps
+Chronologic Simulation VCS Release L-2016.06_Full64
+Linux 4.15.0-142-generic #146~16.04.1-Ubuntu SMP Tue Apr 13 09:27:15 UTC 2021 x86_64
+CPU cores: 4
+Limit information:
+======================================
+cputime			unlimited
+filesize		unlimited
+datasize		unlimited
+stacksize		8194 kbytes
+coredumpsize	0 kbytes
+memoryuse		unlimited
+vmemoryuse		unlimited
+descriptors		1048576
+memorylocked	64 kbytes
+maxproc			30951
+======================================
+(Special)Runtime environment variables:
+
+Runtime environment variables:
+XDG_VTNR=7
+LC_PAPER=zh_CN.UTF-8
+LC_ADDRESS=zh_CN.UTF-8
+XDG_SESSION_ID=c2
+WORK_HOME=/home/wugxfly/Documents/uvm
+XDG_GREETER_DATA_DIR=/var/lib/lightdm-data/wugxfly
+LC_MONETARY=zh_CN.UTF-8
+CLUTTER_IM_MODULE=xim
+UVM_HOME=/home/wugxfly/Documents/example_and_uvm_source_code/uvm-1.1d
+SESSION=ubuntu
+GPG_AGENT_INFO=/home/wugxfly/.gnupg/S.gpg-agent:0:1
+TERM=xterm-256color
+VTE_VERSION=4205
+XDG_MENU_PREFIX=gnome-
+SHELL=/bin/bash
+QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1
+WINDOWID=60823080
+LC_NUMERIC=zh_CN.UTF-8
+UPSTART_SESSION=unix:abstract=/com/ubuntu/upstart-session/1000/1382
+GNOME_KEYRING_CONTROL=
+GTK_MODULES=gail:atk-bridge:unity-gtk-module
+USER=wugxfly
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
+QT_ACCESSIBILITY=1
+LC_TELEPHONE=zh_CN.UTF-8
+XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0
+XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
+SIM_TOOL=VCS
+SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
+SESSION_MANAGER=local/wugxfly:@/tmp/.ICE-unix/1612,unix/wugxfly:/tmp/.ICE-unix/1612
+DEFAULTS_PATH=/usr/share/gconf/ubuntu.default.path
+XDG_CONFIG_DIRS=/etc/xdg/xdg-ubuntu:/usr/share/upstart/xdg:/etc/xdg
+DESKTOP_SESSION=ubuntu
+PATH=/opt/Xilinx/DocNav:/opt/Xilinx/SDK/2017.4/bin:/opt/Xilinx/SDK/2017.4/gnu/microblaze/lin/bin:/opt/Xilinx/SDK/2017.4/gnu/arm/lin/bin:/opt/Xilinx/SDK/2017.4/gnu/microblaze/linux_toolchain/lin64_le/bin:/opt/Xilinx/SDK/2017.4/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin:/opt/Xilinx/SDK/2017.4/gnu/aarch32/lin/gcc-arm-none-eabi/bin:/opt/Xilinx/SDK/2017.4/gnu/aarch64/lin/aarch64-linux/bin:/opt/Xilinx/SDK/2017.4/gnu/aarch64/lin/aarch64-none/bin:/opt/Xilinx/SDK/2017.4/gnu/armr5/lin/gcc-arm-none-eabi/bin:/opt/Xilinx/SDK/2017.4/tps/lnx64/cmake-3.3.2/bin:/opt/Xilinx/Vivado/2017.4/bin:/home/wugxfly/bin:/home/wugxfly/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/opt/synopsys/L-2016.06/gui/dve/bin:/opt/synopsys/L-2016.06/bin:/opt/synopsys/verdi/bin:/opt/synopsys/scl/amd64/bin:/usr/src/cmake-3.9.2/bin
+QT_IM_MODULE=fcitx
+QT_QPA_PLATFORMTHEME=appmenu-qt5
+VERDI_HOME=/opt/synopsys/verdi
+LC_IDENTIFICATION=zh_CN.UTF-8
+XDG_SESSION_TYPE=x11
+PWD=/home/wugxfly/Documents/cnn_mnist_1718/1718a1/conv
+JOB=dbus
+VCS_HOME=/opt/synopsys/L-2016.06
+XMODIFIERS=@im=fcitx
+GNOME_KEYRING_PID=
+LANG=en_US.UTF-8
+novas_home=/opt/synopsys/verdi
+GDM_LANG=en_US
+MANDATORY_PATH=/usr/share/gconf/ubuntu.mandatory.path
+VCS_ARCH_OVERRIDE=linux
+LC_MEASUREMENT=zh_CN.UTF-8
+COMPIZ_CONFIG_PROFILE=ubuntu
+IM_CONFIG_PHASE=1
+LM_LICENSE_FILE=27000@wugxfly
+XILINX_VIVADO=/opt/Xilinx/Vivado/2017.4
+GDMSESSION=ubuntu
+SESSIONTYPE=gnome-session
+GTK2_MODULES=overlay-scrollbar
+SHLVL=1
+HOME=/home/wugxfly
+XDG_SEAT=seat0
+LANGUAGE=en_US
+GNOME_DESKTOP_SESSION_ID=this-is-deprecated
+XDG_SESSION_DESKTOP=ubuntu
+LOGNAME=wugxfly
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-iZKG73I051
+XDG_DATA_DIRS=/usr/share/ubuntu:/usr/share/gnome:/usr/local/share:/usr/share:/var/lib/snapd/desktop:/var/lib/snapd/desktop
+QT4_IM_MODULE=fcitx
+LESSOPEN=| /usr/bin/lesspipe %s
+PKG_CONFIG_PATH=:/usr/local/opencv4/lib/pkgconfig
+INSTANCE=
+XDG_RUNTIME_DIR=/run/user/1000
+DISPLAY=:0
+XDG_CURRENT_DESKTOP=Unity
+GTK_IM_MODULE=fcitx
+LESSCLOSE=/usr/bin/lesspipe %s %s
+LC_TIME=zh_CN.UTF-8
+LC_NAME=zh_CN.UTF-8
+XAUTHORITY=/home/wugxfly/.Xauthority
+_=./run
+VCS_PATHMAP_PRELOAD_DONE=1
+LC_ALL=C
+DVE=/opt/synopsys/L-2016.06/gui/dve
+SPECMAN_OUTPUT_TO_TTY=1
+Runtime command line arguments:
+argv[0]=./simv
+208 profile - 100
+          CPU/Mem usage: 0.020 sys,  0.250 user,  224.15M sys,  0.00M vm
+209 VC callback profile - scalar:0 vector:0
+210 Wed Mar 16 07:29:38 2022
+211 pliAppInit
+212 *Verdi3* : FSDB_GATE is set.
+213 *Verdi3* : FSDB_RTL is set.
+214 *Verdi3* : Enable Parallel Dumping.
+215 pliAppMiscSet: New Sim Round
+216 pliEntryInit
+217 LIBSSCORE=found /opt/synopsys/verdi/share/PLI/lib/LINUXAMD64/libsscore_vcs201606.so through $NOVAS_HOME setting.
+218 FSDB Dumper for VCS, Release Verdi3_L-2016.06-1, Linux x86_64/64bit, 07/10/2016
+219 (C) 1996 - 2016 by Synopsys, Inc.
+220 sps_call_fsdbDumpfile at 0 : tb/conv_top_tb.sv(36)
+221 argv[0]: conv_top_tb.fsdb
+222 *Verdi3* FSDB WARNING: The FSDB file already exists. Overwriting the FSDB file may crash the programs that are using this file.
+223 *Verdi3* : Create FSDB file 'conv_top_tb.fsdb'
+224 sps_call_fsdbDumpvars at 0 : tb/conv_top_tb.sv(37)
+225 *Verdi3* : Begin traversing the scopes, layer (0).
+226 *Verdi3* : End of traversing.
+227 fsdbDumpvars traverse var: profile - 
+          CPU/Mem usage: 0.020 sys,  0.260 user,  311.38M sys,  0.00M vm
+                   incr: 0.000 sys,  0.010 user,  10.10M sys,  0.00M vm
+                   accu: 0.000 sys,  0.010 user,  10.10M sys,  0.00M vm
+              accu incr: 0.000 sys,  0.010 user,  10.10M sys,  0.00M vm
+
+          Count usage: 911 var,  788 idcode,  560 callback
+                 incr: 911 var,  788 idcode,  560 callback
+                 accu: 911 var,  788 idcode,  560 callback
+            accu incr: 911 var,  788 idcode,  560 callback
+228 VC callback profile - scalar:0 vector:0
+229 Wed Mar 16 07:29:38 2022
+230 fsdbDumpvars: profile - 
+          CPU/Mem usage: 0.020 sys,  0.260 user,  312.57M sys,  0.00M vm
+                   incr: 0.000 sys,  0.000 user,  1.19M sys,  0.00M vm
+                   accu: 0.000 sys,  0.010 user,  11.28M sys,  0.00M vm
+              accu incr: 0.000 sys,  0.000 user,  1.19M sys,  0.00M vm
+
+          Count usage: 911 var,  788 idcode,  560 callback
+                 incr: 0 var,  0 idcode,  0 callback
+                 accu: 911 var,  788 idcode,  560 callback
+            accu incr: 0 var,  0 idcode,  0 callback
+231 VC callback profile - scalar:199 vector:361
+232 Wed Mar 16 07:29:38 2022
+233 sps_call_fsdbDumpMDA at 0 : tb/conv_top_tb.sv(38)
+234 *Verdi3* : Begin traversing the MDAs, layer (0).
+235 *Verdi3* : Enable +mda and +packedmda dumping.
+236 *Verdi3* : End of traversing the MDAs.
+237 fsdbDumpMDA traverse var: profile - 
+          CPU/Mem usage: 0.020 sys,  0.260 user,  312.89M sys,  0.00M vm
+                   incr: 0.000 sys,  0.000 user,  0.32M sys,  0.00M vm
+                   accu: 0.000 sys,  0.000 user,  0.32M sys,  0.00M vm
+              accu incr: 0.000 sys,  0.000 user,  0.32M sys,  0.00M vm
+
+          Count usage: 6942 var,  6819 idcode,  615 callback
+                 incr: 6031 var,  6031 idcode,  55 callback
+                 accu: 6031 var,  6031 idcode,  55 callback
+            accu incr: 6031 var,  6031 idcode,  55 callback
+238 VC callback profile - scalar:199 vector:361
+239 Wed Mar 16 07:29:38 2022
+240 fsdbDumpMDA: profile - 
+          CPU/Mem usage: 0.020 sys,  0.260 user,  313.02M sys,  0.00M vm
+                   incr: 0.000 sys,  0.000 user,  0.14M sys,  0.00M vm
+                   accu: 0.000 sys,  0.000 user,  0.45M sys,  0.00M vm
+              accu incr: 0.000 sys,  0.000 user,  0.14M sys,  0.00M vm
+
+          Count usage: 6942 var,  6819 idcode,  615 callback
+                 incr: 0 var,  0 idcode,  0 callback
+                 accu: 6031 var,  6031 idcode,  55 callback
+            accu incr: 0 var,  0 idcode,  0 callback
+241 VC callback profile - scalar:335 vector:6689
+242 Wed Mar 16 07:29:38 2022
+243 End of simulation at 200000000
+244 VC callback profile - scalar:45280 vector:9061326
+245 Wed Mar 16 07:29:39 2022
+246 Parallel profile    -  Flush:4 Expand:0 ProduceWait:0 ConsumerWait:74 BlockUsed:76
+247                        ProduceTime:1.156623883 ConsumerTime:0.538650782 Buffer:64MB
+248 SimExit
+249 Sim process exit

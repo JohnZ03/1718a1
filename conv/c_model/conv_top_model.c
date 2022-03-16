@@ -29,25 +29,32 @@ int sigmoid_model(int x) {
 
 
 void conv_top_model(const int img[35][32], const int conv_w[5][7][7],const int conv_b[5][28][28],int sig_layer[5][28][28]){
-    int conv_layer[5][28][28];
+    long long conv_layer;
     int filter_dim;
     int i,j,k,l;
+    long long conv_layer_mid = 0;
     for (filter_dim = 0; filter_dim < 5; filter_dim++)
     {
             for (i = 0; i < 28; i++)
             {
                     for (j = 0; j < 28; j++)
                     {
-                            conv_layer[filter_dim][i][j] = 0;
+                            conv_layer_mid = 0;
+                            conv_layer     = 0;
                             sig_layer[filter_dim][i][j] = 0;
                             for (k = 0; k < filter_size; k++)
                             {
                                     for (l = 0; l < filter_size; l++)
                                     {
-                                            conv_layer[filter_dim][i][j] += img[i + k + 1][j + l - 2] * conv_w[filter_dim][k][l];
+                                            conv_layer_mid += (long long)(img[k][l]*256) * (long long)conv_w[k][l]; 
+
                                     }
                             }
-                            sig_layer[filter_dim][i][j] = sigmoid_model(conv_layer[filter_dim][i][j] + floor((double)conv_b[filter_dim][i][j])/256);
+                            conv_layer_mid += conv_b[filter_dim][i][j] * 256;
+                            conv_layer = floor((double)conv_layer_mid/256);
+                            if(conv_layer>32767) conv_layer = 32767;
+                            else if(conv_layer<-32768) conv_layer = -32768;
+                            sig_layer[filter_dim][i][j] = sigmoid_model(conv_layer);
                     }
             }
     }

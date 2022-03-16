@@ -1,0 +1,69 @@
+@verdi rc file Version 1.0
+[General]
+VerdiVersion = Verdi3_L-2016.06-1
+[KeyNote]
+Line1 = Automatic Backup 0
+[TestBench]
+ConstrViewShow = 0
+InherViewShow = 0
+FSDBMsgShow = 0
+AnnotationShow = 0
+powerDumped = 0
+[hb]
+postSimFile = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/conv/conv_top_tb.fsdb
+syncTime = 5600.5
+viewport = 65 24 1855 1056 608 291 208 898
+activeNode = "conv_top_tb.dut"
+activeScope = "conv_top_tb.dut"
+activeFile = "dut/con_top.v"
+interactiveMode = False
+viewType = Source
+simulatorMode = False
+sourceBeginLine = 0
+baMode = False
+srcLineNum = True
+syncSignal = False
+traceMode = Hierarchical
+showTraceInSchema = True
+paMode = False
+funcMode = False
+traceCrossHier = True
+DnDtraceCrossHierOnly = True
+traceIncTopPort = False
+leadingZero = False
+signalPane = False
+Scope1 = "conv_top_tb.dut"
+multipleSelection = 1 7 6 0 0
+sdfCheckUndef = FALSE
+simFlow = FALSE
+[hb.sourceTab.1]
+scope = conv_top_tb.dut
+File = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/conv/dut/con_top.v
+Line = 1
+[imp.design1]
+dbEnum =  oh
+invokeDir = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/conv
+design = DebussyLib
+hostCommand = hostCommand -f filelist.f
+[nMemoryManager]
+FsdbFile = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/conv/conv_top_tb.fsdb
+UserActionNum = 0
+nMemWindowNum = 0
+[wave.0]
+viewPort = 0 28 1855 577 297 61
+SessionFile = /home/wugxfly/Documents/cnn_mnist_1718/1718a1/conv/verdiLog/novas_autosave.ses.wave.0
+displayGrid = FALSE
+hierarchicalName = FALSE
+snap = TRUE
+displayLeadingZeros = FALSE
+fixDelta = FALSE
+displayCursorMarker = FALSE
+autoUpdate = FALSE
+highlightGlitchs = FALSE
+waveformSync = FALSE
+displayErrors = TRUE
+displayMsgSymbols = TRUE
+showMsgDescriptions = TRUE
+autoFit = FALSE
+displayDeltaY = FALSE
+centerCursor = FALSE
