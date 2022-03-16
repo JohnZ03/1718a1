@@ -1,3 +1,5 @@
+// fixed point c model
+
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
@@ -10,7 +12,6 @@ const int filter_size = 7;
 // const double eta = 0.01;
 const int batch_size = 200;
 
-//
 unsigned char data_train[60000][784];
 unsigned char data_test[10000][784];
 unsigned char label_train[60000];
@@ -55,7 +56,7 @@ short dense_softmax_fp[10];
 
 /* ************************************************************ */
 /* Helper functions */
-short sigmoid_test(int x)
+short sigmoid_test0(int x)
 {
         short y;
         if (x > short(-1 * pow(2, FRACBITS)) && x <= short(1 * pow(2, FRACBITS)))
@@ -118,7 +119,7 @@ short sigmoid_test(int x)
         return y;
 }
 
-short sigmoid_test0(int x)
+short sigmoid_test(int x)
 {
         short y;
         double x1 = x;
@@ -168,21 +169,6 @@ short sigmoid_test0(int x)
 //         return 1 / (1 + exp(-x));
 // }
 
-// double d_sigmoid(double x)
-// {
-//         double sig = sigmoid(x);
-//         return sig * (1 - sig);
-// }
-
-// double softmax_den(double *x, int len)
-// {
-//         double val = 0;
-//         for (int i = 0; i < len; i++)
-//         {
-//                 val += exp(x[i]);
-//         }
-//         return val;
-// }
 
 /* ************************************************************ */
 /* Forward Pass */
@@ -206,7 +192,6 @@ void forward_pass(unsigned char img[][32])
                                         {
                                                 // Q8.0 * Q7.8
                                                 conv_layer[filter_dim][i][j] += int(img[i + k + 1][j + l - 2]) * conv_w_fp[filter_dim][k][l];
-                                                // std::cout << filter_dim * 28 * 28 + i * 28 + j << ":" << int(img[i + k + 1][j + l - 2]) << "*" << conv_w_fp[filter_dim][k][l] << "=" << int(img[i + k + 1][j + l - 2]) * conv_w_fp[filter_dim][k][l] << std::endl;
                                                 // Option 1: truncate immediatley
                                                 // conv_layer_fp[filter_dim][i][j] = conv_layer[filter_dim][i][j];
                                         }
@@ -217,8 +202,6 @@ void forward_pass(unsigned char img[][32])
                                 // Option 3: keep all bits
                                 sig_layer_fp[filter_dim][i][j] = sigmoid_test(conv_layer[filter_dim][i][j] + conv_b_fp[filter_dim][i][j]);
                                 // sig_layer_fp[filter_dim][i][j] = sigmoid_test(conv_layer_fp[filter_dim][i][j] + conv_b_fp[filter_dim][i][j]);
-                                // std::cout << filter_dim * 28 * 28 + i * 28 + j << ":" << conv_layer[filter_dim][i][j] + conv_b_fp[filter_dim][i][j] << std::endl;
-                                // std::cout << filter_dim * 28 * 28 + i * 28 + j << ":" << sig_layer_fp[filter_dim][i][j] / 256.0 << std::endl;
                         }
                 }
         }
@@ -300,7 +283,6 @@ void forward_pass(unsigned char img[][32])
                 dense_sum2_fp[i] = dense_sum2[i];
 
                 dense_sum2_fp[i] += dense_b2_fp[i];
-                // std::cout << i << ":" << dense_sum2_fp[i] / 256.0 << std::endl;
         }
 
         // // Softmax Output
