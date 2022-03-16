@@ -1,0 +1,57 @@
+
+Warning-[DBG_FLAG_DEP] Debug Option is being Deprecated
+  The '-fsdb' debug-related option is being deprecated and will no longer be 
+  supported in a future release.
+  Please recompile using the '-debug_access<+options>' switch and incremental 
+  options as required.  Recommended options are '-debug_access' for 
+  post-process debug, '-debug_access+classdbg' for testbench debug, and 
+  '-debug_access+all' for all debug capabilities.  Refer the VCS user guide 
+  for more granular options for debug control under the switch '-debug_access'
+  and refer to '-debug_region' for region control.
+
+*** Using c compiler gcc-4.4 instead of cc ...
+                         Chronologic VCS (TM)
+         Version L-2016.06_Full64 -- Tue Mar 15 22:05:36 2022
+               Copyright (c) 1991-2016 by Synopsys Inc.
+                         ALL RIGHTS RESERVED
+
+This program is proprietary and confidential information of Synopsys Inc.
+and may be used and disclosed only as authorized in a license agreement
+controlling such use and disclosure.
+
+The design hasn't changed and need not be recompiled. 
+If you really want to, delete file simv.daidir/.vcs.timestamp and
+run VCS again.
+
+
+Note-[RT_BS] Larger stack needed
+  Note: Bumping stack limit from 8192 to 8194 Kbytes.
+
+Chronologic VCS simulator copyright 1991-2016
+Contains Synopsys proprietary information.
+Compiler version L-2016.06_Full64; Runtime version L-2016.06_Full64;  Mar 15 22:05 2022
+
+Warning-[STASKW_RMIEAFL] Illegal entry
+dut/con_top.v, 208
+  Illegal entry found at file conv_b.txt line 1 while executing $readmem.
+  Please ensure that the file has proper entries.
+
+*Verdi3* Loading libsscore_vcs201606.so
+*Verdi3* : FSDB_GATE is set.
+*Verdi3* : FSDB_RTL is set.
+*Verdi3* : Enable Parallel Dumping.
+FSDB Dumper for VCS, Release Verdi3_L-2016.06-1, Linux x86_64/64bit, 07/10/2016
+(C) 1996 - 2016 by Synopsys, Inc.
+*Verdi3* FSDB WARNING: The FSDB file already exists. Overwriting the FSDB file may crash the programs that are using this file.
+*Verdi3* : Create FSDB file 'conv_top_tb.fsdb'
+*Verdi3* : Begin traversing the scopes, layer (0).
+*Verdi3* : End of traversing.
+*Verdi3* : Begin traversing the MDAs, layer (0).
+*Verdi3* : Enable +mda and +packedmda dumping.
+*Verdi3* : End of traversing the MDAs.
+$finish called from file "tb/conv_top_tb.sv", line 44.
+$finish at simulation time            200000000
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 200000000 ps
+CPU Time:      1.550 seconds;       Data structure size:   0.1Mb
+Tue Mar 15 22:05:37 2022

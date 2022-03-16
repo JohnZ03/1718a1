@@ -10,8 +10,10 @@ con_top dut(
     .ima(cif.ima),
     .ena_in(cif.ena_in),
     .frame_start_in(cif.frame_start_in),
+    .frame_start_dim_in(cif.frame_start_dim_in),
     .line_start_in(cif.line_start_in),
     .frame_end_in(cif.frame_end_in),
+    .frame_end_dim_in(cif.frame_end_dim_in),
     .frame_start_out(cif.frame_start_out),
     .frame_end_out(cif.frame_end_out),
     .line_start_out(cif.line_start_out),
@@ -45,24 +47,41 @@ con_top dut(
 
 
     task driver_one_pkt();
-        cif.frame_start_in <= 1'b0;
-        cif.frame_end_in   <= 1'b0;
+        cif.line_start_in = 1'b0;
+        cif.frame_start_in = 1'b0;
+        cif.frame_start_dim_in = 1'b0;
+        cif.frame_end_in   = 1'b0;
+        cif.frame_end_dim_in   = 1'b0;
         @(cif.cb);
         //generate a packet
-        cif.frame_start_in <= 1'b1;
-		@(cif.cb);
-        cif.ena_in <= 1'b1;
-        cif.frame_start_in <= 1'b0;
-        for(int i=0; i<35;  i=i+1) begin
-            for(int j=0; j<32;  j=j+1) begin
-		        cif.ima = i*32+j;
-                if(i==34&&j==31)
-                    cif.frame_end_in <=  1'b1;
-                @(cif.cb);
+        for(int u=0;u<5;u=u+1) begin
+            cif.line_start_in = 1'b1;
+            cif.frame_start_in = 1'b1;
+            if(u==0)
+                cif.frame_start_dim_in = 1'b1;
+		    @(cif.cb);
+            cif.ena_in = 1'b1;
+            cif.frame_start_in = 1'b0;
+            cif.frame_start_dim_in = 1'b0;
+            for(int i=0; i<35;  i=i+1) begin
+                for(int j=0; j<32;  j=j+1) begin
+                    cif.line_start_in = 1'b0;
+		            cif.ima = i*32+j;
+                    if(i<34 &&j==31)
+                        cif.line_start_in = 1'b1;
+                    if(i==34&&j==31) begin
+                        cif.frame_end_in =  1'b1;
+                        if(u==4)
+                            cif.frame_end_dim_in =  1'b1;
+                    end   
+                       
+                    @(cif.cb);
+                end
             end
+            cif.frame_end_in <=  1'b0;
+            cif.frame_end_dim_in <=  1'b0;
+            cif.ena_in <= 1'b0;
         end
-        cif.frame_end_in <=  1'b0;
-        cif.ena_in <= 1'b0;
     endtask
 
     initial begin
