@@ -318,8 +318,8 @@ void read_weights()
                         dense_w2_fp[i][j] = dense_w2[i][j] * pow(2, FRACBITS);
                 }
 
-        for (int i = 0; i < 120; i++)
-                for (int k = 0; k < 980; k++)
+        for (int k = 0; k < 980; k++)
+                for (int i = 0; i < 120; i++)
                 {
                         fin >> dense_w[k][i];
                         dense_w_fp[k][i] = dense_w[k][i] * pow(2, FRACBITS);
