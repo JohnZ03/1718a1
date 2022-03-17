@@ -144,7 +144,7 @@ reg signed [15:0]bias_r4;
         end
         endgenerate
 
-        always@(posedge clk negedge rst_n)
+        always@(posedge clk or negedge rst_n)
          if(!rst_n)
             out_r2[34*25-1:34*24] <= 0;
          else
