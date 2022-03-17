@@ -170,7 +170,6 @@ short sigmoid_test(int x)
 //         return 1 / (1 + exp(-x));
 // }
 
-
 /* ************************************************************ */
 /* Forward Pass */
 void forward_pass(unsigned char img[][32])
@@ -298,7 +297,10 @@ void read_weights()
 {
         std::ifstream fin("weights.txt");
         if (!fin)
-                std::cerr << "Unable to open file!";
+        {
+                std::cerr << "Unable to open weights!";
+                exit(1);
+        }
 
         for (int i = 0; i < 120; i++)
         {
@@ -331,7 +333,12 @@ void read_weights()
                         for (int j = 0; j < 7; j++)
                         {
                                 fin >> conv_w[i][k][j];
-                                conv_w_fp[i][k][j] = conv_w[i][k][j] * pow(2, FRACBITS_CONV_W);
+                                if (int(conv_w[i][k][j] * pow(2, FRACBITS) >= 32768))
+                                        conv_w_fp[i][k][j] = 32767;
+                                else if (int(conv_w[i][k][j] * pow(2, FRACBITS) < -32768))
+                                        conv_w_fp[i][k][j] = -32768;
+                                else
+                                        conv_w_fp[i][k][j] = conv_w[i][k][j] * pow(2, FRACBITS);
                         }
 
         for (int i = 0; i < 5; i++)
@@ -419,7 +426,8 @@ int main()
 {
         read_test_data();
         read_weights();
-        int val_len = 600;
+        // TODO: val_len = 600
+        int val_len = 86;
         int cor = 0;
         int confusion_mat[10][10];
         for (int i = 0; i < 10; i++)
@@ -453,5 +461,73 @@ int main()
                 std::cout << std::endl;
         }
 
+        cor = 0;
+        for (int i = 0; i < 10; i++)
+        {
+                for (int j = 0; j < 10; j++)
+                        confusion_mat[i][j] = 0;
+        }
+
+        std::ifstream fin("./forward_pass_top/res.txt");
+        if (!fin)
+        {
+                std::cerr << "Unable to open results!";
+                exit(1);
+        }
+        std::cout << "Testing hardware results." << std::endl;
+        int res[10] = {};
+        char sign = 1;
+        char bit;
+        for (int i = 0; i < val_len; i++)
+        {
+                for (int num = 9; num >= 0; num--) // result vector is in the order of 9 to 0, each 16 bits
+                {
+                        res[num] = 0;
+                        fin >> bit;
+                        sign = 1;
+                        if (bit == '1')
+                                sign = -1;
+
+                        for (int w = 14; w >= 0; w--)
+                        {
+                                fin >> bit;
+                                res[num] += pow(2, w) * (bit - '0');
+                        }
+                        if(sign == -1)
+                        {
+                                res[num] -= 32768; //according to 2's complement
+                        }
+                }
+
+                int max_val = res[0];
+                int max_pos = 0;
+                for (int i = 1; i < 10; i++)
+                {
+                        if (res[i] > max_val)
+                        {
+                                max_val = res[i];
+                                max_pos = i;
+                        }
+                }
+
+                int pre = max_pos;
+                confusion_mat[label_test[i]][pre]++;
+                if (pre == label_test[i])
+                        cor++;
+        }
+
+        accu = double(cor) / val_len;
+        std::cout << "Accuracy: " << accu << std::endl;
+
+        std::cout << "   0 1 2 3 4 5 6 7 8 9" << std::endl;
+        for (int i = 0; i < 10; i++)
+        {
+                std::cout << i << ": ";
+                for (int j = 0; j < 10; j++)
+                {
+                        std::cout << confusion_mat[i][j] << " ";
+                }
+                std::cout << std::endl;
+        }
         return 0;
 }
