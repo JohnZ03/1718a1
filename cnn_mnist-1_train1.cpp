@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <fstream>
+#include <cstdio>
 
 using namespace std;
 const int filter_size = 7;
@@ -621,18 +622,25 @@ void output_weights_formatted()
         fout << endl;
         fout.close();
 
-        fout.open("conv_w.txt");
-        if (!fout)
-                cerr << "Unable to open file!";
+        // fout.open("conv_w.txt");
+        // if (!fout)
+        // cerr << "Unable to open file!";
+        FILE *pFile;
+        int n;
+        char name[100];
+
+        pFile = fopen("conv_w.txt", "w");
         for (int i = 0; i < 5; i++)
         {
                 for (int k = 0; k < 7; k++)
                         for (int j = 0; j < 7; j++)
-                                fout << hex_to_bin(type_cast(conv_w[i][6-k][6-j]));
-                fout << endl;
+                                fprintf(pFile, "%04hx", int(conv_w[i][6 - k][6 - j] * 256));
+                fprintf(pFile, "\n");
+                // fout << endl;
         }
-        fout << endl;
-        fout.close();
+        fclose(pFile);
+        // fout << endl;
+        // fout.close();
 
         fout.open("conv_b.txt");
         if (!fout)
