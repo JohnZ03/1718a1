@@ -57,7 +57,7 @@ short dense_softmax_fp[10];
 
 /* ************************************************************ */
 /* Helper functions */
-short sigmoid_test0(int x)
+short sigmoid_test0(short x)
 {
         short y;
         if (x > short(-1 * pow(2, FRACBITS)) && x <= short(1 * pow(2, FRACBITS)))
@@ -120,7 +120,7 @@ short sigmoid_test0(int x)
         return y;
 }
 
-short sigmoid_test(int x)
+short sigmoid_test(short x)
 {
         short y;
         double x1 = x;
@@ -191,7 +191,7 @@ void forward_pass(unsigned char img[][32])
                                         for (int l = 0; l < filter_size; l++)
                                         {
                                                 // Q8.0 * Q7.8
-                                                conv_layer[filter_dim][i][j] += int(img[i + k + 1][j + l - 2]) * conv_w_fp[filter_dim][k][l];
+                                                conv_layer[filter_dim][i][j] += img[i + k + 1][j + l - 2] * conv_w_fp[filter_dim][k][l];
                                                 // Option 1: truncate immediatley
                                                 // conv_layer_fp[filter_dim][i][j] = conv_layer[filter_dim][i][j];
                                         }
@@ -200,8 +200,18 @@ void forward_pass(unsigned char img[][32])
                                 // conv_layer_fp[filter_dim][i][j] = conv_layer[filter_dim][i][j];
 
                                 // Option 3: keep all bits
-                                sig_layer_fp[filter_dim][i][j] = sigmoid_test(conv_layer[filter_dim][i][j] + conv_b_fp[filter_dim][i][j]);
-                                // sig_layer_fp[filter_dim][i][j] = sigmoid_test(conv_layer_fp[filter_dim][i][j] + conv_b_fp[filter_dim][i][j]);
+                                // sig_layer_fp[filter_dim][i][j] = sigmoid_test(conv_layer[filter_dim][i][j] + conv_b_fp[filter_dim][i][j]);
+
+                                // Option 4: set to maximum
+                                conv_layer_fp[filter_dim][i][j] += conv_b_fp[filter_dim][i][j];
+                                if (conv_layer[filter_dim][i][j] >= 32768)
+                                        conv_layer_fp[filter_dim][i][j] = 32767;
+                                else if (conv_layer[filter_dim][i][j] < -32768)
+                                        conv_layer_fp[filter_dim][i][j] = -32768;
+                                else
+                                        conv_layer_fp[filter_dim][i][j] = conv_layer[filter_dim][i][j];
+
+                                sig_layer_fp[filter_dim][i][j] = sigmoid_test(conv_layer_fp[filter_dim][i][j]);
                         }
                 }
         }
@@ -333,12 +343,12 @@ void read_weights()
                         for (int j = 0; j < 7; j++)
                         {
                                 fin >> conv_w[i][k][j];
-                                if (int(conv_w[i][k][j] * pow(2, FRACBITS) >= 32768))
-                                        conv_w_fp[i][k][j] = 32767;
-                                else if (int(conv_w[i][k][j] * pow(2, FRACBITS) < -32768))
-                                        conv_w_fp[i][k][j] = -32768;
-                                else
-                                        conv_w_fp[i][k][j] = conv_w[i][k][j] * pow(2, FRACBITS);
+                                // if (int(conv_w[i][k][j] * pow(2, FRACBITS) >= 32768))
+                                //         conv_w_fp[i][k][j] = 32767;
+                                // else if (int(conv_w[i][k][j] * pow(2, FRACBITS) < -32768))
+                                //         conv_w_fp[i][k][j] = -32768;
+                                // else
+                                conv_w_fp[i][k][j] = conv_w[i][k][j] * pow(2, FRACBITS);
                         }
 
         for (int i = 0; i < 5; i++)
@@ -426,8 +436,7 @@ int main()
 {
         read_test_data();
         read_weights();
-        // TODO: val_len = 600
-        int val_len = 86;
+        int val_len = 600;
         int cor = 0;
         int confusion_mat[10][10];
         for (int i = 0; i < 10; i++)
@@ -493,9 +502,9 @@ int main()
                                 fin >> bit;
                                 res[num] += pow(2, w) * (bit - '0');
                         }
-                        if(sign == -1)
+                        if (sign == -1)
                         {
-                                res[num] -= 32768; //according to 2's complement
+                                res[num] -= 32768; // according to 2's complement
                         }
                 }
 
