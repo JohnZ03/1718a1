@@ -191,19 +191,19 @@ void forward_pass(unsigned char img[][32])
                                         for (int l = 0; l < filter_size; l++)
                                         {
                                                 // Q8.0 * Q7.8
-                                                conv_layer[filter_dim][i][j] += img[i + k + 1][j + l - 2] * conv_w_fp[filter_dim][k][l];
-                                                // Option 1: truncate immediatley
+                                                conv_layer[filter_dim][i][j] += (int) img[i + k + 1][j + l - 2] * conv_w_fp[filter_dim][k][l];
+                                                // Option 1(wrong): truncate immediatley
                                                 // conv_layer_fp[filter_dim][i][j] = conv_layer[filter_dim][i][j];
                                         }
                                 }
-                                // Option 2: truncate after accumulation
+                                // Option 2(wrong): truncate after accumulation
                                 // conv_layer_fp[filter_dim][i][j] = conv_layer[filter_dim][i][j];
 
                                 // Option 3: keep all bits
                                 // sig_layer_fp[filter_dim][i][j] = sigmoid_test(conv_layer[filter_dim][i][j] + conv_b_fp[filter_dim][i][j]);
 
                                 // Option 4: set to maximum
-                                conv_layer_fp[filter_dim][i][j] += conv_b_fp[filter_dim][i][j];
+                                conv_layer[filter_dim][i][j] += conv_b_fp[filter_dim][i][j];
                                 if (conv_layer[filter_dim][i][j] >= 32768)
                                         conv_layer_fp[filter_dim][i][j] = 32767;
                                 else if (conv_layer[filter_dim][i][j] < -32768)
@@ -268,7 +268,7 @@ void forward_pass(unsigned char img[][32])
                 {
                         // Q7.8 * Q7.8
                         dense_sum[i] += (dense_w_fp[j][i] * dense_input_fp[j]) >> FRACBITS;
-                        // Option 1: truncate immediatley
+                        // Option 1(wrong): truncate immediatley
                         // dense_sum_fp[i] = dense_sum[i];
                 }
                 // Option 2: truncate after accumulation
