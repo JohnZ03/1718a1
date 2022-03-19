@@ -120,7 +120,7 @@ short sigmoid_test0(short x)
         return y;
 }
 
-short sigmoid_test(int x)
+short sigmoid_test(short x)
 {
         short y;
         double x1 = x;
@@ -175,8 +175,7 @@ short sigmoid_test(int x)
 void forward_pass(unsigned char img[][32])
 {
 
-        // long long conv_layer;
-        long long conv_layer_mid = 0;
+        // Convolution Operation + Sigmoid Activation
         for (int filter_dim = 0; filter_dim < 5; filter_dim++)
         {
                 for (int i = 0; i < 28; i++)
@@ -185,67 +184,37 @@ void forward_pass(unsigned char img[][32])
                         {
                                 max_pooling[filter_dim][i][j] = 0;
 
-                                conv_layer_mid = 0;
                                 conv_layer[filter_dim][i][j] = 0;
                                 sig_layer[filter_dim][i][j] = 0;
                                 for (int k = 0; k < filter_size; k++)
                                 {
                                         for (int l = 0; l < filter_size; l++)
                                         {
-                                                conv_layer_mid += (long long)(img[i + k + 1][j + l - 2] * 256) * (long long)conv_w_fp[filter_dim][k][l];
+                                                // Q8.0 * Q7.8
+                                                conv_layer[filter_dim][i][j] += (int)img[i + k + 1][j + l - 2] * conv_w_fp[filter_dim][k][l];
+                                                // Option 1(wrong): truncate immediatley
+                                                // conv_layer_fp[filter_dim][i][j] = conv_layer[filter_dim][i][j];
                                         }
                                 }
-                                conv_layer_mid += conv_b_fp[filter_dim][i][j] * 256;
-                                conv_layer[filter_dim][i][j] = floor((double)conv_layer_mid / 256);
-                                if (conv_layer[filter_dim][i][j] > 32767)
-                                        conv_layer[filter_dim][i][j] = 32767;
+                                // Option 2(wrong): truncate after accumulation
+                                // conv_layer_fp[filter_dim][i][j] = conv_layer[filter_dim][i][j];
+
+                                // Option 3: keep all bits
+                                // sig_layer_fp[filter_dim][i][j] = sigmoid_test(conv_layer[filter_dim][i][j] + conv_b_fp[filter_dim][i][j]);
+
+                                // Option 4: set to maximum
+                                conv_layer[filter_dim][i][j] += conv_b_fp[filter_dim][i][j];
+                                if (conv_layer[filter_dim][i][j] >= 32768)
+                                        conv_layer_fp[filter_dim][i][j] = 32767;
                                 else if (conv_layer[filter_dim][i][j] < -32768)
-                                        conv_layer[filter_dim][i][j] = -32768;
-                                sig_layer_fp[filter_dim][i][j] = sigmoid_test(conv_layer[filter_dim][i][j]);
+                                        conv_layer_fp[filter_dim][i][j] = -32768;
+                                else
+                                        conv_layer_fp[filter_dim][i][j] = conv_layer[filter_dim][i][j];
+
+                                sig_layer_fp[filter_dim][i][j] = sigmoid_test(conv_layer_fp[filter_dim][i][j]);
                         }
                 }
         }
-
-        // // Convolution Operation + Sigmoid Activation
-        // for (int filter_dim = 0; filter_dim < 5; filter_dim++)
-        // {
-        //         for (int i = 0; i < 28; i++)
-        //         {
-        //                 for (int j = 0; j < 28; j++)
-        //                 {
-        //                         max_pooling[filter_dim][i][j] = 0;
-
-        //                         conv_layer[filter_dim][i][j] = 0;
-        //                         sig_layer[filter_dim][i][j] = 0;
-        //                         for (int k = 0; k < filter_size; k++)
-        //                         {
-        //                                 for (int l = 0; l < filter_size; l++)
-        //                                 {
-        //                                         // Q8.0 * Q7.8
-        //                                         conv_layer[filter_dim][i][j] += (int)img[i + k + 1][j + l - 2] * conv_w_fp[filter_dim][k][l];
-        //                                         // Option 1(wrong): truncate immediatley
-        //                                         // conv_layer_fp[filter_dim][i][j] = conv_layer[filter_dim][i][j];
-        //                                 }
-        //                         }
-        //                         // Option 2(wrong): truncate after accumulation
-        //                         // conv_layer_fp[filter_dim][i][j] = conv_layer[filter_dim][i][j];
-
-        //                         // Option 3: keep all bits
-        //                         // sig_layer_fp[filter_dim][i][j] = sigmoid_test(conv_layer[filter_dim][i][j] + conv_b_fp[filter_dim][i][j]);
-
-        //                         // Option 4: set to maximum
-        //                         conv_layer[filter_dim][i][j] += conv_b_fp[filter_dim][i][j];
-        //                         if (conv_layer[filter_dim][i][j] >= 32768)
-        //                                 conv_layer_fp[filter_dim][i][j] = 32767;
-        //                         else if (conv_layer[filter_dim][i][j] < -32768)
-        //                                 conv_layer_fp[filter_dim][i][j] = -32768;
-        //                         else
-        //                                 conv_layer_fp[filter_dim][i][j] = conv_layer[filter_dim][i][j];
-
-        //                         sig_layer_fp[filter_dim][i][j] = sigmoid_test(conv_layer_fp[filter_dim][i][j]);
-        //                 }
-        //         }
-        // }
 
         // MAX Pooling (max_pooling, max_layer)
         int cur_max = 0;
@@ -374,11 +343,11 @@ void read_weights()
                         for (int j = 0; j < 7; j++)
                         {
                                 fin >> conv_w[i][k][j];
-                                // if (int(conv_w[i][k][j] * pow(2, FRACBITS) >= 32768))
-                                //         conv_w_fp[i][k][j] = 32767;
-                                // else if (int(conv_w[i][k][j] * pow(2, FRACBITS) < -32768))
-                                //         conv_w_fp[i][k][j] = -32768;
-                                // else
+                                if (int(conv_w[i][k][j] * pow(2, FRACBITS) >= 32768))
+                                        conv_w_fp[i][k][j] = 32767;
+                                else if (int(conv_w[i][k][j] * pow(2, FRACBITS) < -32768))
+                                        conv_w_fp[i][k][j] = -32768;
+                                else
                                 conv_w_fp[i][k][j] = conv_w[i][k][j] * pow(2, FRACBITS);
                         }
 
