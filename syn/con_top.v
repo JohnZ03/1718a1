@@ -209,7 +209,7 @@ con  con_inst(
  end
 
  initial begin
-     $readmemb("conv_w.txt", rom_conv_w);
+     $readmemh("conv_w.txt", rom_conv_w);
  end
 
 
