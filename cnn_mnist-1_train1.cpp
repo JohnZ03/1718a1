@@ -634,7 +634,12 @@ void output_weights_formatted()
         {
                 for (int k = 0; k < 7; k++)
                         for (int j = 0; j < 7; j++)
-                                fprintf(pFile, "%04hx", int(conv_w[i][6 - k][6 - j] * 256));
+                                if (int(conv_w[i][6 - k][6 - j] * 256 >= 32768))
+                                        fprintf(pFile, "7fff");
+                                else if (int(conv_w[i][k][j] * 256 < -32768))
+                                        fprintf(pFile, "8000");
+                                else
+                                        fprintf(pFile, "%04hx", int(conv_w[i][6 - k][6 - j] * 256));
                 fprintf(pFile, "\n");
                 // fout << endl;
         }
